@@ -22,9 +22,11 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: 2026-08-23
-ruleset_version: 1
+ruleset_version: 2
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "standard #2 cone · exact product unrecorded"
   grinder_burr: ode-gen2-stock
   water: not-recorded
   vessel: glass-315
@@ -102,7 +104,7 @@ target_temp_c: 5
 
 ## 규칙 평가
 
-- Ruleset: **v1**
+- Ruleset: **v2**
 - Hard constraints: **pass** — 기록 보존용 profile 값과 ice plan 구조는 유효함
 - Advisory review: **Research Hold** — `brew_ready: false`이므로 실행 레시피로 사용하지 않음
 - Rule exception: **없음**

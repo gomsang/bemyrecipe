@@ -365,6 +365,8 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
   const brewIceRule = RECIPE_RULES.ui.iceRoles.brewIce;
   const servingIceRule = RECIPE_RULES.ui.iceRoles.servingIce;
   const rinseRule = RECIPE_RULES.ui.filterRinse;
+  const showerSelectorValue = String(recipe.controlConditions?.shower_selector ?? "");
+  const showerSelectorRule = RECIPE_RULES.ui.showerSelector[showerSelectorValue as keyof typeof RECIPE_RULES.ui.showerSelector];
   // Firestore can briefly contain catalog documents created by an older schema.
   // Evaluate them in the browser instead of allowing one stale document to break the public catalog.
   const ruleEvaluation = recipe.ruleEvaluation ?? evaluateRecipeRules({
@@ -469,6 +471,13 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
 
       <section className="prep-program">
         <div className="detail-section-title"><span>PREPARATION</span><span>{recipe.preparation.steps.length} STEPS</span></div>
+        {showerSelectorRule ? (
+          <div className="rinse-note">
+            <span>PHYSICAL SHOWER SELECTOR</span>
+            <strong>{showerSelectorRule.label}</strong>
+            <p>{showerSelectorRule.description}</p>
+          </div>
+        ) : null}
         <div className="rinse-note">
           <span>FILTER RINSE</span>
           <strong>{recipe.preparation.filterRinse.enabled ? rinseRule.enabledLabel : rinseRule.disabledLabel}</strong>

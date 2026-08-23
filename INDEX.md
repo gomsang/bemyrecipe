@@ -12,7 +12,7 @@
 - Accepted recipe: 0
 - Candidate recipe: 3
 - 총 brew log: 0
-- Research Dossier: 2 (`sufficient-with-gaps` 2)
+- Research Dossier: 3 (`complete` 1, `sufficient-with-gaps` 2)
 
 ## 원두
 
@@ -49,11 +49,14 @@
 
 - [Harfusa · 315ml Flash brew · 2026-08-23](research/2026-08-23-harfusa.md) — Aiden/Ode/과학/전문가/커뮤니티/원두 조사 완료, intake complete, exact roaster·개인 열 보정값 gap
 - [Harfusa · 500ml Tumbler Flash brew · 2026-08-23](research/2026-08-23-harfusa-tumbler-500.md) — Aiden/Ode/과학/전문가/커뮤니티/원두/삼다수 조사, `sufficient-with-gaps`
+- [Aiden rinse · 외부 profile · shower selector · 2026-08-23](research/2026-08-23-aiden-rinse-profiles-shower-selector.md) — 동봉 필터 rinse 불필요, filter별 조건부 판정, 공개 washed Ethiopia profile 비교, selector match/mismatch 근거, `complete`
 
 ## 다음 교정 우선순위
 
-1. 315ml v2 첫 brew에서 carafe output, transfer 온도, drawdown, ice remaining 측정
+1. 315ml v2 첫 brew에서 exact filter, one-green-dot selector, carafe output, transfer 온도, drawdown, ice remaining 측정
 2. 315ml v2 추출 직후와 5분 후의 베르가못 clarity·백도 sweetness를 비교해 실제 우선순위 확인
-3. Ode Gen 2 calibration/seasoning 상태 기록
-4. 삼다수 alkalinity/KH 또는 TDS를 알게 되면 Profile 보강
-5. 첫 log를 근거로 primary variable 하나만 바꿀지 결정
+3. Filter가 Fellow 동봉 white paper라면 필요할 때 rinse/no-rinse 한 변수 paired test
+4. 공식 Single selector에서 dry edge/crater와 거친 맛이 반복될 때만 Batch selector A/B 검토
+5. Ode Gen 2 calibration/seasoning 상태 기록
+6. 삼다수 alkalinity/KH 또는 TDS를 알게 되면 Profile 보강
+7. 첫 log를 근거로 primary variable 하나만 바꿀지 결정

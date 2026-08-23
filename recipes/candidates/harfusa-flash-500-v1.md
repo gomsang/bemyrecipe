@@ -24,9 +24,11 @@ acceptance_note: null
 similar_recipes:
   - harfusa-flash-315-v1.md
 created: 2026-08-23
-ruleset_version: 1
+ruleset_version: 2
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "standard #2 cone · exact product unrecorded"
   grinder_burr: ode-gen2-stock
   water: samdasoo
   vessel: tumbler-500
@@ -61,6 +63,11 @@ prep_steps:
     phase: before_brew
     label: "필터 린싱"
     instruction: "Cone paper filter를 뜨거운 물로 충분히 적신다. Aiden 위에서 린싱했다면 carafe의 린스 물을 완전히 버리고 carafe를 비운다."
+    critical: true
+  - id: set_shower_selector
+    phase: before_brew
+    label: "Single basket / one green dot"
+    instruction: "Single Serve cone basket을 장착하고 뚜껑 안쪽 물리 shower selector를 한 개의 초록 점(Single)에 맞춘다. Profile의 pulse 설정과 별개의 수동 확인이다."
     critical: true
   - id: add_brew_ice
     phase: before_brew
@@ -126,7 +133,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 
 ## 규칙 평가
 
-- Ruleset: **v1**
+- Ruleset: **v2**
 - Hard constraints: **pass** — ICED/FLASH, split ice, rinse-water 폐기, ordered prep가 일치함
 - Advisory review: **없음**
 - Rule exception: **없음**
@@ -135,6 +142,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 ## Research Dossier
 
 - Dossier: [Harfusa · 500ml Tumbler Flash brew](../../research/2026-08-23-harfusa-tumbler-500.md)
+- 공통 기계 조사: [Aiden rinse · 외부 profile · shower selector](../../research/2026-08-23-aiden-rinse-profiles-shower-selector.md)
 - Research status: `sufficient-with-gaps`
 - 조사 시점: 2026-08-23
 - 핵심 충돌: 공식 Light 99°C와 더 낮은 declining profile, Ode 3–7대의 상충 보고, hot-water extraction과 ice remaining의 충돌
@@ -162,7 +170,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 | Brew ice · 150g | 추출 **전**, 빈 Aiden carafe | 뜨거운 추출액을 즉시 급랭하고 최종 농도를 만드는 recipe water | 상당 부분 녹는 것이 정상이며, 끝까지 남기기 위한 얼음이 아님 |
 | Serving ice · 80g | 추출 **후**, 이송 직전 500ml tumbler | 이미 차가워진 커피의 온도를 유지하고 음용 중 얼음을 남김 | carafe에 처음부터 합쳐 넣지 않고 fresh ice로 별도 계량 |
 
-Paper filter는 뜨거운 물로 린싱합니다. Fellow의 Aiden 레시피 안내처럼 기기 위에서 린싱했다면 carafe에 받은 물을 완전히 버린 뒤 brew ice를 넣습니다. 린스 물은 Aiden selected water 280ml나 얼음 230g에 포함하지 않습니다.
+Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린싱합니다. Aiden 동봉 필터는 제조사 지침상 rinse가 필수는 아니지만 exact filter가 아직 미기록이므로, 이번 version에서는 방식을 바꾸지 않습니다. 기기 위에서 린싱했다면 carafe에 받은 물을 완전히 버린 뒤 brew ice를 넣습니다. 린스 물은 Aiden selected water 280ml나 얼음 230g에 포함하지 않습니다.
 
 ## 준비
 
@@ -177,6 +185,8 @@ Paper filter는 뜨거운 물로 린싱합니다. Fellow의 Aiden 레시피 안�
 | 분쇄도 | Ode Gen 2 Stock Burr · **5⅓** |
 | 물 | 제주삼다수 |
 | Basket | Single Serve cone |
+| Shower selector | **One green dot / Single** |
+| Filter | Standard #2 cone · exact product 미기록 |
 
 중요: Aiden에는 scale이 없습니다. 명목 1:14 때문에 기기가 약 20g을 안내하더라도 **실제 투입량은 반드시 25.0g**으로 계량합니다.
 
@@ -215,6 +225,7 @@ Paper filter는 뜨거운 물로 린싱합니다. Fellow의 Aiden 레시피 안�
 - ✅ Intake gate complete
 - ✅ Research status `sufficient-with-gaps`; 각 주요 setting이 Dossier 근거/가설과 연결됨
 - ✅ 280ml: Single Serve cone 영역이며 공식 450ml cap 아래
+- ✅ 물리 shower selector: one green dot / Single — basket과 공식 기본 조합 일치
 - ✅ 92–95°C: 현재 알려진 Aiden hot-brew 범위 안
 - ✅ Pulse count 3과 pulse temperature 3개 일치
 - ⚠️ 실제 dose는 machine-assumed dose보다 25% 많음 — 화면 안내 대신 25.0g 사용
@@ -228,12 +239,13 @@ Paper filter는 뜨거운 물로 린싱합니다. Fellow의 Aiden 레시피 안�
 ## 실행 순서
 
 1. Single Serve cone filter를 장착하고 paper를 뜨거운 물로 충분히 헹굽니다. Aiden 위에서 린싱했다면 carafe의 물을 **완전히 버리고 carafe를 비웁니다.**
-2. 빈 Aiden carafe에 **brew ice 150g**을 넣고, carafe를 가볍게 흔들어 얼음을 고르게 펼칩니다. 이 얼음은 급랭과 희석을 담당합니다.
-3. 원두 **25.0g**을 Ode Gen 2 **5⅓**에 분쇄해 cone basket에 평평하게 담습니다.
-4. 위 profile과 **280ml**를 선택해 brew합니다. 기기 dose 안내가 20g 부근이어도 25g을 유지합니다.
-5. Drip finish 후 carafe를 **10–15초 부드럽게 swirl**해 층과 온도를 균일하게 합니다. Brew ice가 거의 녹는 것이 예상되며, 작은 조각이 남아도 정상입니다.
-6. 500ml tumbler에 **fresh serving ice 80g**을 새로 넣고 carafe의 커피를 전부 붓습니다. 이 얼음은 음용 중 차가움과 잔존 얼음을 담당합니다. 세게 젓지 말고 2–3회만 가볍게 섞습니다.
-7. 처음과 5분 후를 나누어 맛을 보고, 다 마실 때 얼음 잔존 여부를 기록합니다.
+2. Single Serve cone basket을 확인하고 물리 shower selector를 **한 개의 초록 점 / Single**에 맞춥니다.
+3. 빈 Aiden carafe에 **brew ice 150g**을 넣고, carafe를 가볍게 흔들어 얼음을 고르게 펼칩니다. 이 얼음은 급랭과 희석을 담당합니다.
+4. 원두 **25.0g**을 Ode Gen 2 **5⅓**에 분쇄해 cone basket에 평평하게 담습니다.
+5. 위 profile과 **280ml**를 선택해 brew합니다. 기기 dose 안내가 20g 부근이어도 25g을 유지합니다.
+6. Drip finish 후 carafe를 **10–15초 부드럽게 swirl**해 층과 온도를 균일하게 합니다. Brew ice가 거의 녹는 것이 예상되며, 작은 조각이 남아도 정상입니다.
+7. 500ml tumbler에 **fresh serving ice 80g**을 새로 넣고 carafe의 커피를 전부 붓습니다. 이 얼음은 음용 중 차가움과 잔존 얼음을 담당합니다. 세게 젓지 말고 2–3회만 가볍게 섞습니다.
+8. 처음과 5분 후를 나누어 맛을 보고, 다 마실 때 얼음 잔존 여부를 기록합니다.
 
 ## 이번 버전의 가설
 
@@ -251,11 +263,12 @@ Paper filter는 뜨거운 물로 린싱합니다. Fellow의 Aiden 레시피 안�
 | Bloom 1:3 · 45s · 95°C | 9일차 25g bed에 actual 1:2.4 wetting, 공식 Light 45초를 보수적으로 채택 | Fellow profiles + roast age | Medium |
 | 3 pulses · 28s | 공식 3×23초에서 high-dose/fines overflow 지침의 +5초 적용 | Fellow overflow guide | Medium |
 | 94→93→92°C | 99°C flat보다 낮되 concentrate 추출을 위해 지나치게 낮추지 않은 decline | Aiden 측정 리뷰 + UC Davis 제약 | Medium-Low |
-| Paper filter hot rinse | 종이 향을 줄이고 basket을 준비하되, 린스 물은 recipe water와 분리 | [Fellow Aiden recipe guidance](https://fellowproducts.com/blogs/brew-talks/fellows-take-on-brandywine-felloween-iv-brew-recipe) | High |
+| Paper filter hot rinse | Exact paper가 미기록이라 이 version의 통제조건으로 유지. Aiden 동봉 filter에는 필수가 아니며 carafe rinse water는 완전 폐기 | [Fellow filter FAQ](https://help.fellowproducts.com/hc/en-us/articles/24977666937115-Does-Aiden-pre-rinse-the-coffee-filter-automatically) + Aiden recipe guidance | Medium |
 
 ## 첫 brew에서 기록할 것
 
 - Recipe와 실제 dose/water/ice가 같았는지
+- Exact filter brand/white·brown 여부, 실제 rinse와 one-green-dot selector가 recipe와 같았는지
 - Brew 종료 후 `carafe 총 내용물 무게 − 처음 brew ice 150g`; 예상 hot beverage 약 230g
 - Carafe swirl 후 transfer 직전 온도와 텀블러 최종 적재 무게; 예상 약 460g
 - Drawdown: fast / normal / slow, basket standing water 여부

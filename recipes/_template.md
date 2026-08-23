@@ -21,9 +21,11 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: YYYY-MM-DD
-ruleset_version: 1
+ruleset_version: 2
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "brand-size-bleached-status"
   grinder_burr: "grinder-and-burr-id"
   water: "water-id"
   vessel: "serving-vessel-id"
@@ -58,6 +60,11 @@ prep_steps:
     phase: before_brew
     label: "필터 린싱"
     instruction: "Paper filter를 뜨거운 물로 충분히 적시고 린스 물을 완전히 버린다."
+    critical: true
+  - id: set_shower_selector
+    phase: before_brew
+    label: "Basket / shower selector"
+    instruction: "Single Serve cone basket을 확인하고 물리 selector를 한 개의 초록 점에 맞춘다."
     critical: true
   - id: add_brew_ice
     phase: before_brew
@@ -105,7 +112,7 @@ Research/Brew gate: **blocked / brew_ready: false**
 
 ## 규칙 평가
 
-- Ruleset: v1
+- Ruleset: v2
 - Hard constraints: pass / blocked
 - Advisory review:
 - 새 통제조건 또는 허용값:

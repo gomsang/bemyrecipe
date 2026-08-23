@@ -22,6 +22,8 @@
 - 최신 firmware와 변경사항
 - 현재 UI에서 쓸 수 있는 profile 변수와 범위
 - 선택한 물의 의미, basket/volume 영역, bloom와 pulse 동작
+- Filter rinse의 현재 공식 입장과 실제 filter paper identity
+- Basket, 물리 shower selector, profile의 Single/Batch pulse branch 구분
 - 공식 roast profile과 grinder starting point
 
 사용자의 현재 기기 UI가 공식 문서와 다르면 UI를 기록하고 우선합니다.
@@ -54,6 +56,8 @@
 - 적용 가능한 원칙
 - 현재 원두·basket·dose·drink style과 다른 점
 - 이해관계나 affiliate 여부
+
+Roaster/barista의 공개 Aiden profile을 참고하면 소개 페이지와 실제 share payload를 함께 확인합니다. Coffee의 origin·process·roast·rest, basket·volume·dose, grinder/burr·water·serve mode, profile 값, 결과 측정의 공개 여부를 정규화하고 `numeric anchor / directional evidence / hypothesis only` 중 하나로 분류합니다.
 
 ### E. Aiden 커뮤니티
 

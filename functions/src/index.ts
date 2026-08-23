@@ -11,7 +11,7 @@ import { FellowClient } from "./fellow-client.js";
 initializeApp();
 const db = getFirestore();
 const REGION = "asia-northeast3";
-const SUPPORTED_RECIPE_RULESET_VERSION = 1;
+const SUPPORTED_RECIPE_RULESET_VERSION = 2;
 const credentialKey = defineSecret("CREDENTIAL_ENCRYPTION_KEY");
 const tokenPepper = defineSecret("TOKEN_PEPPER");
 

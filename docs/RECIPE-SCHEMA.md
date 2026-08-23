@@ -39,9 +39,11 @@ revision:
 ## Ruleset과 통제조건
 
 ```yaml
-ruleset_version: 1
+ruleset_version: 2
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "Fellow Aiden #2 white"
   grinder_burr: ode-gen2-stock
   water: samdasoo
   vessel: tumbler-500
@@ -50,7 +52,7 @@ rule_exceptions: []
 rule_extension_requests: []
 ```
 
-`control_conditions`는 계산과 재현성에 영향을 주는 recipe별 조건입니다. 현재 ruleset에 없는 key나 허용값도 삭제하지 않습니다. Validator는 이를 hard error 대신 review로 분류하고 system-change proposal을 만듭니다.
+`control_conditions`는 계산과 재현성에 영향을 주는 recipe별 조건입니다. `basket`은 실제 basket, `shower_selector`는 뚜껑 안쪽의 물리 위치, `filter_paper`는 brand·size·bleached 상태입니다. 물리 selector는 profile의 Single Serve/Batch pulse 설정과 별개입니다. 현재 ruleset에 없는 key나 허용값도 삭제하지 않습니다. Validator는 이를 hard error 대신 review로 분류하고 system-change proposal을 만듭니다.
 
 새 조건이 더 나은 레시피에 필요하면 다음처럼 기록합니다.
 
@@ -90,7 +92,17 @@ filter_rinse:
   discard_rinse_water: true
 ```
 
-린스 물이 카라페에 남으면 계산하지 않은 물이 음료에 추가됩니다. Aiden에서 필터를 린싱했다면 카라페의 물을 완전히 버린 뒤 Brew ice를 넣습니다. 린싱하지 않는 레시피는 세 값을 `false`, `none`, `false`로 명시합니다.
+Rinse는 Aiden의 필수 cycle이 아닙니다. Fellow는 동봉 필터는 rinse가 필요 없다고 안내하며, unbleached/bamboo/냄새가 있는 filter는 rinse 후보입니다. Recipe는 `filter_paper`와 rinse 선택을 함께 고정합니다. 린스 물이 카라페에 남으면 계산하지 않은 물이 음료에 추가되므로, Aiden에서 필터를 린싱했다면 카라페의 물을 완전히 버린 뒤 Brew ice를 넣습니다. 린싱하지 않는 레시피는 세 값을 `false`, `none`, `false`로 명시합니다.
+
+## 물리 shower selector
+
+```yaml
+control_conditions:
+  basket: single_serve
+  shower_selector: single_serve # single_serve | batch
+```
+
+기본 조합은 Single Serve cone + one green dot, Batch basket + three blue dots입니다. 다른 조합은 금지하지 않지만 Ruleset `review`로 표시하고 selector만 바꾸는 A/B 근거를 남깁니다. `brew_ready: true`이면 `set_shower_selector` prep step이 필요합니다.
 
 ## 얼음 계획
 
@@ -133,11 +145,12 @@ prep_steps:
 배열 순서가 실제 실행 순서입니다. 다음 내용은 본문에만 두지 말고 step으로 기록합니다.
 
 1. 필터를 린싱하는지와 린스 물 폐기
-2. Brew ice의 중량·용기·투입 시점
-3. 실제 dose, 분쇄도, Aiden selected water
-4. Drip finish 확인과 추출 후 swirl
-5. Serving ice의 중량·용기·투입 시점
-6. 이송과 기록할 측정값
+2. 실제 basket과 물리 shower selector 위치
+3. Brew ice의 중량·용기·투입 시점
+4. 실제 dose, 분쇄도, Aiden selected water
+5. Drip finish 확인과 추출 후 swirl
+6. Serving ice의 중량·용기·투입 시점
+7. 이송과 기록할 측정값
 
 `brew_ready: true`이면 step이 하나 이상 있어야 합니다. 추출하면 안 되는 연구 보류 레시피는 `phase: hold` step으로 이유를 표시합니다.
 

@@ -72,7 +72,7 @@ Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의
 - **Brew ice**: 추출 전에 빈 카라페에 넣습니다. 뜨거운 추출액을 즉시 식히고 농도를 완성하며, 대부분 녹는 것이 정상입니다.
 - **Serving ice**: 추출이 끝난 뒤 음용 컵에 새로 넣습니다. 마시는 동안 차가움을 유지하고 얼음이 남도록 하는 몫입니다.
 
-필터 린싱, 린스 물 폐기, 얼음 투입, 분쇄·도징, 추출 후 swirl, 이송 순서는 `prep_steps`에 저장됩니다. UI의 **PREPARATION**은 이 값을 그대로 표시합니다. 상세 필드와 HOT/ICED 예시는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md)를 참고하십시오.
+필터 종류와 조건부 린싱, 린스 물 폐기, 물리 shower selector, 얼음 투입, 분쇄·도징, 추출 후 swirl, 이송 순서는 `prep_steps`와 `control_conditions`에 저장됩니다. UI의 **PREPARATION**은 이 값을 그대로 표시합니다. 상세 필드와 HOT/ICED 예시는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md)를 참고하십시오.
 
 ## Ruleset
 

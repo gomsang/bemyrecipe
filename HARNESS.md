@@ -180,6 +180,9 @@ estimatedIceRemainingG = max(0, BI + SI - iceNeededG)
 
 - 선택 brew water가 현재 기기 UI에서 가능한가
 - `≤450ml`면 Single Serve cone 영역, 그보다 크면 Batch 영역인지
+- 실제 basket과 물리 shower selector를 각각 기록했고, 공식 기본 조합이면 서로 일치하는가
+- 물리 shower selector와 profile의 Single Serve/Batch pulse 설정을 같은 값으로 오해하지 않았는가
+- filter paper의 brand·size·bleached 여부와 rinse 선택을 기록했는가
 - 모든 hot-brew 온도가 Aiden 공식 50–99°C 범위에 있는가
 - `pulseCount`와 pulse temperature 개수가 같은가
 - actual bloom이 베드를 충분히 적시는가; `1:2` 미만이면 강한 경고
@@ -187,6 +190,54 @@ estimatedIceRemainingG = max(0, BI + SI - iceNeededG)
 - 컵 headspace가 목표 이상인가
 - 아이스 목표인데 열수지상 얼음이 남을 가능성이 있는가
 - nominal ratio나 interval의 현재 UI 한계를 오래된 게시물만으로 단정하지 않았는가
+
+## 5.1 Filter rinse 판정
+
+Filter rinse는 Aiden 작동에 필요한 필수 cycle이 아닙니다. Fellow는 Aiden에 자동 pre-rinse가 없으며 **동봉 필터는 린스할 필요가 없다**고 안내합니다. 반면 일부 Fellow Drops 레시피는 paper filter 린스를 권장합니다. 이 둘은 모순된 기계 명령이 아니라, 동봉 필터의 필요성과 개별 레시피의 준비 선택을 각각 말한 것으로 해석합니다.
+
+Rinse의 주된 목적은 필터 고유의 냄새·먼지 제거와 종이 안착입니다. Aiden의 닫힌 brew chamber에서 manual dripper의 예열 논리를 그대로 필수화하지 않습니다. 특히 Flash brew에서는 린스 물이 남으면 계산하지 않은 희석이 생기므로 예열 이득보다 물수지 통제가 우선입니다.
+
+| Filter 조건 | 기본 판정 | 실행 |
+|---|---|---|
+| Fellow 동봉/공식 Aiden white filter, 냄새 없음 | Optional | 재현성을 위해 rinse 또는 no-rinse 중 하나를 recipe에 고정 |
+| 산소표백 white filter, water-only test에서 중립 | Optional | 생략 가능; brand가 바뀌면 재확인 |
+| Unbleached, bamboo, 장기 개봉, 보관 냄새, 물만 통과시켜도 종이 향 | Recommended | 뜨거운 물로 린스하고 물을 완전히 폐기 |
+| Brand·재질 미기록 | Unknown | baseline에서는 한 방식을 보수적으로 고정하되 `필수`라고 부르지 않고 filter 정보를 다음 intake/log에 보강 |
+
+Rinse를 하는 recipe는 다음을 지킵니다.
+
+- `filter_paper`와 `filter_rinse`를 함께 기록합니다.
+- 가능한 경우 rinse water source, 온도 범위, 대략적인 양을 prep 또는 log에 남깁니다.
+- Aiden 위에서 린스했다면 carafe를 완전히 비운 뒤 Brew ice를 계량합니다.
+- Rinse on/off 비교에서는 같은 filter lot와 같은 recipe를 쓰고, rinse만 primary variable로 바꿉니다.
+- 종이 향 차이가 불명확하면 water-only triangle test 또는 최소 2회의 blind paired brew로 확인합니다.
+
+## 5.2 Basket, 물리 shower selector, profile branch
+
+다음 세 값은 서로 다른 변수입니다.
+
+1. `basket`: 실제로 장착한 Single Serve cone 또는 Batch basket
+2. `shower_selector`: 뚜껑 안쪽의 물리 위치, 한 개의 초록 점 또는 세 개의 파란 점
+3. Profile branch: 선택 용량에서 실행되는 Single Serve pulses 또는 Batch pulses
+
+공식 기본값은 basket과 selector를 맞추는 것입니다.
+
+| Aiden selected water | Basket | 물리 shower selector | 기본 판정 |
+|---:|---|---|---|
+| `≤450ml` | `single_serve` | `single_serve` · one green dot | Default |
+| `>450ml` | `batch` | `batch` · three blue dots | Default |
+
+기기가 경고를 건너뛸 수 있거나 brew가 시작된다는 사실은 더 나은 추출의 증거가 아닙니다. Batch selector를 Single Serve cone과 쓰면 물 분포와 국소 agitation이 바뀌므로, 일부 coffee에서 중앙 crater나 과도한 교반을 줄일 가능성은 있지만 edge wetting·bypass·낮은 extraction을 만들 가능성도 있습니다. 현재 공개 자료에는 `Single basket + Batch selector`가 항상 우월하다는 통제 측정이 없습니다.
+
+Mismatch를 금지하지는 않습니다. 다만 다음 조건의 실험으로만 허용합니다.
+
+- `basket`과 `shower_selector`를 서로 다르게 기록하고 Ruleset은 `review`로 표시합니다.
+- Grind, dose, water, bloom, pulses, temperature, filter와 rinse를 고정하고 `shower_selector`만 바꿉니다.
+- 같은 recipe를 각 조건 최소 2회 반복하고 bed 사진, dry edge/중앙 crater, drawdown, final beverage, 가능하면 TDS/EY, taste를 기록합니다.
+- Bed 모양만으로 승패를 정하지 않고 cup quality와 반복성을 우선합니다.
+- 개인 log가 반복해 우위를 보이기 전에는 공식 match를 baseline으로 유지합니다.
+
+현재 Harfusa Candidate의 190ml와 280ml는 모두 Single Serve 영역이므로 기본 물리 설정은 **one green dot / Single**입니다.
 
 ## 6. 첫 레시피 설계 순서
 
@@ -216,11 +267,39 @@ Recipe마다 다음을 함께 기록합니다.
 
 Fellow가 현재 제시하는 숫자도 범용 출발점입니다. 반대로 유명 바리스타나 Reddit 사용자의 숫자도 보편적인 particle size가 아닙니다.
 
+## 6.2 외부 Aiden profile 비교와 전이
+
+유명 roaster, Fellow Drops, 바리스타 profile은 강한 참고자료이지만 source의 명성만으로 숫자를 이식하지 않습니다. 공개 profile을 참고할 때는 사람용 소개 페이지와 실제 share payload를 함께 확인하고 다음 조건을 표로 정규화합니다.
+
+- Coffee: origin, producer/station, variety, process, altitude, roast level, tasting notes, roast age
+- Machine: firmware 확인일, basket, selected water, hot/iced, 실제 dose와 nominal ratio
+- Profile: bloom ratio/time/temp, Single/Batch pulse count·interval·temperature
+- Environment: grinder와 burr, grind range, water, filter, rinse, vessel
+- Outcome: roaster 목표와 실제 사용자 측정/log; 결과가 없으면 `설정 공개`일 뿐 `우수성 검증`은 아님
+
+전이 수준은 다음처럼 구분합니다.
+
+| 수준 | 조건 | 사용할 수 있는 것 |
+|---|---|---|
+| Numeric anchor | Aiden 공개 payload가 있고 coffee·roast·process·basket·volume·burr가 매우 가까움 | 겹치는 범위의 출발점; actual dose/bloom은 다시 계산 |
+| Directional evidence | 일부 조건만 가깝거나 결과 측정이 없음 | high/low temperature, flat/declining, bloom/pulse의 방향성 |
+| Hypothesis only | Manual pour-over, 다른 brewer/burr, 조건 누락, community 재작성 | 다음 한 변수 실험 아이디어만 사용 |
+
+2026-08-23에 확인한 세 washed Ethiopia Aiden profile만 해도 nominal ratio `1:15–1:17`, bloom `1:3 · 35–60초`, Single Serve temperature `90–97°C`, flat/declining이 모두 존재합니다. 따라서 “washed Ethiopia 공식값” 하나를 만들지 않습니다. 대신 다음 패턴만 Harness에 남깁니다.
+
+- `1:3` nominal bloom은 유사 profile에서 반복되지만 실제 dose가 다르면 actual bloom ratio를 반드시 재계산합니다.
+- Single Serve 3 pulses가 흔하지만 coffee와 volume을 무시한 필수값은 아닙니다.
+- 더 큰 Single Serve volume일수록 같은 grinder 범위 안에서 굵은 쪽으로 이동하라는 Fellow 지침을 우선합니다.
+- Medium–Light washed Ethiopia의 declining profile은 harsh finish를 줄일 가설이 될 수 있지만, flat profile도 Light washed Ethiopia에서 사용되므로 roast와 실제 log가 결정합니다.
+- Manual pour-over의 swirl·pour 횟수는 Aiden pulse 숫자로 직접 번역하지 않습니다.
+
 ## 7. 시음 기록 원칙
 
 최소 기록:
 
 - 실제 투입량과 기기 설정이 recipe와 같았는가
+- 실제 filter paper와 rinse 여부가 recipe와 같았는가
+- 실제 basket과 물리 shower selector 위치가 recipe와 같았는가
 - 최종 beverage 무게
 - 가능하면 낙하 온도와 마시기 시작한 온도
 - drawdown: fast / normal / slow
@@ -246,6 +325,8 @@ Fellow가 현재 제시하는 숫자도 범용 출발점입니다. 반대로 유
 | 얼음이 남지 않음 | Serving ice | 컵 여유가 있을 때만 증가 |
 | 얼음이 남지 않고 컵도 타이트함 | Brew water | 새 ratio/bloom과 함께 재계산 |
 | 향이 좋으나 반복 재현 안 됨 | 변경 없음 | 같은 recipe 한 번 더 |
+| Bed crater만 보이고 맛·drawdown은 정상 | 변경 없음 | 사진만 남기고 같은 recipe 반복 |
+| 같은 위치의 dry edge/crater와 거친 맛이 반복됨 | Shower selector | 다른 변수 고정 후 match/mismatch A/B |
 
 분쇄도 표기는 grinder calibration에 종속됩니다. `4⅓` 같은 숫자만 쓰지 말고 이전 버전 대비 `굵게 1클릭`처럼 변화량도 기록합니다.
 
@@ -262,6 +343,8 @@ Primary variable 예시:
 - bloom ratio 또는 time 또는 temperature
 - pulse count 또는 interval
 - 특정 pulse temperature
+- filter rinse on/off — 같은 filter lot를 유지
+- 물리 shower selector — basket과 profile은 유지
 
 하나를 바꾸면서 자동으로 다시 계산되는 machine-assumed dose, actual ratio, bloom water, headspace는 dependent value이므로 추가 변경으로 세지 않습니다.
 

@@ -1,5 +1,5 @@
 export const RECIPE_RULES = {
-  version: 1,
+  version: 2,
   ui: {
     serveModes: {
       hot: {
@@ -51,8 +51,18 @@ export const RECIPE_RULES = {
     filterRinse: {
       enabledLabel: "HOT WATER / DISCARD",
       disabledLabel: "NO RINSE",
-      enabledDescription: "Paper filter를 적신 뒤 카라페의 린스 물을 완전히 버립니다. 그 다음 Brew ice를 넣어야 계산한 농도가 유지됩니다.",
-      disabledDescription: "이 레시피는 필터 린싱을 하지 않습니다. 준비 과정에서 별도의 물을 더하지 않습니다.",
+      enabledDescription: "이 레시피에서는 필터 종류와 재현성을 통제하기 위해 린싱합니다. 카라페의 린스 물을 완전히 버린 뒤 Brew ice를 넣어야 계산한 농도가 유지됩니다.",
+      disabledDescription: "이 레시피는 필터 린싱을 생략합니다. Aiden 동봉 필터처럼 제조사가 린스 불필요를 밝힌 종이는 그대로 사용할 수 있으며, 필터가 바뀌면 다시 확인합니다.",
+    },
+    showerSelector: {
+      single_serve: {
+        label: "ONE GREEN DOT / SINGLE",
+        description: "Single Serve cone basket에 맞춘 물리 showerhead 위치입니다. 프로필의 pulse 설정과는 별개의 수동 설정입니다.",
+      },
+      batch: {
+        label: "THREE BLUE DOTS / BATCH",
+        description: "Batch basket에 맞춘 물리 showerhead 위치입니다. Single Serve basket에서 쓸 때는 공식 기본값이 아니라 통제 실험으로 기록합니다.",
+      },
     },
     ruleStatus: {
       pass: { label: "RULES PASS", description: "현재 ruleset의 기계 한계와 실행 조건을 통과했습니다." },
@@ -74,6 +84,19 @@ export const RECIPE_RULES = {
       values: ["single_serve", "batch"],
       required: "all",
       description: "Aiden에서 실제로 사용하는 basket",
+    },
+    shower_selector: {
+      label: "Shower selector",
+      type: "enum",
+      values: ["single_serve", "batch"],
+      required: "all",
+      description: "추출 직전에 맞추는 물리 showerhead 위치. profile의 Single/Batch pulse branch와 다름",
+    },
+    filter_paper: {
+      label: "Filter paper",
+      type: "string",
+      required: "all",
+      description: "필터 brand·size와 bleached/unbleached 여부. 린스 필요성의 판정 기준",
     },
     grinder_burr: {
       label: "Grinder / burr",
@@ -277,6 +300,7 @@ export function evaluateRecipeRules(input: RecipeRuleInput): RuleEvaluation {
   if (input.brewReady) {
     if (!plan.steps.length) hard("prep.required", "brew_ready recipe에는 prep_steps가 필요합니다.");
     if (plan.filterRinse.enabled && !seenStepIds.has("rinse_filter")) hard("prep.rinse.required", "린싱하는 brew-ready recipe에는 rinse_filter step이 필요합니다.");
+    if (input.controlConditions.shower_selector && !seenStepIds.has("set_shower_selector")) hard("prep.shower_selector.required", "shower_selector를 기록한 brew-ready recipe에는 set_shower_selector step이 필요합니다.");
     if (brewIce.grams > 0 && !seenStepIds.has("add_brew_ice")) hard("prep.brew_ice.required", "Brew ice가 있으면 add_brew_ice step이 필요합니다.");
     if (servingIce.grams > 0 && !seenStepIds.has("add_serving_ice")) hard("prep.serving_ice.required", "Serving ice가 있으면 add_serving_ice step이 필요합니다.");
     if (plan.steps.some((step) => step.phase === "hold")) hard("prep.hold.forbidden", "brew_ready recipe에는 hold step을 둘 수 없습니다.");
@@ -344,6 +368,14 @@ function evaluateControlConditions(
       advisory(`control.${key}.value`, `${definition.label} 값 ${String(value)}는 현재 허용 목록에 없습니다.`);
       propose(key, `${definition.label} 허용값 확장 검토`, "새로운 실제 조건이 기존 enum에 포함되지 않습니다.");
     }
+  }
+  const basket = input.controlConditions.basket;
+  const showerSelector = input.controlConditions.shower_selector;
+  if (basket && showerSelector && basket !== showerSelector) {
+    advisory(
+      "control.shower_selector.mismatch",
+      `Basket ${String(basket)}와 shower selector ${String(showerSelector)}가 다릅니다. 공식 기본 조합이 아니므로 한 변수 A/B 실험과 brew log 근거를 남기세요.`,
+    );
   }
 }
 

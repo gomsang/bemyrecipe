@@ -36,9 +36,11 @@ Hard constraint는 `rule_exceptions`로 우회할 수 없다.
 ## Markdown 계약
 
 ```yaml
-ruleset_version: 1
+ruleset_version: 2
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "Fellow Aiden #2 white"
   grinder_burr: ode-gen2-stock
   water: samdasoo
   vessel: tumbler-500
@@ -52,6 +54,8 @@ rule_extension_requests: []
 ```yaml
 control_conditions:
   basket: single_serve
+  shower_selector: single_serve
+  filter_paper: "Fellow Aiden #2 white"
   ice_shape: large-clear-cube
 rule_extension_requests:
   - condition: ice_shape
