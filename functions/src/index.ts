@@ -224,7 +224,16 @@ async function authenticateToken(authorization: string | undefined) {
 }
 
 export const syncCatalog = onRequest(
-  { region: REGION, secrets: [credentialKey, tokenPepper], timeoutSeconds: 120, memory: "512MiB", cors: false },
+  {
+    region: REGION,
+    secrets: [credentialKey, tokenPepper],
+    timeoutSeconds: 120,
+    memory: "512MiB",
+    cors: false,
+    // Codex and local clients reach this endpoint without Google IAM credentials.
+    // Application-level writes still require a revocable bmr_live token below.
+    invoker: "public",
+  },
   async (request, response) => {
     response.set("access-control-allow-origin", "*");
     response.set("access-control-allow-headers", "authorization, content-type");
