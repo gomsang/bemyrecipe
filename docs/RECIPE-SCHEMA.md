@@ -78,7 +78,7 @@ drink_guide:
 - Bean 파일: `beans/<roaster-code>-<origin>-<producer-or-lot>.md`
 - Lineage: `<roaster-code>-<bean-lot>-<style>-<cup>`처럼 소문자 roaster code로 시작
 - 웹 레시피 제목: `<ROASTER_CODE> · <coffee> · <style> · v<number>`
-- Aiden `profile_name`: `<ROASTER_CODE> <coffee> <style> <cup> v<number>`; 서버가 앞에 `[C]` 또는 `[A]`를 추가
+- Aiden `profile_name`: `<ROASTER_CODE> <coffee> <style> <cup> v<number>`; 서버가 앞에 `C.` 또는 `A.`를 추가
 
 로스터가 뒤늦게 확인되면 `UNK`를 유지한 채 새 version을 만드는 것이 아니라 bean id, lineage, 제목과 profile name을 실제 코드로 정정합니다. 이미 brew log가 존재한다면 링크도 함께 옮겨 계보가 갈라지지 않게 합니다.
 
@@ -119,8 +119,9 @@ revision:
 ## Ruleset과 통제조건
 
 ```yaml
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "Fellow Aiden #2 white"
@@ -132,7 +133,7 @@ rule_exceptions: []
 rule_extension_requests: []
 ```
 
-`control_conditions`는 계산과 재현성에 영향을 주는 recipe별 조건입니다. `basket`은 실제 basket, `shower_selector`는 뚜껑 안쪽의 물리 위치, `filter_paper`는 brand·size·bleached 상태입니다. 물리 selector는 profile의 Single Serve/Batch pulse 설정과 별개입니다. 현재 ruleset에 없는 key나 허용값도 삭제하지 않습니다. Validator는 이를 hard error 대신 review로 분류하고 system-change proposal을 만듭니다.
+`control_conditions`는 계산과 재현성에 영향을 주는 recipe별 조건입니다. `aiden_quantity_mode`는 물양 선택 간격, `basket`은 실제 basket, `shower_selector`는 뚜껑 안쪽의 물리 위치, `filter_paper`는 brand·size·bleached 상태입니다. 물리 selector는 profile의 Single Serve/Batch pulse 설정과 별개입니다. 현재 ruleset에 없는 key나 허용값도 삭제하지 않습니다. Validator는 이를 hard error 대신 review로 분류하고 system-change proposal을 만듭니다.
 
 새 조건이 더 나은 레시피에 필요하면 다음처럼 기록합니다.
 
@@ -164,6 +165,29 @@ brew_method: flash     # standard | flash | cold_drip
 `iced`는 Aiden의 Cold Brew 스위치를 뜻하지 않습니다. Flash brew는 `serve_mode: iced`, `brew_method: flash`, `cold_brew_enabled: false`입니다.
 
 Flash recipe는 `retention_factor`, `drop_temp_c`, `target_temp_c`와 함께 컵별 최소 여유인 `minimum_headspace_ml`을 기록합니다. Validator는 0°C 상변화 모델로 `drop_temp_c`와 5°C 높은 stress 조건을 계산합니다. `ice_goal: remain_while_drinking`이면 두 조건 모두 잔존 얼음 10g 이상이어야 하고, 고체 얼음의 부피까지 포함한 headspace가 `minimum_headspace_ml` 이상이어야 합니다.
+
+## Aiden 물양 선택 모드
+
+`brew_water_g`는 기기가 실제로 고를 수 있는 값이어야 하며, 같은 숫자라도 단위 모드가 다르면 선택 가능 여부가 달라집니다.
+
+```yaml
+brew_water_g: 190
+control_conditions:
+  aiden_quantity_mode: metric_precise
+prep_steps:
+  - id: set_quantity_mode
+    phase: before_brew
+    label: "Precise Units 설정"
+    instruction: "Settings → Units → Precise Units를 켜고 190ml를 선택한다."
+    critical: true
+```
+
+| 모드 | 확인된 선택 간격 | 용도 |
+|---|---|---|
+| `standard_cup` | 150ml부터 75ml 간격 | 기기의 cup/half-cup 표시. 150 → 225 → 300ml |
+| `metric_precise` | Single 150–450ml는 10ml 간격, Batch 500–1500ml는 50ml 간격 | 180·190·280ml처럼 정밀한 물양 |
+
+`metric_precise`를 쓰려면 Aiden에서 `Settings → Units → Precise Units`를 켭니다. `brew_ready: true`에는 `set_quantity_mode` prep step이 필요합니다. Validator는 mode별 간격과 `≤450ml` Single Serve / `≥500ml` Batch basket 경계를 함께 검사합니다. 451–499ml는 현재 확인된 선택 목록에서 제외합니다. 이 간격은 공식 문서가 전부 열거한 값이 아니라 현재 기기·현행 firmware 실기 자료로 확인한 동작이므로 firmware가 바뀌면 다시 검증합니다.
 
 ## 필터 린싱
 
@@ -242,7 +266,7 @@ prep_steps:
 
 | 필드 | 허용값 |
 |---|---|
-| `profile_name` | 1–50자 영문·숫자·허용 문장부호. 기기 저장 시 시스템이 선두 `[C] ` 또는 `[A] `를 붙일 수 있음 |
+| `profile_name` | 1–50자 영문·숫자·허용 문장부호. 기기 저장 시 시스템이 선두 `C. ` 또는 `A. `를 붙일 수 있음 |
 | `profile_temperature_c` | 50–99°C, 0.5°C 단위 |
 | `nominal_ratio` | 14–20, 0.5 단위 |
 | `bloom_ratio` | 1–3, 0.5 단위 |
@@ -254,4 +278,4 @@ prep_steps:
 
 Fellow 앱이나 firmware에서 값이 바뀌면 공식 문서와 실제 UI를 다시 확인한 뒤 `shared/aiden-profile.ts`와 Functions validator를 함께 수정합니다.
 
-Markdown의 `profile_name`에는 상태 접두사를 직접 넣지 않습니다. 사이트와 동기화 서버가 Candidate를 `[C]`, Accepted를 `[A]`로 변환하며, 기존 `[C]`/`[A]`가 있으면 교체해 중복 접두사를 만들지 않습니다. 접두사를 포함한 최종 이름도 50자를 넘지 않습니다.
+Markdown의 `profile_name`에는 상태 접두사를 직접 넣지 않습니다. 사이트와 동기화 서버가 Candidate를 `C.`, Accepted를 `A.`로 변환합니다. Aiden 표시에서 대괄호가 누락되는 현상을 피하기 위해 기본 ASCII 마침표를 사용합니다. 기존 `[C]`/`[A]` 또는 `C-`/`A-` 이름도 찾아 같은 사용자 profile을 새 이름으로 갱신하며, 중복 profile을 만들지 않습니다. 접두사를 포함한 최종 이름도 50자를 넘지 않습니다.

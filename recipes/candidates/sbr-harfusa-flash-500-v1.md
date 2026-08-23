@@ -24,8 +24,9 @@ acceptance_note: null
 similar_recipes:
   - sbr-harfusa-flash-315-v1.md
 created: 2026-08-23
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "standard #2 cone · exact product unrecorded"
@@ -91,6 +92,11 @@ ice_plan:
     timing: before_transfer
     purpose: keep_cold
 prep_steps:
+  - id: set_quantity_mode
+    phase: before_brew
+    label: "Precise Units 설정"
+    instruction: "Aiden에서 Settings → Units → Precise Units를 켠다. 물양 선택 화면이 10ml씩 움직이는지 확인한 뒤 280ml를 고른다."
+    critical: true
   - id: rinse_filter
     phase: before_brew
     label: "필터 린싱"
@@ -166,7 +172,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 
 ## 규칙 평가
 
-- Ruleset: **v3**
+- Ruleset: **v4**
 - Hard constraints: **pass** — ICED/FLASH, split ice, rinse-water 폐기, ordered prep가 일치함
 - Advisory review: **없음**
 - Rule exception: **없음**
@@ -211,6 +217,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 |---|---:|
 | 실제 원두 | **25.0g** |
 | Aiden brew water | **280ml** |
+| Aiden 물양 모드 | **Precise Metric · Single 10ml 간격** |
 | Brew ice · carafe | **150g** |
 | Serving ice · tumbler | **80g** |
 | 컵 | 500ml tumbler |

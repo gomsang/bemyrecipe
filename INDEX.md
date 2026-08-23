@@ -12,7 +12,7 @@
 - Accepted recipe: 0
 - Candidate recipe: 4
 - 총 brew log: 0
-- Research Dossier: 3 (`complete` 1, `sufficient-with-gaps` 2)
+- Research Dossier: 4 (`complete` 2, `sufficient-with-gaps` 2)
 
 ## 원두
 
@@ -28,13 +28,13 @@
 |---|---|---|---|---|
 | [v1](recipes/candidates/sbr-harfusa-flash-315-v1.md) | Candidate · Research Hold | Legacy provisional: 20g · 225ml · 96→95→94°C | `brew_ready: false`; intake blocked | 없음 |
 | [v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) | Candidate · Research Hold | 17g · 190ml · brew ice 110g · serving ice 20g · Ode 5⅓ · 94→92°C | 상변화 계산 교정에서 70°C 잔존 얼음 0g; 추출 금지 | 없음 |
-| [v3](recipes/candidates/sbr-harfusa-flash-315-v3.md) | Candidate | 16g · 180ml · brew ice 120g · serving ice 22g · Ode 5⅓ · 94→92°C | `brew_ready: true`; 70°C stress 잔존 얼음 12.1g | 없음 |
+| [v3](recipes/candidates/sbr-harfusa-flash-315-v3.md) | Candidate | 16g · 180ml · brew ice 120g · serving ice 22g · Ode 5⅓ · 94→92°C | `brew_ready: true`; Precise Units 필요; 70°C stress 잔존 얼음 12.1g | 없음 |
 
 ### SBR · Harfusa · Flash brew · 500ml Tumbler
 
 | Version | 상태 | 핵심 설정 | 검증 상태 | 로그 |
 |---|---|---|---|---|
-| [v1](recipes/candidates/sbr-harfusa-flash-500-v1.md) | Candidate | 25g · 280ml · brew ice 150g · serving ice 80g · Ode 5⅓ · 95→92°C | `brew_ready: true`; 미추출 | 없음 |
+| [v1](recipes/candidates/sbr-harfusa-flash-500-v1.md) | Candidate | 25g · 280ml · brew ice 150g · serving ice 80g · Ode 5⅓ · 95→92°C | `brew_ready: true`; Precise Units 필요; 미추출 | 없음 |
 
 ## Accepted Recipes
 
@@ -52,13 +52,15 @@
 - [SBR · Harfusa · 315ml Flash brew · 2026-08-23](research/2026-08-23-harfusa.md) — Aiden/Ode/과학/전문가/커뮤니티/원두 조사 완료, intake complete, roast development·개인 열 보정값 gap
 - [SBR · Harfusa · 500ml Tumbler Flash brew · 2026-08-23](research/2026-08-23-harfusa-tumbler-500.md) — Aiden/Ode/과학/전문가/커뮤니티/원두/삼다수 조사, `sufficient-with-gaps`
 - [Aiden rinse · 외부 profile · shower selector · 2026-08-23](research/2026-08-23-aiden-rinse-profiles-shower-selector.md) — 동봉 필터 rinse 불필요, filter별 조건부 판정, 공개 washed Ethiopia profile 비교, selector match/mismatch 근거, `complete`
+- [Aiden 물양 선택 간격 · profile 이름 · 2026-08-24](research/2026-08-24-aiden-water-selector-profile-name.md) — standard cup/Precise Units 간격, basket 경계, `C.`/`A.` 접두사와 legacy migration, `complete`
 
 ## 다음 교정 우선순위
 
-1. 315ml v3 첫 brew에서 exact filter, one-green-dot selector, carafe output, transfer 온도, drawdown, ice remaining 측정
-2. 315ml v3 추출 직후와 5분 후의 베르가못 clarity·백도 sweetness를 비교해 실제 우선순위 확인
-3. Filter가 Fellow 동봉 white paper라면 필요할 때 rinse/no-rinse 한 변수 paired test
-4. 공식 Single selector에서 dry edge/crater와 거친 맛이 반복될 때만 Batch selector A/B 검토
-5. Ode Gen 2 calibration/seasoning 상태 기록
-6. 삼다수 alkalinity/KH 또는 TDS를 알게 되면 Profile 보강
-7. 첫 log를 근거로 primary variable 하나만 바꿀지 결정
+1. Aiden의 Precise Units를 켜고 180·190·280ml가 10ml 간격으로 표시되는지 확인
+2. 315ml v3 첫 brew에서 exact filter, one-green-dot selector, carafe output, transfer 온도, drawdown, ice remaining 측정
+3. 315ml v3 추출 직후와 5분 후의 베르가못 clarity·백도 sweetness를 비교해 실제 우선순위 확인
+4. Filter가 Fellow 동봉 white paper라면 필요할 때 rinse/no-rinse 한 변수 paired test
+5. 공식 Single selector에서 dry edge/crater와 거친 맛이 반복될 때만 Batch selector A/B 검토
+6. Ode Gen 2 calibration/seasoning 상태 기록
+7. 삼다수 alkalinity/KH 또는 TDS를 알게 되면 Profile 보강
+8. 첫 log를 근거로 primary variable 하나만 바꿀지 결정

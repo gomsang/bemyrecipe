@@ -22,8 +22,9 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: 2026-08-23
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: standard_cup
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "standard #2 cone · exact product unrecorded"
@@ -132,7 +133,7 @@ minimum_headspace_ml: 20
 
 ## 규칙 평가
 
-- Ruleset: **v3**
+- Ruleset: **v4**
 - Hard constraints: **pass** — 기록 보존용 profile 값과 ice plan 구조는 유효함
 - Advisory review: **Research Hold** — `brew_ready: false`이므로 실행 레시피로 사용하지 않음
 - Rule exception: **없음**

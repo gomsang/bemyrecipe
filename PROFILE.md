@@ -1,6 +1,6 @@
 # Personal Brew Profile
 
-마지막 갱신: 2026-08-23
+마지막 갱신: 2026-08-24
 
 ## 음용 취향
 
@@ -17,6 +17,8 @@
 - Burr: Stock Gen 2 Brew Burrs
 - Grinder calibration: 미기록 — 다른 사용자의 숫자는 참고값으로만 사용
 - Aiden firmware: 1.5.9로 마지막 확인(2026-08-23); 현재 기기 UI가 최종 기준
+- Aiden water units: `metric_precise` 사용 — 사용자가 2026-08-24에 Precise Units 활성화 결정
+- 기본 cup 표시에서는 150ml 다음이 225ml이며, 정밀 물양 레시피는 `Settings → Units → Precise Units`를 전제로 함
 
 ## 음용 컵
 

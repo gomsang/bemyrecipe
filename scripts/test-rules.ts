@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
+import { validateAidenWaterSelection as validateServerWater } from "../functions/src/aiden-water";
 import { evaluateRecipeRules, type RecipeRuleInput } from "../shared/recipe-rules";
 
 const base: RecipeRuleInput = {
-  recipeRulesetVersion: 3,
+  recipeRulesetVersion: 4,
   serveMode: "iced",
   brewMethod: "flash",
   brewReady: true,
   coldBrewEnabled: false,
+  selectedWaterMl: 280,
   controlConditions: {
+    aiden_quantity_mode: "metric_precise",
     basket: "single_serve",
     shower_selector: "single_serve",
     filter_paper: "fellow-aiden-single-white",
@@ -26,6 +29,7 @@ const base: RecipeRuleInput = {
       servingIce: { grams: 80, vessel: "tumbler-500", timing: "before_transfer", purpose: "keep_cold" },
     },
     steps: [
+      { id: "set_quantity_mode", phase: "before_brew", label: "Precise Units", instruction: "10ml 단위를 확인한다.", critical: true },
       { id: "rinse_filter", phase: "before_brew", label: "필터 린싱", instruction: "린스 물을 버린다.", critical: true },
       { id: "set_shower_selector", phase: "before_brew", label: "Shower selector", instruction: "한 개의 초록 점에 맞춘다.", critical: true },
       { id: "add_brew_ice", phase: "before_brew", label: "Brew ice", instruction: "카라페에 넣는다.", critical: true },
@@ -37,6 +41,27 @@ const base: RecipeRuleInput = {
 const pass = evaluateRecipeRules(base);
 assert.equal(pass.status, "pass");
 assert.equal(pass.errors.length, 0);
+
+const unsupportedPreciseWater = evaluateRecipeRules({ ...base, selectedWaterMl: 285 });
+assert.equal(unsupportedPreciseWater.status, "blocked");
+assert(unsupportedPreciseWater.errors.some((item) => item.ruleId === "water.selection.invalid"));
+
+const standardCupWater = evaluateRecipeRules({
+  ...base,
+  selectedWaterMl: 225,
+  controlConditions: { ...base.controlConditions, aiden_quantity_mode: "standard_cup" },
+});
+assert.equal(standardCupWater.status, "pass");
+
+const impossibleStandardWater = evaluateRecipeRules({
+  ...base,
+  selectedWaterMl: 190,
+  controlConditions: { ...base.controlConditions, aiden_quantity_mode: "standard_cup" },
+});
+assert.equal(impossibleStandardWater.status, "blocked");
+assert(impossibleStandardWater.errors.some((item) => item.ruleId === "water.selection.invalid"));
+assert.doesNotThrow(() => validateServerWater({ selectedWaterMl: 190, quantityMode: "metric_precise", basket: "single_serve" }));
+assert.throws(() => validateServerWater({ selectedWaterMl: 190, quantityMode: "standard_cup", basket: "single_serve" }));
 
 const impossibleHot = evaluateRecipeRules({ ...base, serveMode: "hot", brewMethod: "standard" });
 assert.equal(impossibleHot.status, "blocked");
@@ -70,7 +95,7 @@ const requestedExtension = evaluateRecipeRules({
 assert.equal(requestedExtension.proposals[0]?.rationale, "표면적이 희석 속도를 반복적으로 설명함");
 assert.deepEqual(requestedExtension.proposals[0]?.suggestedChanges, ["ICE PLAN UI에 형태 표시"]);
 
-const futureRuleset = evaluateRecipeRules({ ...base, recipeRulesetVersion: 4 });
+const futureRuleset = evaluateRecipeRules({ ...base, recipeRulesetVersion: 5 });
 assert.equal(futureRuleset.status, "review");
 assert(futureRuleset.proposals.some((item) => item.condition === "ruleset_version"));
 
@@ -83,4 +108,4 @@ const hardException = evaluateRecipeRules({
 assert.equal(hardException.status, "blocked");
 assert(hardException.warnings.some((item) => item.ruleId === "exception.hard-constraint"));
 
-console.log("✓ recipe rules: pass / blocked / review / proposal / exception behavior");
+console.log("✓ recipe rules: water selector / pass / blocked / review / proposal / exception behavior");

@@ -66,10 +66,11 @@ export class FellowClient {
     return saved;
   }
 
-  async upsertByTitle(payload: FellowProfilePayload) {
+  async upsertByTitle(payload: FellowProfilePayload, aliases: string[] = []) {
+    const allowedTitles = new Set([payload.title, ...aliases].map((title) => title.trim().toLowerCase()));
     const existing = (await this.profiles()).find((profile) => (
       /^p\d+$/.test(String(profile.id))
-      && String(profile.title).trim().toLowerCase() === payload.title.trim().toLowerCase()
+      && allowedTitles.has(String(profile.title).trim().toLowerCase())
     ));
     return this.saveProfile(payload, existing ? String(existing.id) : null);
   }

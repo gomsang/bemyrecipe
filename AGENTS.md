@@ -20,7 +20,7 @@ Read these files before recipe work:
 
 Markdown files are the database. Update them as part of the requested work; do not merely print a recipe in chat and leave the repository stale.
 
-Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, `minimum_headspace_ml`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
+Every recipe must declare `ruleset_version`, `control_conditions` including `aiden_quantity_mode`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, `minimum_headspace_ml`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
 
 Every recipe must also ship with a Drink Guide. Its primary reader is the person drinking the coffee, not the brewer; only **WHY THIS BREW** is brewer-facing. Store reusable, sourced coffee context in the linked bean file's `story` frontmatter and version-specific brewing/serving narrative in the recipe's `drink_guide` frontmatter. Cover place, region, people or production structure, variety history and meaning, altitude, process stages, roast, a tasting-note lexicon, glossary, uncertainty, why the settings were chosen, and what to notice while drinking. Separate exact-lot facts from station, regional, variety, and brew context. Never invent a farm, producer, cultivar, fermentation detail, or roast method to make the story feel complete.
 
@@ -125,6 +125,7 @@ Source prestige alone does not make a recipe setting transferable. Always record
 ## Non-negotiable reasoning
 
 - Aiden selected water is water delivered to the bed, not beverage yield.
+- Validate selected water against the declared Aiden quantity mode and basket. `standard_cup` uses 75ml half-cup steps from 150ml; `metric_precise` uses verified device steps and requires a `set_quantity_mode` prep step. Never assume range membership alone means a number is selectable.
 - Aiden has no scale. Separate machine-assumed dose from actual dose.
 - Calculate actual hot ratio, total recipe-water ratio, nominal bloom water, and actual bloom ratio.
 - Separate carafe/brew ice from serving ice.
@@ -159,4 +160,4 @@ Source prestige alone does not make a recipe setting transferable. Always record
 - Accepted recipe: `recipes/accepted/<bean-slug>-<style>-<cup-ml>-v<number>.md`
 - Brew log: `logs/YYYY-MM-DD-<recipe-slug>-brew-<number>.md`
 
-Use lowercase ASCII slugs and begin every bean-derived recipe lineage with the lowercase roaster code. Recipe headings and Aiden `profile_name` must include the uppercase roaster code; the device status prefix remains `[C]` or `[A]`. Keep all displayed content in Korean unless the original coffee name or technical term is clearer in English.
+Use lowercase ASCII slugs and begin every bean-derived recipe lineage with the lowercase roaster code. Recipe headings and Aiden `profile_name` must include the uppercase roaster code; the device status prefix is `C.` or `A.`. Keep all displayed content in Korean unless the original coffee name or technical term is clearer in English.

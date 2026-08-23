@@ -1,6 +1,9 @@
+import { AIDEN_QUANTITY_MODES, validateAidenWaterSelection } from "./aiden-water";
+
 export const RECIPE_RULES = {
-  version: 3,
+  version: 4,
   ui: {
+    quantityModes: AIDEN_QUANTITY_MODES,
     serveModes: {
       hot: {
         label: "HOT",
@@ -110,6 +113,13 @@ export const RECIPE_RULES = {
       required: "all",
       description: "추출수 또는 제품명과 알려진 수질 정보",
     },
+    aiden_quantity_mode: {
+      label: "Aiden water selector",
+      type: "enum",
+      values: ["standard_cup", "metric_precise"],
+      required: "all",
+      description: "선택 물양의 실제 간격을 결정하는 기기 단위 모드",
+    },
     vessel: {
       label: "Serving vessel",
       type: "string",
@@ -211,6 +221,7 @@ export type RecipeRuleInput = {
   brewMethod: string;
   brewReady: boolean;
   coldBrewEnabled: boolean;
+  selectedWaterMl: number;
   preparation: RulePreparationPlan;
   controlConditions: Record<string, unknown>;
   exceptions: RuleException[];
@@ -261,6 +272,13 @@ export function evaluateRecipeRules(input: RecipeRuleInput): RuleEvaluation {
   if (input.serveMode === "cold_brew" && !input.coldBrewEnabled) hard("mode.cold.profile", "COLD BREW recipe는 cold_brew_enabled: true여야 합니다.");
   if (input.serveMode !== "cold_brew" && input.coldBrewEnabled) hard("mode.cold.profile", "HOT/ICED recipe는 cold_brew_enabled: false여야 합니다.");
 
+  const waterSelectionErrors = validateAidenWaterSelection({
+    selectedWaterMl: input.selectedWaterMl,
+    quantityMode: String(input.controlConditions.aiden_quantity_mode ?? ""),
+    basket: String(input.controlConditions.basket ?? ""),
+  });
+  waterSelectionErrors.forEach((message) => hard("water.selection.invalid", message));
+
   const plan = input.preparation;
   if (!includes(RECIPE_RULES.schema.rinseWater, plan.filterRinse.water)) hard("rinse.water.invalid", "filter_rinse.water는 hot 또는 none이어야 합니다.");
   if (plan.filterRinse.enabled && (plan.filterRinse.water !== "hot" || !plan.filterRinse.discardRinseWater)) {
@@ -299,6 +317,7 @@ export function evaluateRecipeRules(input: RecipeRuleInput): RuleEvaluation {
   }
   if (input.brewReady) {
     if (!plan.steps.length) hard("prep.required", "brew_ready recipe에는 prep_steps가 필요합니다.");
+    if (!seenStepIds.has("set_quantity_mode")) hard("prep.quantity_mode.required", "brew-ready recipe에는 Aiden 물양 단위 모드를 확인하는 set_quantity_mode step이 필요합니다.");
     if (plan.filterRinse.enabled && !seenStepIds.has("rinse_filter")) hard("prep.rinse.required", "린싱하는 brew-ready recipe에는 rinse_filter step이 필요합니다.");
     if (input.controlConditions.shower_selector && !seenStepIds.has("set_shower_selector")) hard("prep.shower_selector.required", "shower_selector를 기록한 brew-ready recipe에는 set_shower_selector step이 필요합니다.");
     if (brewIce.grams > 0 && !seenStepIds.has("add_brew_ice")) hard("prep.brew_ice.required", "Brew ice가 있으면 add_brew_ice step이 필요합니다.");

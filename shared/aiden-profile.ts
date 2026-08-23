@@ -47,17 +47,33 @@ export type FellowProfilePayload = {
 export type RecipeProfileStatus = "accepted" | "candidate";
 
 const PROFILE_NAME_PATTERN = /^[A-Za-z0-9 !@#$%&*+?\/.,:)(-]+$/;
-const RECIPE_STATUS_PREFIX_PATTERN = /^\[(?:A|C)\]\s+/;
+const RECIPE_STATUS_PREFIX_PATTERN = /^(?:\[(?:A|C)\]|(?:A|C)[.-])\s+/i;
+
+function withoutRecipeStatusPrefix(profileName: string) {
+  let result = profileName.trim();
+  while (RECIPE_STATUS_PREFIX_PATTERN.test(result)) result = result.replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim();
+  return result;
+}
 
 export function profileNameForRecipe(profileName: string, status: RecipeProfileStatus) {
-  const prefix = status === "accepted" ? "[A]" : "[C]";
-  const unprefixed = profileName.trim().replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim() || "Recipe";
-  return `${prefix} ${unprefixed.slice(0, 46).trimEnd()}`;
+  const prefix = status === "accepted" ? "A." : "C.";
+  const unprefixed = withoutRecipeStatusPrefix(profileName) || "Recipe";
+  return `${prefix} ${unprefixed.slice(0, 47).trimEnd()}`;
+}
+
+export function profileTitleAliasesForRecipe(profileName: string, status: RecipeProfileStatus) {
+  const unprefixed = withoutRecipeStatusPrefix(profileName) || "Recipe";
+  const states: RecipeProfileStatus[] = status === "accepted" ? ["accepted", "candidate"] : ["candidate"];
+  return states.flatMap((item) => {
+    const letter = item === "accepted" ? "A" : "C";
+    const base = unprefixed.slice(0, 47).trimEnd();
+    return [`${letter}. ${base}`, `${letter}- ${base}`, `[${letter}] ${unprefixed.slice(0, 46).trimEnd()}`];
+  });
 }
 
 function validProfileName(profileName: string) {
   if (!profileName || profileName.length > 50) return false;
-  const unprefixed = profileName.replace(RECIPE_STATUS_PREFIX_PATTERN, "");
+  const unprefixed = withoutRecipeStatusPrefix(profileName);
   return Boolean(unprefixed) && PROFILE_NAME_PATTERN.test(unprefixed);
 }
 
@@ -68,7 +84,7 @@ function includesNumber(options: readonly number[], value: number) {
 export function validateAidenProfile(profile: AidenProfile): string[] {
   const errors: string[] = [];
   if (!validProfileName(profile.profile_name)) {
-    errors.push("profile_name은 1–50자의 영문·숫자·허용 문장부호만 사용할 수 있으며, 시스템 접두사는 [A] 또는 [C]만 허용합니다.");
+    errors.push("profile_name은 1–50자의 영문·숫자·허용 문장부호만 사용할 수 있으며, 시스템 접두사는 A. 또는 C.만 사용합니다.");
   }
   if (!includesNumber(AIDEN_PROFILE_OPTIONS.temperaturesC, profile.profile_temperature_c)) {
     errors.push("profile_temperature_c는 50–99°C 범위의 0.5°C 단위여야 합니다.");

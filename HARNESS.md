@@ -228,6 +228,24 @@ finalLiquidTempC = (B × c × Td - (BI + SI) × Lf) / (c × (B + BI + SI))
 - 아이스 목표인데 열수지상 얼음이 남을 가능성이 있는가
 - nominal ratio나 interval의 현재 UI 한계를 오래된 게시물만으로 단정하지 않았는가
 
+### 5.0 Aiden 물양 선택 간격
+
+선택 물양은 단순 범위 검사가 아니라 `control_conditions.aiden_quantity_mode`와 함께 검증합니다.
+
+| `aiden_quantity_mode` | 확인된 선택값 | 준비 단계 |
+|---|---|---|
+| `standard_cup` | 150ml부터 75ml 간격: 150, 225, 300, 375, 450… | 기기의 기본 cup/half-cup 표시 확인 |
+| `metric_precise` | Single 150–450ml는 10ml 간격; Batch 500–1500ml는 50ml 간격 | `Settings → Units → Precise Units` 활성화 |
+
+`brew_ready: true`인 레시피에는 `set_quantity_mode` prep step을 둡니다. Validator는 다음을 hard constraint로 다룹니다.
+
+- 물양이 선언한 mode의 시작값·간격·범위를 벗어남
+- 150–450ml인데 Single Serve basket이 아님
+- 500–1500ml인데 Batch basket이 아님
+- 현재 확인된 전환 공백인 451–499ml를 사용함
+
+공식 Fellow 자료는 Single Brew를 150–450ml로 구분하고 기기에서 metric/imperial 단위를 고를 수 있다고 설명합니다. 다만 Precise Units의 세부 간격은 공식 지원 문서가 모두 열거하지 않습니다. 10ml/50ml 간격은 현행 기기 실기 자료와 사용자 보고가 일치하는 범위에서 사용하며, firmware가 바뀌거나 실제 UI가 다르면 현재 기기 관찰을 우선하고 중앙 registry와 test를 함께 갱신합니다. 범위 안이라는 이유만으로 190ml 같은 값을 자동 허용하지 않습니다.
+
 ## 5.1 Filter rinse 판정
 
 Filter rinse는 Aiden 작동에 필요한 필수 cycle이 아닙니다. Fellow는 Aiden에 자동 pre-rinse가 없으며 **동봉 필터는 린스할 필요가 없다**고 안내합니다. 반면 일부 Fellow Drops 레시피는 paper filter 린스를 권장합니다. 이 둘은 모순된 기계 명령이 아니라, 동봉 필터의 필요성과 개별 레시피의 준비 선택을 각각 말한 것으로 해석합니다.
@@ -274,7 +292,7 @@ Mismatch를 금지하지는 않습니다. 다만 다음 조건의 실험으로�
 - Bed 모양만으로 승패를 정하지 않고 cup quality와 반복성을 우선합니다.
 - 개인 log가 반복해 우위를 보이기 전에는 공식 match를 baseline으로 유지합니다.
 
-현재 Harfusa Candidate의 190ml와 280ml는 모두 Single Serve 영역이므로 기본 물리 설정은 **one green dot / Single**입니다.
+현재 Harfusa Candidate의 180ml, 190ml와 280ml는 모두 `metric_precise`의 Single Serve 영역이므로 기본 물리 설정은 **one green dot / Single**입니다.
 
 ## 6. 첫 레시피 설계 순서
 

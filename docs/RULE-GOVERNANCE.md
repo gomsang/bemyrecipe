@@ -13,6 +13,7 @@
 실행하거나 저장할 수 없는 상태다.
 
 - Aiden이 받을 수 없는 profile 값
+- 현재 `aiden_quantity_mode`에서 고를 수 없는 물양 또는 물양과 basket의 불일치
 - HOT인데 ice가 들어간 것처럼 서로 모순되는 구조
 - ice strategy와 실제 중량의 불일치
 - 린스 물을 버리지 않아 계산하지 않은 물이 남는 구조
@@ -38,8 +39,9 @@ Hard constraint는 `rule_exceptions`로 우회할 수 없다.
 ## Markdown 계약
 
 ```yaml
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "Fellow Aiden #2 white"

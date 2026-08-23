@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { profileNameForRecipe, type AidenProfile } from "../shared/aiden-profile";
+import { AIDEN_QUANTITY_MODES } from "../shared/aiden-water";
 import {
   evaluateRecipeRules,
   getBrewMethodRule,
@@ -378,6 +379,8 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
   const rinseRule = RECIPE_RULES.ui.filterRinse;
   const showerSelectorValue = String(recipe.controlConditions?.shower_selector ?? "");
   const showerSelectorRule = RECIPE_RULES.ui.showerSelector[showerSelectorValue as keyof typeof RECIPE_RULES.ui.showerSelector];
+  const quantityModeValue = String(recipe.controlConditions?.aiden_quantity_mode ?? "");
+  const quantityModeRule = AIDEN_QUANTITY_MODES[quantityModeValue as keyof typeof AIDEN_QUANTITY_MODES];
   // Firestore can briefly contain catalog documents created by an older schema.
   // Evaluate them in the browser instead of allowing one stale document to break the public catalog.
   const ruleEvaluation = recipe.ruleEvaluation ?? evaluateRecipeRules({
@@ -386,6 +389,7 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
     brewMethod: recipe.brewMethod,
     brewReady: recipe.brewReady,
     coldBrewEnabled: recipe.profile.cold_brew_enabled,
+    selectedWaterMl: recipe.brew.brewWaterG,
     preparation: recipe.preparation,
     controlConditions: recipe.controlConditions ?? {},
     exceptions: recipe.ruleExceptions ?? [],
@@ -461,6 +465,15 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
           <Metric icon={<Thermometer />} label="BASE TEMP" value={`${recipe.profile.profile_temperature_c}°C`} />
           <Metric icon={<Settings2 />} label="GRIND" value={recipe.brew.grindSetting} />
         </div>
+
+        <section className="quantity-program">
+          <div className="detail-section-title"><span>AIDEN WATER SELECTOR</span><span>{quantityModeRule?.label ?? "MODE MISSING"}</span></div>
+          <div className="quantity-program-body">
+            <div><span>SELECT</span><strong>{recipe.brew.brewWaterG}ml</strong></div>
+            <div><span>STEP</span><strong>{quantityModeRule?.stepLabel ?? "확인 필요"}</strong></div>
+            <p>{quantityModeRule?.description ?? "이 레시피의 물양을 실제 기기에서 선택할 단위 모드가 기록되지 않았습니다."}</p>
+          </div>
+        </section>
 
         <section className="brew-program">
         <div className="detail-section-title"><span>BREW PROGRAM</span><span>{recipe.profile.pulse_count + 1} PHASES</span></div>

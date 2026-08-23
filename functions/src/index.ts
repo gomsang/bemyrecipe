@@ -4,14 +4,15 @@ import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import type { AidenProfile } from "./aiden-profile.js";
-import { fromFellowProfile, profileNameForRecipe, toFellowPayload, validateProfile } from "./aiden-profile.js";
+import { fromFellowProfile, profileNameForRecipe, profileTitleAliasesForRecipe, toFellowPayload, validateProfile } from "./aiden-profile.js";
+import { validateAidenWaterSelection } from "./aiden-water.js";
 import { createOpaqueToken, decryptJson, digestMatches, encryptJson, tokenDigest, type EncryptedValue } from "./crypto.js";
 import { FellowClient } from "./fellow-client.js";
 
 initializeApp();
 const db = getFirestore();
 const REGION = "asia-northeast3";
-const SUPPORTED_RECIPE_RULESET_VERSION = 3;
+const SUPPORTED_RECIPE_RULESET_VERSION = 4;
 const credentialKey = defineSecret("CREDENTIAL_ENCRYPTION_KEY");
 const tokenPepper = defineSecret("TOKEN_PEPPER");
 
@@ -229,6 +230,7 @@ export const saveRecipeToAiden = onCall(
       if (ruleEvaluation?.status === "blocked" || !Array.isArray(ruleEvaluation?.errors) || ruleEvaluation.errors.length > 0) {
         throw new Error("Recipe hard rule validation을 통과하지 못했습니다.");
       }
+      validateCatalogAidenWater(recipe);
 
       const sourceProfile = recipe.profile as AidenProfile;
       const profile = { ...sourceProfile, profile_name: profileNameForRecipe(sourceProfile.profile_name, status) };
@@ -237,7 +239,10 @@ export const saveRecipeToAiden = onCall(
       if (!credentials) throw new Error("먼저 Fellow 계정을 연결하세요.");
       const client = new FellowClient(credentials);
       await client.connect();
-      const saved = await client.upsertByTitle(toFellowPayload(profile));
+      const saved = await client.upsertByTitle(
+        toFellowPayload(profile),
+        profileTitleAliasesForRecipe(sourceProfile.profile_name, status),
+      );
       const localId = String(recipe.localId ?? recipe.id ?? recipeId);
       const profileId = String(saved.id ?? "");
       await recipeSyncRef(uid, localId).set({
@@ -290,6 +295,18 @@ function catalogRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? value as Record<string, unknown>
     : null;
+}
+
+function validateCatalogAidenWater(recipe: Record<string, unknown>) {
+  const localId = String(recipe.id ?? "unknown");
+  const brew = catalogRecord(recipe.brew);
+  const conditions = catalogRecord(recipe.controlConditions);
+  if (!brew || !conditions) throw new Error(`Aiden water selector 통제조건이 없습니다: ${localId}`);
+  validateAidenWaterSelection({
+    selectedWaterMl: Number(brew.brewWaterG),
+    quantityMode: String(conditions.aiden_quantity_mode ?? ""),
+    basket: String(conditions.basket ?? ""),
+  });
 }
 
 function validateCatalogDrinkGuide(recipe: Record<string, unknown>) {
@@ -437,6 +454,7 @@ export const syncCatalog = onRequest(
         if (ruleEvaluation?.status === "blocked" || !Array.isArray(ruleEvaluation?.errors) || ruleEvaluation.errors.length > 0) {
           throw new Error(`Recipe hard rule validation을 통과하지 못했습니다: ${localId}`);
         }
+        validateCatalogAidenWater(recipe);
         validateCatalogDrinkGuide(recipe);
         const documentId = `${publicOwnerKey(principal.uid)}__${localId}`;
         incomingIds.add(documentId);
@@ -477,7 +495,10 @@ export const syncCatalog = onRequest(
                 ...item.profile,
                 profile_name: profileNameForRecipe(item.profile.profile_name, "accepted"),
               };
-              const saved = await client.upsertByTitle(toFellowPayload(acceptedProfile));
+              const saved = await client.upsertByTitle(
+                toFellowPayload(acceptedProfile),
+                profileTitleAliasesForRecipe(item.profile.profile_name, "accepted"),
+              );
               const profileId = String(saved.id ?? "");
               await recipeSyncRef(principal.uid, String(item.recipe.id)).set({ status: "synced", profileId, syncedAt: FieldValue.serverTimestamp() }, { merge: true });
               aidenResults.push({ recipeId: item.documentId, status: "synced", profileId });

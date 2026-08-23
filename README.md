@@ -2,7 +2,7 @@
 
 대화로 만든 Fellow Aiden 레시피를 Markdown에 남기고, 웹에서 읽고, 내 Aiden으로 보내는 작은 개인 도구입니다.
 
-사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `[C]`, `[A]` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
+사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `C.`, `A.` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
 
 > Fellow는 공개 Aiden API를 제공하지 않습니다. 이 프로젝트의 기기 연결은 앱이 사용하는 비공식 엔드포인트를 직접 호출하며, Fellow의 변경으로 동작이 중단될 수 있습니다. 다른 Fellow 라이브러리를 런타임 의존성으로 설치하지 않습니다.
 
@@ -59,7 +59,7 @@ npm run catalog:validate
 
 Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의 cup/mode 변경, 동일 조건을 새 lineage로 복제한 경우를 차단합니다.
 
-로그인 상태에서는 상세 화면의 **에이든 프로필로 저장**으로 Candidate와 Accepted를 모두 수동 저장할 수 있습니다. 서버가 Markdown이 아니라 동기화된 레시피 projection을 다시 검증한 뒤 Candidate에는 `[C] `, Accepted에는 `[A] `를 붙입니다. Research Hold나 hard rule을 통과하지 못한 레시피는 버튼이 비활성화되며, 로그아웃 화면에는 이 개인 기능이 나타나지 않습니다.
+로그인 상태에서는 상세 화면의 **에이든 프로필로 저장**으로 Candidate와 Accepted를 모두 수동 저장할 수 있습니다. 서버가 Markdown이 아니라 동기화된 레시피 projection을 다시 검증한 뒤 Candidate에는 `C. `, Accepted에는 `A. `를 붙입니다. 기존 `[C]`/`[A]` 이름은 같은 profile을 새 이름으로 갱신합니다. Research Hold나 hard rule을 통과하지 못한 레시피는 버튼이 비활성화되며, 로그아웃 화면에는 이 개인 기능이 나타나지 않습니다.
 
 로컬 설정법은 [local/README.md](local/README.md)에 정리되어 있습니다.
 
@@ -77,6 +77,8 @@ Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의
 - **Serving ice**: 추출이 끝난 뒤 음용 컵에 새로 넣습니다. 마시는 동안 차가움을 유지하고 얼음이 남도록 하는 몫입니다.
 
 필터 종류와 조건부 린싱, 린스 물 폐기, 물리 shower selector, 얼음 투입, 분쇄·도징, 추출 후 swirl, 이송 순서는 `prep_steps`와 `control_conditions`에 저장됩니다. UI의 **PREPARATION**은 이 값을 그대로 표시합니다. 상세 필드와 HOT/ICED 예시는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md)를 참고하십시오.
+
+Aiden 물양은 단위 모드에 따라 간격이 달라집니다. 기본 cup/half-cup 모드는 75ml씩 움직이고, `Settings → Units → Precise Units`를 켜면 Single Serve에서 10ml 단위 선택이 가능합니다. 레시피는 `aiden_quantity_mode`를 기록하고, 사이트의 **AIDEN WATER SELECTOR**에서 필요한 모드와 정확한 물양을 함께 보여 줍니다. Validator와 서버가 이 조합을 둘 다 검사합니다.
 
 Flash recipe는 낙하 온도를 5°C 높인 조건도 함께 검사합니다. 얼음이 남아 있는 평형은 약 0°C라는 상변화 원칙을 적용하고, 고체 얼음의 부피까지 headspace에 포함합니다. `remain_while_drinking` 목표라면 두 조건 모두 얼음 10g 이상과 컵별 최소 여유를 통과해야 합니다.
 

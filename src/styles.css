@@ -152,6 +152,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .metric-icon svg { width: 18px; height: 18px; color: #aaa9a2; }
 .metric > span:nth-child(2) { font-size: 10px; letter-spacing: .11em; color: #969690; margin-top: auto; }
 .metric strong { margin-top: 6px; font-size: 22px; font-weight: 550; }
+.quantity-program { margin-top: 30px; }
+.quantity-program-body { padding: 18px 0; display: grid; grid-template-columns: minmax(100px, .7fr) 1.3fr; gap: 10px 24px; border-bottom: 1px solid #3b3b37; }
+.quantity-program-body > div { display: grid; gap: 5px; }
+.quantity-program-body span { color: #969690; font-size: 10px; font-weight: 720; letter-spacing: .11em; }
+.quantity-program-body strong { color: #e1e1da; font-size: 17px; font-weight: 570; }
+.quantity-program-body p { grid-column: 1 / -1; margin: 3px 0 0; color: #aaa9a2; font-size: 13px; line-height: 1.65; }
 .brew-program { margin-top: 30px; }
 .detail-section-title { display: flex; justify-content: space-between; color: #9c9c95; font-size: 10px; font-weight: 650; letter-spacing: .12em; padding-bottom: 12px; border-bottom: 1px solid #4c4c48; }
 .phase-row { min-height: 72px; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; border-bottom: 1px solid #383835; }

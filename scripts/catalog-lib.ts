@@ -274,6 +274,7 @@ export function buildCatalog(): Catalog {
       brewMethod: String(data.brew_method),
       brewReady: Boolean(data.brew_ready),
       coldBrewEnabled: Boolean(data.cold_brew_enabled),
+      selectedWaterMl: Number(data.brew_water_g),
       preparation,
       controlConditions,
       exceptions: ruleExceptions,

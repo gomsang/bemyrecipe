@@ -29,8 +29,9 @@ similar_recipes:
   - sbr-harfusa-flash-315-v1.md
   - sbr-harfusa-flash-500-v1.md
 created: 2026-08-23
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "standard #2 cone · exact product unrecorded"
@@ -172,7 +173,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: false**
 
 ## 규칙 평가
 
-- Ruleset: **v3**
+- Ruleset: **v4**
 - Hard constraints: **blocked** — 실행 순서는 맞지만 교정된 flash 열수지의 잔존 얼음 기준을 통과하지 못함
 - Advisory review: **없음**
 - Rule exception: **없음**
@@ -212,12 +213,15 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: false**
 
 Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린싱합니다. Aiden 동봉 필터는 제조사 지침상 rinse가 필수는 아니지만 exact filter가 아직 미기록이므로, 이번 version에서는 방식을 바꾸지 않습니다. Aiden 위에서 린싱했다면 carafe에 받은 물을 완전히 버린 뒤 brew ice를 넣습니다. 린스 물은 selected water 190ml나 얼음 130g에 포함하지 않습니다.
 
+190ml는 기본 cup/half-cup 모드에는 나타나지 않습니다. `Settings → Units → Precise Units`를 켜면 Single Serve 구간이 10ml씩 움직여 선택할 수 있습니다. 다만 이 v2는 열수지 교정으로 실행이 보류된 기록이며, 실제 추출에는 최신 v3를 사용합니다.
+
 ## 준비
 
 | 항목 | 값 |
 |---|---:|
 | 실제 원두 | **17.0g** |
 | Aiden brew water | **190ml** |
+| Aiden 물양 모드 | **Precise Metric · Single 10ml 간격** |
 | Brew ice · carafe | **110g** |
 | Serving ice · 315ml glass | **20g** |
 | 예상 적재 / headspace | **286g / 29ml** |

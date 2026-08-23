@@ -21,8 +21,9 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: YYYY-MM-DD
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "brand-size-bleached-status"
@@ -80,6 +81,11 @@ ice_plan:
     timing: before_transfer
     purpose: keep_cold
 prep_steps:
+  - id: set_quantity_mode
+    phase: before_brew
+    label: "Aiden 물양 단위 확인"
+    instruction: "Recipe의 aiden_quantity_mode에 맞춰 기기 단위 설정을 확인하고 selected water를 고른다."
+    critical: true
   - id: rinse_filter
     phase: before_brew
     label: "필터 린싱"

@@ -38,17 +38,33 @@ export type FellowProfilePayload = {
 export type RecipeProfileStatus = "accepted" | "candidate";
 
 const PROFILE_NAME_PATTERN = /^[A-Za-z0-9 !@#$%&*+?\/.,:)(-]+$/;
-const RECIPE_STATUS_PREFIX_PATTERN = /^\[(?:A|C)\]\s+/;
+const RECIPE_STATUS_PREFIX_PATTERN = /^(?:\[(?:A|C)\]|(?:A|C)[.-])\s+/i;
+
+function withoutRecipeStatusPrefix(profileName: string) {
+  let result = profileName.trim();
+  while (RECIPE_STATUS_PREFIX_PATTERN.test(result)) result = result.replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim();
+  return result;
+}
 
 export function profileNameForRecipe(profileName: string, status: RecipeProfileStatus) {
-  const prefix = status === "accepted" ? "[A]" : "[C]";
-  const unprefixed = profileName.trim().replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim() || "Recipe";
-  return `${prefix} ${unprefixed.slice(0, 46).trimEnd()}`;
+  const prefix = status === "accepted" ? "A." : "C.";
+  const unprefixed = withoutRecipeStatusPrefix(profileName) || "Recipe";
+  return `${prefix} ${unprefixed.slice(0, 47).trimEnd()}`;
+}
+
+export function profileTitleAliasesForRecipe(profileName: string, status: RecipeProfileStatus) {
+  const unprefixed = withoutRecipeStatusPrefix(profileName) || "Recipe";
+  const states: RecipeProfileStatus[] = status === "accepted" ? ["accepted", "candidate"] : ["candidate"];
+  return states.flatMap((item) => {
+    const letter = item === "accepted" ? "A" : "C";
+    const base = unprefixed.slice(0, 47).trimEnd();
+    return [`${letter}. ${base}`, `${letter}- ${base}`, `[${letter}] ${unprefixed.slice(0, 46).trimEnd()}`];
+  });
 }
 
 function validProfileName(profileName: string) {
   if (!profileName || profileName.length > 50) return false;
-  const unprefixed = profileName.replace(RECIPE_STATUS_PREFIX_PATTERN, "");
+  const unprefixed = withoutRecipeStatusPrefix(profileName);
   return Boolean(unprefixed) && PROFILE_NAME_PATTERN.test(unprefixed);
 }
 

@@ -30,8 +30,9 @@ similar_recipes:
   - sbr-harfusa-flash-315-v2.md
   - sbr-harfusa-flash-500-v1.md
 created: 2026-08-24
-ruleset_version: 3
+ruleset_version: 4
 control_conditions:
+  aiden_quantity_mode: metric_precise
   basket: single_serve
   shower_selector: single_serve
   filter_paper: "standard #2 cone · exact product unrecorded"
@@ -97,6 +98,11 @@ ice_plan:
     timing: before_transfer
     purpose: keep_cold
 prep_steps:
+  - id: set_quantity_mode
+    phase: before_brew
+    label: "Precise Units 설정"
+    instruction: "Aiden에서 Settings → Units → Precise Units를 켠다. 물양 선택 화면이 10ml씩 움직이는지 확인한 뒤 180ml를 고른다."
+    critical: true
   - id: rinse_filter
     phase: before_brew
     label: "필터 린싱"
@@ -170,6 +176,7 @@ minimum_headspace_ml: 20
 |---|---:|
 | 실제 원두 | **16.0g** |
 | Aiden selected water | **180ml** |
+| Aiden 물양 모드 | **Precise Metric · Single 10ml 간격** |
 | Brew ice / Serving ice | **120g / 22g** |
 | 분쇄 | Ode Gen 2 Stock Burr · **5⅓** |
 | Bloom | **1:3 · 45초 · 95°C** |
@@ -197,7 +204,8 @@ Aiden은 실제 원두 무게를 재지 않는다. 명목 1:14가 약 12.9g을 �
 ## Harness check
 
 - ✅ Intake와 Research gate 통과
-- ✅ Ruleset v3의 65°C base와 70°C stress에서 잔존 얼음 10g 이상
+- ✅ Ruleset v4의 `metric_precise`에서 180ml 선택 가능
+- ✅ 65°C base와 70°C stress에서 잔존 얼음 10g 이상
 - ✅ 두 조건에서 20ml minimum headspace 이상
 - ✅ Single basket + one green dot 공식 기본 조합
 - ✅ Actual bloom 1:2.41, pulse 3개와 온도 3개 일치
