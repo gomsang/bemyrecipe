@@ -73,6 +73,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .status-badge.accepted { color: #313d21; border-color: #889762; background: #ebf1d8; }
 .serve-mode-badge { display: inline-flex; align-items: center; gap: 4px; width: fit-content; font-size: 7px; font-weight: 760; letter-spacing: .1em; color: #65655f; }
 .serve-mode-badge.iced { color: #4d6876; }
+.version-badge { color: #555550; font-family: ui-monospace, monospace; font-weight: 720; }
 .recipe-copy { min-width: 0; }
 .recipe-copy h2 { margin: 12px 0 6px; overflow-wrap: anywhere; font-size: clamp(18px, 2vw, 25px); letter-spacing: -.03em; line-height: 1.16; font-weight: 620; }
 .recipe-copy p { margin: 0; color: #6f6f6a; font-size: 11px; }
@@ -91,6 +92,30 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .detail-summary { color: #a7a7a0; font-size: 11px; line-height: 1.65; margin: 0; }
 .note-strip { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 24px; }
 .note-strip span { border: 1px solid #454541; border-radius: 16px; padding: 5px 9px; font-size: 9px; color: #bdbdb5; }
+.version-program { margin: 0 0 24px; }
+.version-list { border-bottom: 1px solid #3b3b37; }
+.version-row { width: 100%; min-height: 64px; padding: 10px 0; display: grid; grid-template-columns: 34px 1fr auto; gap: 9px; align-items: center; border: 0; border-bottom: 1px solid #343431; background: transparent; color: #9b9b94; text-align: left; cursor: pointer; }
+.version-row:last-child { border-bottom: 0; }
+.version-row:hover { color: #deded7; }
+.version-row.active { color: #f4f4ef; }
+.version-marker { width: 27px; height: 27px; display: grid; place-items: center; border: 1px solid #4a4a46; border-radius: 50%; font-family: ui-monospace, monospace; font-size: 7px; }
+.version-row.active .version-marker { border-color: #c3d3a3; color: #c3d3a3; }
+.version-copy { min-width: 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; }
+.version-copy small { grid-column: 1 / -1; color: #74746f; font-size: 6px; letter-spacing: .1em; }
+.version-copy strong { overflow-wrap: anywhere; font-size: 9px; line-height: 1.45; font-weight: 560; }
+.version-copy i { align-self: start; color: #777771; font-size: 5px; font-style: normal; letter-spacing: .1em; }
+.revision-note { padding: 15px 0 2px; border-bottom: 1px solid #3b3b37; }
+.revision-note > div:first-child { display: grid; gap: 5px; }
+.revision-note span, .revision-note > small { color: #797973; font-size: 6px; letter-spacing: .11em; }
+.revision-note strong { font-size: 10px; font-weight: 580; line-height: 1.45; }
+.revision-note > p { margin: 8px 0; color: #8d8d86; font-size: 8px; line-height: 1.55; }
+.revision-note > small { display: block; margin-top: 10px; color: #a9b890; }
+.revision-note ul { margin: 12px 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.revision-note li { position: relative; padding-left: 13px; color: #9a9a93; font-size: 8px; line-height: 1.45; }
+.revision-note li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #71716b; position: absolute; left: 0; top: 5px; }
+.success-criteria { margin-top: 14px; padding: 12px 0; border-top: 1px solid #353532; display: grid; gap: 6px; }
+.success-criteria p { margin: 0; padding-left: 13px; position: relative; color: #8f9b7a; font-size: 8px; line-height: 1.45; }
+.success-criteria p::before { content: "✓"; position: absolute; left: 0; color: #a9bd86; }
 .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #3a3a37; }
 .metric { min-height: 92px; padding: 13px 10px 11px; display: flex; flex-direction: column; border-right: 1px solid #3a3a37; }
 .metric:last-child { border-right: 0; }

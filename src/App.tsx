@@ -39,7 +39,7 @@ import {
 import { ProfileEditor } from "./components/ProfileEditor";
 import { LoginDialog } from "./components/LoginDialog";
 import { auth, callServer, firebaseConfigured, loadPublicRecipes, logout, type AuthUser } from "./lib/firebase";
-import type { Catalog, CatalogRecipe } from "./lib/types";
+import type { Catalog, CatalogRecipe, RecipeRevision, RevisionKind } from "./lib/types";
 
 type View = "recipes" | "aiden" | "manage";
 type StatusFilter = "all" | "accepted" | "candidate";
@@ -68,6 +68,44 @@ const EMPTY_DASHBOARD: Dashboard = {
   recipes: [],
 };
 
+const REVISION_KIND_LABELS: Record<RevisionKind, string> = {
+  baseline: "BASELINE",
+  gate_completion: "GATE COMPLETION",
+  sensory_adjustment: "SENSORY",
+  execution_adjustment: "EXECUTION",
+  correction: "CORRECTION",
+  equipment_adaptation: "EQUIPMENT",
+};
+
+function recipeHeads(recipes: CatalogRecipe[]) {
+  const heads = new Map<string, CatalogRecipe>();
+  for (const recipe of recipes) {
+    const current = heads.get(recipe.lineage);
+    if (!current || recipe.version > current.version) heads.set(recipe.lineage, recipe);
+  }
+  return [...heads.values()];
+}
+
+function versionsOf(recipes: CatalogRecipe[], lineage: string) {
+  return recipes.filter((recipe) => recipe.lineage === lineage).sort((left, right) => right.version - left.version);
+}
+
+function recipeDisplayTitle(recipe: CatalogRecipe) {
+  return recipe.title.replace(/\s*[·-]\s*v\d+(?:\.\d+)?\s*$/i, "");
+}
+
+function revisionFor(recipe: CatalogRecipe): RecipeRevision {
+  return recipe.revision ?? {
+    kind: recipe.version === 1 ? "baseline" : "correction",
+    parentId: null,
+    primaryVariable: null,
+    summary: recipe.version === 1 ? "첫 baseline" : `Version ${recipe.version} 변경 기록`,
+    rationale: "이전 catalog schema에서 생성된 기록입니다.",
+    changes: [],
+    successCriteria: [],
+  };
+}
+
 function App() {
   const [recipes, setRecipes] = useState<CatalogRecipe[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -88,7 +126,7 @@ function App() {
       .then((catalog) => {
         if (!active) return;
         setRecipes(catalog.recipes);
-        setSelectedId(catalog.recipes[0]?.id ?? "");
+        setSelectedId(recipeHeads(catalog.recipes)[0]?.id ?? "");
       })
       .catch(() => undefined);
     loadPublicRecipes()
@@ -100,9 +138,11 @@ function App() {
           recipe.rulesetVersion === RECIPE_RULES.version
           && recipe.ruleEvaluation?.recipeRulesetVersion === RECIPE_RULES.version
           && Object.keys(recipe.controlConditions ?? {}).length > 0
+          && Boolean(recipe.revision?.summary)
+          && Number.isInteger(recipe.versionCount)
         ))) return;
         setRecipes(liveRecipes);
-        setSelectedId((current) => current || liveRecipes[0]?.id || "");
+        setSelectedId((current) => current || recipeHeads(liveRecipes)[0]?.id || "");
       })
       .catch(() => undefined);
     return () => { active = false; };
@@ -137,15 +177,18 @@ function App() {
     }
   }
 
-  const filtered = useMemo(() => recipes.filter((recipe) => {
+  const latestRecipes = useMemo(() => recipeHeads(recipes), [recipes]);
+  const filtered = useMemo(() => latestRecipes.filter((recipe) => {
     const statusMatches = status === "all" || recipe.status === status;
     const haystack = `${recipe.title} ${recipe.bean.name} ${recipe.bean.origin} ${recipe.bean.tastingNotes.join(" ")}`.toLowerCase();
     return statusMatches && haystack.includes(query.trim().toLowerCase());
-  }), [recipes, status, query]);
+  }), [latestRecipes, status, query]);
 
-  const selected = recipes.find((recipe) => recipe.id === selectedId) ?? filtered[0];
-  const acceptedCount = recipes.filter((recipe) => recipe.status === "accepted").length;
-  const candidateCount = recipes.filter((recipe) => recipe.status === "candidate").length;
+  const requestedRecipe = recipes.find((recipe) => recipe.id === selectedId);
+  const selected = requestedRecipe && filtered.some((recipe) => recipe.lineage === requestedRecipe.lineage) ? requestedRecipe : filtered[0];
+  const selectedVersions = selected ? versionsOf(recipes, selected.lineage) : [];
+  const acceptedCount = latestRecipes.filter((recipe) => recipe.status === "accepted").length;
+  const candidateCount = latestRecipes.filter((recipe) => recipe.status === "candidate").length;
 
   function navigate(next: View) {
     setView(next);
@@ -178,9 +221,10 @@ function App() {
       {!authReady ? <div className="route-loader"><LoaderCircle className="spin" /></div> : null}
       {authReady && view === "recipes" ? (
         <PublicRecipes
-          recipes={recipes}
+          recipes={latestRecipes}
           filtered={filtered}
           selected={selected}
+          versions={selectedVersions}
           selectedId={selectedId}
           onSelect={setSelectedId}
           status={status}
@@ -197,7 +241,7 @@ function App() {
           loading={dashboardLoading}
           onRefresh={refreshDashboard}
           onConnected={(aiden) => setDashboard((current) => ({ ...current, aiden, profiles: [] }))}
-          recipes={recipes}
+          recipes={latestRecipes}
         />
       ) : null}
       {authReady && user && view === "manage" ? (
@@ -218,6 +262,7 @@ type PublicRecipesProps = {
   recipes: CatalogRecipe[];
   filtered: CatalogRecipe[];
   selected?: CatalogRecipe;
+  versions: CatalogRecipe[];
   selectedId: string;
   onSelect: (id: string) => void;
   status: StatusFilter;
@@ -261,11 +306,11 @@ function PublicRecipes(props: PublicRecipesProps) {
         <div className="catalog-layout">
           <div className="recipe-list">
             {props.filtered.map((recipe, index) => (
-              <button className={props.selectedId === recipe.id ? "recipe-row selected" : "recipe-row"} onClick={() => props.onSelect(recipe.id)} key={recipe.id}>
+              <button className={props.selected?.lineage === recipe.lineage ? "recipe-row selected" : "recipe-row"} onClick={() => props.onSelect(recipe.id)} key={recipe.lineage}>
                 <span className="recipe-index">{String(index + 1).padStart(2, "0")}</span>
                 <div className="recipe-copy">
-                  <div className="recipe-meta"><StatusBadge status={recipe.status} /><ServeModeBadge mode={recipe.serveMode} /><span>{recipe.bean.origin}</span><span>{recipe.bean.process}</span></div>
-                  <h2>{recipe.title}</h2>
+                  <div className="recipe-meta"><StatusBadge status={recipe.status} /><ServeModeBadge mode={recipe.serveMode} /><span className="version-badge">V{recipe.version} · {recipe.versionCount} {recipe.versionCount === 1 ? "VERSION" : "VERSIONS"}</span><span>{recipe.bean.origin}</span><span>{recipe.bean.process}</span></div>
+                  <h2>{recipeDisplayTitle(recipe)}</h2>
                   <p>{recipe.bean.tastingNotes.join(" · ")}</p>
                 </div>
                 <div className="recipe-specs">
@@ -278,7 +323,7 @@ function PublicRecipes(props: PublicRecipesProps) {
             ))}
             {!props.filtered.length ? <div className="empty-list">조건에 맞는 레시피가 없습니다.</div> : null}
           </div>
-          {props.selected ? <RecipeDetail recipe={props.selected} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
+          {props.selected ? <RecipeDetail recipe={props.selected} versions={props.versions} onSelectVersion={props.onSelect} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
         </div>
       </section>
     </main>
@@ -300,7 +345,11 @@ function vesselLabel(value: string) {
   return value.replaceAll("-", " ").toUpperCase();
 }
 
-function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
+function RecipeDetail({ recipe, versions, onSelectVersion }: {
+  recipe: CatalogRecipe;
+  versions: CatalogRecipe[];
+  onSelectVersion: (id: string) => void;
+}) {
   const serveModeRule = getServeModeRule(recipe.serveMode);
   const brewMethodRule = getBrewMethodRule(recipe.brewMethod);
   const iceStrategyRule = getIceStrategyRule(recipe.preparation.icePlan.strategy);
@@ -328,6 +377,8 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
       <h2>{recipe.bean.name}</h2>
       <p className="detail-summary">{recipe.summary}</p>
       <div className="note-strip">{recipe.bean.tastingNotes.map((note) => <span key={note}>{note}</span>)}</div>
+
+      <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
 
       <div className="metric-grid">
         <Metric icon={<Coffee />} label="DOSE" value={`${recipe.brew.doseG}g`} />
@@ -410,6 +461,45 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
       </section>
       <div className="source-line"><ShieldCheck size={15} /><span>{recipe.validation.valid ? "Aiden 입력값 검증 완료" : "입력값 확인 필요"}</span><span>{recipe.created}</span></div>
     </aside>
+  );
+}
+
+function VersionHistory({ recipe, versions, onSelect }: {
+  recipe: CatalogRecipe;
+  versions: CatalogRecipe[];
+  onSelect: (id: string) => void;
+}) {
+  const revision = revisionFor(recipe);
+  const latestVersion = Math.max(...versions.map((item) => item.version));
+  return (
+    <section className="version-program">
+      <div className="detail-section-title"><span>VERSION HISTORY</span><span>{versions.length} {versions.length === 1 ? "REVISION" : "REVISIONS"}</span></div>
+      <div className="version-list">
+        {versions.map((item) => {
+          const itemRevision = revisionFor(item);
+          return (
+            <button className={item.id === recipe.id ? "version-row active" : "version-row"} onClick={() => onSelect(item.id)} key={item.id}>
+              <span className="version-marker">V{item.version}</span>
+              <span className="version-copy">
+                <small>{REVISION_KIND_LABELS[itemRevision.kind]}{item.version === latestVersion ? " · LATEST" : ""} · {item.created}</small>
+                <strong>{itemRevision.summary}</strong>
+                <i>{item.status.toUpperCase()}</i>
+              </span>
+              <ChevronRight size={14} />
+            </button>
+          );
+        })}
+      </div>
+      <div className="revision-note">
+        <div><span>SELECTED CHANGE</span><strong>{revision.summary}</strong></div>
+        <p>{revision.rationale}</p>
+        {revision.primaryVariable ? <small>PRIMARY VARIABLE · {revision.primaryVariable.replaceAll("_", " ").toUpperCase()}</small> : <small>BASELINE · NO PARENT</small>}
+        {revision.changes.length ? <ul>{revision.changes.map((change) => <li key={change}>{change}</li>)}</ul> : null}
+        {revision.successCriteria.length ? (
+          <div className="success-criteria"><span>SUCCESS CRITERIA</span>{revision.successCriteria.map((criterion) => <p key={criterion}>{criterion}</p>)}</div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 

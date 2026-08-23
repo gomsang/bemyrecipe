@@ -235,6 +235,37 @@ async function authenticateToken(authorization: string | undefined) {
   return { uid: String(data.ownerId), tokenId: snapshot.id };
 }
 
+function validateCatalogVersionGraph(recipes: Record<string, unknown>[]) {
+  const byLineage = new Map<string, Record<string, unknown>[]>();
+  for (const recipe of recipes) {
+    const lineage = String(recipe.lineage ?? "");
+    const version = Number(recipe.version);
+    const localId = String(recipe.id ?? "");
+    const revision = recipe.revision as Record<string, unknown> | undefined;
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(lineage) || !Number.isInteger(version) || version < 1) throw new Error(`Recipe version 정보가 올바르지 않습니다: ${localId}`);
+    if (localId !== `${lineage}-v${version}`) throw new Error(`Recipe id와 lineage/version이 일치하지 않습니다: ${localId}`);
+    if (!revision || !String(revision.kind ?? "") || !String(revision.summary ?? "") || !String(revision.rationale ?? "")) throw new Error(`Recipe revision 정보가 부족합니다: ${localId}`);
+    const versions = byLineage.get(lineage) ?? [];
+    versions.push(recipe);
+    byLineage.set(lineage, versions);
+  }
+  for (const [lineage, versions] of byLineage) {
+    versions.sort((left, right) => Number(left.version) - Number(right.version));
+    versions.forEach((recipe, index) => {
+      const version = Number(recipe.version);
+      const revision = recipe.revision as Record<string, unknown>;
+      if (version !== index + 1) throw new Error(`${lineage} version이 v1부터 연속되지 않습니다.`);
+      if (Number(recipe.versionCount) !== versions.length || Boolean(recipe.isLatest) !== (index === versions.length - 1)) throw new Error(`${lineage}의 latest/versionCount projection이 올바르지 않습니다.`);
+      if (version === 1) {
+        if (revision.kind !== "baseline" || revision.parent !== undefined && revision.parent !== null || revision.parentId !== null) throw new Error(`${lineage} v1 baseline 정보가 올바르지 않습니다.`);
+      } else {
+        const expectedParent = `${lineage}-v${version - 1}`;
+        if (revision.parentId !== expectedParent) throw new Error(`${lineage} v${version} parent는 ${expectedParent}이어야 합니다.`);
+      }
+    });
+  }
+}
+
 export const syncCatalog = onRequest(
   {
     region: REGION,
@@ -278,6 +309,7 @@ export const syncCatalog = onRequest(
         incomingIds.add(documentId);
         validated.push({ documentId, recipe, profile: recipe.profile });
       }
+      validateCatalogVersionGraph(validated.map((item) => item.recipe));
     } catch (reason) {
       response.status(400).json({ error: "validation_failed", message: safeMessage(reason) }); return;
     }

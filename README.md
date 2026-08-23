@@ -42,6 +42,19 @@ npm run catalog:validate
 npm run catalog:sync
 ```
 
+### 레시피 version 관리
+
+사이트는 Markdown 파일 수만큼 카드를 만들지 않습니다. 같은 `lineage`의 파일은 하나의 레시피로 묶고 최신 version만 목록에 표시합니다. 상세 화면의 **VERSION HISTORY**에서 v1, v2 등 이전 설정과 변경 이유·실제 변경값·성공 기준을 선택해 비교할 수 있습니다.
+
+같은 원두, HOT/ICED mode, brew method, cup, basket, vessel, ice goal에서 설정만 바뀌면 새 이름을 만들지 않고 `<lineage>-v<number>.md`로 올립니다. 각 파일의 `revision` frontmatter가 parent와 변경 내용을 기계가 읽을 수 있게 보존합니다. 전체 convention과 허용되는 revision 종류는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md#lineage와-version)에 있습니다.
+
+```bash
+npm run versions:test
+npm run catalog:validate
+```
+
+Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의 cup/mode 변경, 동일 조건을 새 lineage로 복제한 경우를 차단합니다.
+
 로컬 설정법은 [local/README.md](local/README.md)에 정리되어 있습니다.
 
 ## HOT, ICED와 얼음

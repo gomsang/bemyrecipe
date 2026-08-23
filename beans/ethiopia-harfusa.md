@@ -35,7 +35,7 @@ updated: 2026-08-23
 ## 컵노트와 목표
 
 - 로스터 노트: 베르가못, 백도, 오렌지필
-- 살리고 싶은 향미: 우선순위가 아직 없으므로 첫 baseline에서는 베르가못의 선명도와 백도의 단맛을 균형 있게 확인
+- 살리고 싶은 향미: 315ml v2 baseline에서는 베르가못의 선명도와 백도의 단맛을 균형 있게 확인
 - 구분할 것: 기분 좋은 오렌지필과 거칠고 마르는 껍질 쓴맛
 - 주 음용: Flash brew / iced
 
@@ -47,7 +47,7 @@ updated: 2026-08-23
 
 ## Research Dossier
 
-- [2026-08-23 · 315ml Flash brew 조사](../research/2026-08-23-harfusa.md) — `sufficient-with-gaps`; intake 미완료로 numeric brew gate는 blocked
+- [2026-08-23 · 315ml Flash brew 조사](../research/2026-08-23-harfusa.md) — `sufficient-with-gaps`; intake complete / numeric Candidate 허용
 - [2026-08-23 · 500ml Tumbler Flash brew 조사](../research/2026-08-23-harfusa-tumbler-500.md) — `sufficient-with-gaps`; intake complete / numeric Candidate 허용
 
 ## 알려지지 않은 변수
@@ -59,4 +59,5 @@ updated: 2026-08-23
 ## Recipe lineage
 
 - [315ml Flash brew v1 Candidate](../recipes/candidates/harfusa-flash-315-v1.md) — Research Hold / brew_ready false
+- [315ml Split-ice Flash brew v2 Candidate](../recipes/candidates/harfusa-flash-315-v2.md) — brew_ready true / 사용자 채택 전
 - [500ml Tumbler Flash brew v1 Candidate](../recipes/candidates/harfusa-flash-500-v1.md) — brew_ready true / 사용자 채택 전

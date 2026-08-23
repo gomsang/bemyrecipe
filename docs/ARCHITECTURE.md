@@ -24,6 +24,8 @@ Browser
 
 빌드 시 `scripts/build-catalog.ts`가 Markdown을 검증해 `public/catalog.json`을 만듭니다. 정적 파일만으로도 공개 사이트가 열립니다. Firestore에 동기화된 레시피가 있으면 사이트가 최신 원격 카탈로그를 사용합니다.
 
+각 Markdown version은 별도 문서로 보존하지만 UI 목록은 `lineage`로 그룹화합니다. 가장 높은 version이 lineage head가 되어 한 카드만 표시되고, `revision` projection으로 이전 version의 parent·변경 이유·변경값·성공 기준을 펼쳐봅니다. Firestore projection이 현재 version schema보다 오래되면 정적 Markdown catalog가 우선합니다.
+
 비로그인 화면은 Recipes만 보여 줍니다. Aiden과 Console navigation은 인증 후에만 렌더링합니다. 계정 아이콘은 일반적인 계정 진입점으로만 둡니다.
 
 ## 개인 영역

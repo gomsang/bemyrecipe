@@ -8,7 +8,17 @@ research_status: sufficient-with-gaps
 brew_ready: true
 lineage: harfusa-flash-500
 version: 1
-parent: null
+revision:
+  kind: baseline
+  parent: null
+  primary_variable: null
+  summary: "500ml 텀블러용 split-ice baseline"
+  rationale: "Harfusa의 향미 선명도와 백도 단맛을 유지하면서 음용 중 얼음이 남는 첫 실행 기준을 만든다."
+  changes: []
+  success_criteria:
+    - "5분 후에도 베르가못과 백도가 구분됨"
+    - "다 마실 때 serving ice가 남음"
+    - "500ml 텀블러에 충분한 headspace가 확보됨"
 accepted_at: null
 acceptance_note: null
 similar_recipes:

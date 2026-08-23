@@ -8,7 +8,15 @@ research_status: blocked
 brew_ready: false
 lineage: bean-style-cup
 version: 1
-parent: null
+revision:
+  kind: baseline
+  parent: null
+  primary_variable: null
+  summary: "이 lineage의 첫 실행 기준"
+  rationale: "새 bean·serve mode·brew method·cup 조합의 baseline을 만든다."
+  changes: []
+  success_criteria:
+    - "첫 brew에서 검증할 관찰 가능 조건"
 accepted_at: null
 acceptance_note: null
 similar_recipes: []

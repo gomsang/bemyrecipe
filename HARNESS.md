@@ -25,6 +25,13 @@
 - 사용자만 명시적으로 accept할 수 있습니다.
 - Accepted recipe의 개선안도 새 Candidate입니다.
 - Accepted가 교체되어도 이전 파일은 `superseded` 상태로 보존합니다.
+
+### Lineage 판정
+
+- bean, serve mode, brew method, beverage style, cup, basket, vessel, ice goal이 같고 추출 설정만 바뀌면 기존 lineage의 다음 version입니다.
+- 새 version은 직전 version을 `revision.parent`로 가리키고 `revision.primary_variable` 하나를 명시합니다.
+- `revision.summary`, `rationale`, `changes`, `success_criteria`는 frontmatter에 저장합니다. 본문의 변경 설명만으로 대체하지 않습니다.
+- 위 identity가 달라지면 새 lineage입니다. 같은 identity와 control conditions를 이름만 바꿔 새 lineage로 복제하지 않습니다.
 - `brew_ready: true`는 intake와 research gate가 모두 통과했다는 뜻이며, acceptance와는 무관합니다.
 
 ## 1.2 유사 recipe 참고 규칙

@@ -8,9 +8,25 @@ import {
   type RuleException,
   type RuleExtensionRequest,
 } from "../shared/recipe-rules";
-import type { Catalog, CatalogBean, CatalogRecipe, PreparationPlan, RecipeStatus } from "../src/lib/types";
+import type {
+  Catalog,
+  CatalogBean,
+  CatalogRecipe,
+  PreparationPlan,
+  RecipeRevision,
+  RecipeStatus,
+  RevisionKind,
+} from "../src/lib/types";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..");
+const REVISION_KINDS = new Set<RevisionKind>([
+  "baseline",
+  "gate_completion",
+  "sensory_adjustment",
+  "execution_adjustment",
+  "correction",
+  "equipment_adaptation",
+]);
 
 function asDate(value: unknown): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
@@ -116,6 +132,27 @@ function readRuleExtensionRequests(data: Record<string, unknown>): RuleExtension
   }));
 }
 
+function normalizeParentId(value: unknown): string | null {
+  if (value === null || value === undefined || String(value).trim() === "") return null;
+  return path.basename(String(value).trim(), ".md");
+}
+
+function readRevision(data: Record<string, unknown>): RecipeRevision {
+  const revision = record(data.revision);
+  const primaryVariable = revision.primary_variable === null || revision.primary_variable === undefined
+    ? null
+    : String(revision.primary_variable).trim() || null;
+  return {
+    kind: String(revision.kind ?? "") as RevisionKind,
+    parentId: normalizeParentId(revision.parent ?? data.parent),
+    primaryVariable,
+    summary: String(revision.summary ?? "").trim(),
+    rationale: String(revision.rationale ?? "").trim(),
+    changes: Array.isArray(revision.changes) ? revision.changes.map(String).map((item) => item.trim()).filter(Boolean) : [],
+    successCriteria: Array.isArray(revision.success_criteria) ? revision.success_criteria.map(String).map((item) => item.trim()).filter(Boolean) : [],
+  };
+}
+
 function titleFromMarkdown(content: string, fallback: string): string {
   return content.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? fallback;
 }
@@ -162,13 +199,16 @@ export function buildCatalog(): Catalog {
     const errors = [...validateAidenProfile(profile), ...ruleEvaluation.errors.map((item) => `${item.ruleId}: ${item.message}`)];
     const warnings = ruleEvaluation.warnings.map((item) => `${item.ruleId}: ${item.message}`);
     const id = path.basename(file, ".md");
-    return {
+    const recipe: CatalogRecipe = {
       id,
       title: titleFromMarkdown(parsed.content, id),
       status: String(data.status) as RecipeStatus,
       brewReady: Boolean(data.brew_ready),
       lineage: String(data.lineage ?? ""),
       version: Number(data.version ?? 1),
+      isLatest: false,
+      versionCount: 1,
+      revision: readRevision(data),
       created: asDate(data.created),
       acceptedAt: data.accepted_at ? asDate(data.accepted_at) : null,
       acceptanceNote: data.acceptance_note ? String(data.acceptance_note) : null,
@@ -177,6 +217,7 @@ export function buildCatalog(): Catalog {
       bean: readBean(file, data.bean),
       profile,
       brew: {
+        cupId: String(data.cup_id ?? ""),
         doseG: Number(data.dose_g),
         brewWaterG: Number(data.brew_water_g),
         brewIceG: preparation.icePlan.brewIce.grams,
@@ -197,13 +238,22 @@ export function buildCatalog(): Catalog {
       sourcePath: path.relative(REPO_ROOT, file),
       summary: summaryFromMarkdown(parsed.content),
     };
+    recipe.validation.errors.push(...validateRevisionShape(recipe));
+    recipe.validation.valid = recipe.validation.errors.length === 0;
+    return recipe;
   });
+
+  validateVersionGraph(recipes);
 
   recipes.sort((left, right) => {
     const statusOrder = { accepted: 0, candidate: 1, superseded: 2, rejected: 3 };
-    return statusOrder[left.status] - statusOrder[right.status]
-      || Number(right.brewReady) - Number(left.brewReady)
-      || right.created.localeCompare(left.created);
+    const latestLeft = recipes.find((recipe) => recipe.lineage === left.lineage && recipe.isLatest) ?? left;
+    const latestRight = recipes.find((recipe) => recipe.lineage === right.lineage && recipe.isLatest) ?? right;
+    return statusOrder[latestLeft.status] - statusOrder[latestRight.status]
+      || Number(latestRight.brewReady) - Number(latestLeft.brewReady)
+      || latestRight.created.localeCompare(latestLeft.created)
+      || left.lineage.localeCompare(right.lineage)
+      || right.version - left.version;
   });
 
   return {
@@ -211,4 +261,95 @@ export function buildCatalog(): Catalog {
     schemaVersion: 1,
     recipes,
   };
+}
+
+function validateRevisionShape(recipe: CatalogRecipe): string[] {
+  const errors: string[] = [];
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(recipe.lineage)) errors.push("version.lineage.invalid: lineage는 lowercase ASCII slug여야 합니다.");
+  if (!Number.isInteger(recipe.version) || recipe.version < 1) errors.push("version.number.invalid: version은 1 이상의 정수여야 합니다.");
+  if (recipe.id !== `${recipe.lineage}-v${recipe.version}`) errors.push(`version.id.mismatch: 파일 id는 ${recipe.lineage}-v${recipe.version}이어야 합니다.`);
+  if (!REVISION_KINDS.has(recipe.revision.kind)) errors.push("version.kind.invalid: revision.kind가 허용 목록에 없습니다.");
+  if (!recipe.revision.summary) errors.push("version.summary.missing: revision.summary가 필요합니다.");
+  if (!recipe.revision.rationale) errors.push("version.rationale.missing: revision.rationale이 필요합니다.");
+  if (!recipe.revision.successCriteria.length) errors.push("version.success_criteria.missing: revision.success_criteria가 하나 이상 필요합니다.");
+  if (recipe.version === 1) {
+    if (recipe.revision.kind !== "baseline") errors.push("version.baseline.kind: v1의 revision.kind는 baseline이어야 합니다.");
+    if (recipe.revision.parentId !== null) errors.push("version.baseline.parent: v1의 revision.parent는 null이어야 합니다.");
+    if (recipe.revision.primaryVariable !== null) errors.push("version.baseline.primary: v1의 primary_variable은 null이어야 합니다.");
+  } else {
+    if (recipe.revision.kind === "baseline") errors.push("version.revision.kind: v2 이상은 baseline이 될 수 없습니다.");
+    if (!recipe.revision.parentId) errors.push("version.parent.missing: v2 이상은 직전 parent가 필요합니다.");
+    if (!recipe.revision.primaryVariable) errors.push("version.primary_variable.missing: v2 이상은 primary_variable이 필요합니다.");
+    if (!recipe.revision.changes.length) errors.push("version.changes.missing: v2 이상은 changes가 하나 이상 필요합니다.");
+  }
+  return errors;
+}
+
+function versionIdentity(recipe: CatalogRecipe): string {
+  return JSON.stringify([
+    recipe.bean.id,
+    recipe.serveMode,
+    recipe.brewMethod,
+    recipe.brew.beverageStyle,
+    recipe.brew.cupId,
+    recipe.brew.cupCapacityMl,
+    recipe.controlConditions.basket ?? null,
+    recipe.controlConditions.vessel ?? null,
+    recipe.controlConditions.ice_goal ?? null,
+  ]);
+}
+
+function fullContextIdentity(recipe: CatalogRecipe): string {
+  const conditions = Object.fromEntries(Object.entries(recipe.controlConditions).sort(([left], [right]) => left.localeCompare(right)));
+  return JSON.stringify([versionIdentity(recipe), conditions]);
+}
+
+function addVersionError(recipe: CatalogRecipe, message: string) {
+  if (!recipe.validation.errors.includes(message)) recipe.validation.errors.push(message);
+  recipe.validation.valid = false;
+}
+
+export function validateVersionGraph(recipes: CatalogRecipe[]) {
+  const byLineage = new Map<string, CatalogRecipe[]>();
+  for (const recipe of recipes) {
+    const versions = byLineage.get(recipe.lineage) ?? [];
+    versions.push(recipe);
+    byLineage.set(recipe.lineage, versions);
+  }
+
+  for (const [lineage, versions] of byLineage) {
+    versions.sort((left, right) => left.version - right.version);
+    const baselineIdentity = versionIdentity(versions[0]);
+    const seenVersions = new Set<number>();
+    const accepted = versions.filter((recipe) => recipe.status === "accepted");
+    if (accepted.length > 1) {
+      accepted.forEach((recipe) => addVersionError(recipe, "version.accepted.multiple: 한 lineage에는 accepted version이 하나만 있을 수 있습니다."));
+    }
+    versions.forEach((recipe, index) => {
+      recipe.versionCount = versions.length;
+      recipe.isLatest = index === versions.length - 1;
+      if (seenVersions.has(recipe.version)) addVersionError(recipe, `version.duplicate: ${lineage}의 v${recipe.version}이 중복됩니다.`);
+      seenVersions.add(recipe.version);
+      const expectedVersion = index + 1;
+      if (recipe.version !== expectedVersion) addVersionError(recipe, `version.sequence.gap: ${lineage}는 v1부터 끊김 없이 증가해야 합니다.`);
+      if (versionIdentity(recipe) !== baselineIdentity) {
+        addVersionError(recipe, "version.identity.changed: 같은 lineage에서는 bean·serve mode·brew method·cup·basket·vessel·ice goal을 바꿀 수 없습니다. 새 lineage를 만드세요.");
+      }
+      if (recipe.version > 1) {
+        const expectedParent = `${lineage}-v${recipe.version - 1}`;
+        if (recipe.revision.parentId !== expectedParent) addVersionError(recipe, `version.parent.invalid: revision.parent는 ${expectedParent}이어야 합니다.`);
+      }
+    });
+  }
+
+  const contextOwners = new Map<string, string>();
+  for (const recipe of recipes) {
+    const signature = fullContextIdentity(recipe);
+    const owner = contextOwners.get(signature);
+    if (owner && owner !== recipe.lineage) {
+      addVersionError(recipe, `version.lineage.duplicate_context: ${owner}와 모든 실행 조건이 같습니다. 새 recipe가 아니라 해당 lineage의 다음 version으로 기록하세요.`);
+    } else {
+      contextOwners.set(signature, recipe.lineage);
+    }
+  }
 }

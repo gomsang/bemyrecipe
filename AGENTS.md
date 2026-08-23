@@ -22,6 +22,8 @@ Markdown files are the database. Update them as part of the requested work; do n
 
 Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
 
+Every recipe also belongs to a versioned `lineage`. When bean, serve mode, brew method, beverage style, cup, basket, vessel, and ice goal are unchanged, recipe-setting changes must become the next version in the same lineage—not a new recipe card. Record the machine-readable `revision` block from `docs/RECIPE-SCHEMA.md`; the prose `Changed from previous version` section alone is not sufficient.
+
 ## Chat workflow
 
 ### New recipe
@@ -39,7 +41,7 @@ When the user provides a bean and serving goal:
 9. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate` and `brew_ready: true`.
 10. Run every calculation and validation in `HARNESS.md`.
 11. Update `INDEX.md`.
-12. Run `npm run rules:test`, `npm run catalog:validate`, and `npm run catalog:build`.
+12. Run `npm run rules:test`, `npm run versions:test`, `npm run catalog:validate`, and `npm run catalog:build`.
 13. If `CATALOG_SYNC_URL` and `CATALOG_SYNC_TOKEN` are available locally, run `npm run catalog:sync`.
 14. Reply with a compact Markdown brew card: preparation, exact Aiden inputs, Harness calculations, evidence-to-setting rationale, uncertainty, what to observe, and any ruleset expansion proposal.
 
@@ -64,10 +66,11 @@ When the user asks to improve a recipe:
 
 1. Read the latest log and Research Dossier. Refresh any time-sensitive or decision-specific evidence needed for the proposed change.
 2. Copy the latest relevant recipe to the next version number under `recipes/candidates/`, even when its parent was accepted.
-3. Change exactly one primary variable. Recalculate dependent/derived values, which do not count as extra primary changes.
-4. Add a `Changed from previous version` section with evidence, hypothesis, and success criteria.
-5. Never overwrite the prior version or its brew logs.
-6. Update `INDEX.md` and reply with the new Markdown brew card.
+3. Set `revision.parent` to the immediately previous recipe id, choose `revision.kind`, and record `primary_variable`, `summary`, `rationale`, `changes`, and `success_criteria`.
+4. Change exactly one primary variable. Recalculate dependent/derived values, which do not count as extra primary changes. `gate_completion` and factual `correction` may document multiple dependent repairs but must name the single governing change.
+5. Add a `Changed from previous version` section with evidence, hypothesis, and success criteria.
+6. Never overwrite the prior version or its brew logs.
+7. Update `INDEX.md` and reply with the new Markdown brew card.
 
 ### Acceptance
 

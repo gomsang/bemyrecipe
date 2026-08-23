@@ -10,6 +10,17 @@ import type {
 } from "../../shared/recipe-rules";
 
 export type RecipeStatus = "accepted" | "candidate" | "rejected" | "superseded";
+export type RevisionKind = "baseline" | "gate_completion" | "sensory_adjustment" | "execution_adjustment" | "correction" | "equipment_adaptation";
+
+export type RecipeRevision = {
+  kind: RevisionKind;
+  parentId: string | null;
+  primaryVariable: string | null;
+  summary: string;
+  rationale: string;
+  changes: string[];
+  successCriteria: string[];
+};
 
 export type CatalogBean = {
   id: string;
@@ -26,6 +37,7 @@ export type CatalogBean = {
 };
 
 export type BrewSettings = {
+  cupId: string;
   doseG: number;
   brewWaterG: number;
   brewIceG: number;
@@ -73,6 +85,9 @@ export type CatalogRecipe = {
   brewReady: boolean;
   lineage: string;
   version: number;
+  isLatest: boolean;
+  versionCount: number;
+  revision: RecipeRevision;
   created: string;
   acceptedAt: string | null;
   acceptanceNote: string | null;

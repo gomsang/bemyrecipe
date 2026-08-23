@@ -8,7 +8,16 @@ research_status: sufficient-with-gaps
 brew_ready: false
 lineage: harfusa-flash-315
 version: 1
-parent: null
+revision:
+  kind: baseline
+  parent: null
+  primary_variable: null
+  summary: "315ml 조건의 초기 Research Hold baseline"
+  rationale: "초기 가정과 숫자를 보존하되 intake·열수지 gate를 통과하기 전에는 실행하지 않는다."
+  changes: []
+  success_criteria:
+    - "후속 version에서 intake gate가 완료됨"
+    - "후속 version에서 headspace와 ice remaining 조건이 동시에 충족됨"
 accepted_at: null
 acceptance_note: null
 similar_recipes: []

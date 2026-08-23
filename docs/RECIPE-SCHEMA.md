@@ -2,6 +2,40 @@
 
 UI와 Aiden 동기화는 레시피 본문을 추측하지 않고 YAML frontmatter만 읽습니다. 사람이 따라 할 설명도 같은 frontmatter의 `prep_steps`로 관리합니다.
 
+## Lineage와 version
+
+같은 원두·음용 모드·추출 방식·컵·basket·vessel·ice goal에서 추출 설정만 개선되면 새 레시피가 아니라 기존 `lineage`의 다음 version입니다.
+
+```yaml
+lineage: harfusa-flash-315
+version: 2
+revision:
+  kind: sensory_adjustment
+  parent: harfusa-flash-315-v1
+  primary_variable: grind_setting
+  summary: "마르는 끝맛을 줄이기 위해 한 단계 굵게 조정"
+  rationale: "v1 brew log에서 느린 drawdown과 astringency가 함께 관찰됨"
+  changes:
+    - "Ode Gen 2 5⅓ → 6"
+  success_criteria:
+    - "drawdown이 normal 범위로 돌아옴"
+    - "백도 단맛을 유지하면서 혀 마름이 감소함"
+```
+
+### Convention
+
+- 파일 id는 반드시 `<lineage>-v<version>`입니다.
+- v1은 `kind: baseline`, `parent: null`, `primary_variable: null`입니다.
+- v2 이상은 직전 version을 `parent`로 가리키고 번호를 건너뛰지 않습니다. `.md` 확장자는 쓰지 않습니다.
+- `summary`는 목록과 version history에 보일 한 줄 변경 설명입니다.
+- `rationale`은 왜 바꿨는지, `changes`는 실제 차이, `success_criteria`는 다음 brew에서 판정할 조건입니다.
+- 실제 brew를 개선하는 revision은 `primary_variable` 하나만 바꿉니다. 파생 계산값은 `changes`에 함께 기록할 수 있습니다.
+- Research Hold를 처음 실행 가능한 baseline으로 교정하는 경우는 `gate_completion`, 잘못 옮긴 값의 정정은 `correction`을 사용합니다.
+- bean, `serve_mode`, `brew_method`, `beverage_style`, `cup_id`, `cup_capacity_ml`, basket, vessel, ice goal이 바뀌면 새 lineage입니다.
+- grinder나 water처럼 보정 과정에서 확인·교체될 수 있는 조건은 같은 lineage에 둘 수 있지만 반드시 revision change로 기록합니다.
+
+허용되는 `revision.kind`는 `baseline`, `gate_completion`, `sensory_adjustment`, `execution_adjustment`, `correction`, `equipment_adaptation`입니다. 빌드는 version 중복·누락, 잘못된 parent, identity 변경, 동일 조건의 중복 lineage를 차단합니다.
+
 ## Ruleset과 통제조건
 
 ```yaml
