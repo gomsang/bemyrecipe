@@ -35,6 +35,23 @@ export type FellowProfilePayload = {
   batchPulseTemperatures: number[];
 };
 
+export type RecipeProfileStatus = "accepted" | "candidate";
+
+const PROFILE_NAME_PATTERN = /^[A-Za-z0-9 !@#$%&*+?\/.,:)(-]+$/;
+const RECIPE_STATUS_PREFIX_PATTERN = /^\[(?:A|C)\]\s+/;
+
+export function profileNameForRecipe(profileName: string, status: RecipeProfileStatus) {
+  const prefix = status === "accepted" ? "[A]" : "[C]";
+  const unprefixed = profileName.trim().replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim() || "Recipe";
+  return `${prefix} ${unprefixed.slice(0, 46).trimEnd()}`;
+}
+
+function validProfileName(profileName: string) {
+  if (!profileName || profileName.length > 50) return false;
+  const unprefixed = profileName.replace(RECIPE_STATUS_PREFIX_PATTERN, "");
+  return Boolean(unprefixed) && PROFILE_NAME_PATTERN.test(unprefixed);
+}
+
 const isHalfStep = (value: number) => Number.isFinite(value) && Math.abs(value * 2 - Math.round(value * 2)) < 0.001;
 const inHalfStepRange = (value: number, min: number, max: number) => value >= min && value <= max && isHalfStep(value);
 const inIntegerRange = (value: number, min: number, max: number) => Number.isInteger(value) && value >= min && value <= max;
@@ -43,7 +60,7 @@ export function validateProfile(value: unknown): asserts value is AidenProfile {
   if (!value || typeof value !== "object") throw new Error("Aiden profile이 필요합니다.");
   const profile = value as Record<string, unknown>;
   const title = String(profile.profile_name ?? "");
-  if (!/^[A-Za-z0-9 !@#$%&*+?\/.,:)(-]{1,50}$/.test(title)) throw new Error("Profile name 형식이 올바르지 않습니다.");
+  if (!validProfileName(title)) throw new Error("Profile name 형식이 올바르지 않습니다.");
   if (!inHalfStepRange(Number(profile.profile_temperature_c), 50, 99)) throw new Error("Temperature는 50–99°C, 0.5°C 단위여야 합니다.");
   if (!inHalfStepRange(Number(profile.nominal_ratio), 14, 20)) throw new Error("Ratio는 14–20, 0.5 단위여야 합니다.");
   if (!inHalfStepRange(Number(profile.bloom_ratio), 1, 3)) throw new Error("Bloom ratio는 1–3, 0.5 단위여야 합니다.");

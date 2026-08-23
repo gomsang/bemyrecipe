@@ -147,7 +147,7 @@ prep_steps:
 
 | 필드 | 허용값 |
 |---|---|
-| `profile_name` | 1–50자 영문·숫자·허용 문장부호 |
+| `profile_name` | 1–50자 영문·숫자·허용 문장부호. 기기 저장 시 시스템이 선두 `[C] ` 또는 `[A] `를 붙일 수 있음 |
 | `profile_temperature_c` | 50–99°C, 0.5°C 단위 |
 | `nominal_ratio` | 14–20, 0.5 단위 |
 | `bloom_ratio` | 1–3, 0.5 단위 |
@@ -158,3 +158,5 @@ prep_steps:
 | pulse temperature | 50–99°C, 0.5°C 단위; 개수는 count와 동일 |
 
 Fellow 앱이나 firmware에서 값이 바뀌면 공식 문서와 실제 UI를 다시 확인한 뒤 `shared/aiden-profile.ts`와 Functions validator를 함께 수정합니다.
+
+Markdown의 `profile_name`에는 상태 접두사를 직접 넣지 않습니다. 사이트와 동기화 서버가 Candidate를 `[C]`, Accepted를 `[A]`로 변환하며, 기존 `[C]`/`[A]`가 있으면 교체해 중복 접두사를 만들지 않습니다. 접두사를 포함한 최종 이름도 50자를 넘지 않습니다.

@@ -17,6 +17,7 @@ Callable Functions:
 - `saveAidenCredentials`
 - `createApiToken`, `revokeApiToken`
 - `saveAidenProfile`, `deleteAidenProfile`
+- `saveRecipeToAiden`: 로그인 사용자가 검증된 Candidate/Accepted를 상세 화면에서 직접 저장
 
 HTTP Function:
 

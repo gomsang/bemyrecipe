@@ -44,7 +44,22 @@ export type FellowProfilePayload = {
   batchPulseTemperatures: number[];
 };
 
+export type RecipeProfileStatus = "accepted" | "candidate";
+
 const PROFILE_NAME_PATTERN = /^[A-Za-z0-9 !@#$%&*+?\/.,:)(-]+$/;
+const RECIPE_STATUS_PREFIX_PATTERN = /^\[(?:A|C)\]\s+/;
+
+export function profileNameForRecipe(profileName: string, status: RecipeProfileStatus) {
+  const prefix = status === "accepted" ? "[A]" : "[C]";
+  const unprefixed = profileName.trim().replace(RECIPE_STATUS_PREFIX_PATTERN, "").trim() || "Recipe";
+  return `${prefix} ${unprefixed.slice(0, 46).trimEnd()}`;
+}
+
+function validProfileName(profileName: string) {
+  if (!profileName || profileName.length > 50) return false;
+  const unprefixed = profileName.replace(RECIPE_STATUS_PREFIX_PATTERN, "");
+  return Boolean(unprefixed) && PROFILE_NAME_PATTERN.test(unprefixed);
+}
 
 function includesNumber(options: readonly number[], value: number) {
   return options.includes(value);
@@ -52,8 +67,8 @@ function includesNumber(options: readonly number[], value: number) {
 
 export function validateAidenProfile(profile: AidenProfile): string[] {
   const errors: string[] = [];
-  if (!profile.profile_name || profile.profile_name.length > 50 || !PROFILE_NAME_PATTERN.test(profile.profile_name)) {
-    errors.push("profile_name은 1–50자의 영문·숫자·허용 문장부호만 사용할 수 있습니다.");
+  if (!validProfileName(profile.profile_name)) {
+    errors.push("profile_name은 1–50자의 영문·숫자·허용 문장부호만 사용할 수 있으며, 시스템 접두사는 [A] 또는 [C]만 허용합니다.");
   }
   if (!includesNumber(AIDEN_PROFILE_OPTIONS.temperaturesC, profile.profile_temperature_c)) {
     errors.push("profile_temperature_c는 50–99°C 범위의 0.5°C 단위여야 합니다.");

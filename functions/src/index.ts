@@ -4,7 +4,7 @@ import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import type { AidenProfile } from "./aiden-profile.js";
-import { fromFellowProfile, toFellowPayload, validateProfile } from "./aiden-profile.js";
+import { fromFellowProfile, profileNameForRecipe, toFellowPayload, validateProfile } from "./aiden-profile.js";
 import { createOpaqueToken, decryptJson, digestMatches, encryptJson, tokenDigest, type EncryptedValue } from "./crypto.js";
 import { FellowClient } from "./fellow-client.js";
 
@@ -203,6 +203,57 @@ export const saveAidenProfile = onCall(
   },
 );
 
+export const saveRecipeToAiden = onCall(
+  { region: REGION, secrets: [credentialKey], timeoutSeconds: 30 },
+  async (request) => {
+    const uid = userId(request);
+    const recipeId = String((request.data as { recipeId?: unknown })?.recipeId ?? "");
+    if (!/^[A-Za-z0-9_-]{1,180}$/.test(recipeId)) {
+      throw new HttpsError("invalid-argument", "Recipe ID 형식이 올바르지 않습니다.");
+    }
+    try {
+      const ownerKey = publicOwnerKey(uid);
+      let snapshot = await db.doc(`recipes/${recipeId}`).get();
+      if (!snapshot.exists) {
+        snapshot = await db.doc(`recipes/${ownerKey}__${recipeId}`).get();
+      }
+      if (!snapshot.exists) throw new Error("저장할 레시피를 찾지 못했습니다.");
+
+      const recipe = snapshot.data() as Record<string, unknown>;
+      const status = recipe.status;
+      if (status !== "candidate" && status !== "accepted") throw new Error("Candidate 또는 Accepted 레시피만 저장할 수 있습니다.");
+      if (recipe.brewReady !== true) throw new Error("Brew ready 검증을 마친 레시피만 Aiden에 저장할 수 있습니다.");
+      if ((recipe.validation as { valid?: unknown } | undefined)?.valid !== true) throw new Error("입력값 검증을 통과한 레시피만 Aiden에 저장할 수 있습니다.");
+      const ruleEvaluation = recipe.ruleEvaluation as { rulesetVersion?: unknown; status?: unknown; errors?: unknown } | undefined;
+      if (Number(ruleEvaluation?.rulesetVersion) !== SUPPORTED_RECIPE_RULESET_VERSION) throw new Error("현재 ruleset으로 다시 동기화한 뒤 저장하세요.");
+      if (ruleEvaluation?.status === "blocked" || !Array.isArray(ruleEvaluation?.errors) || ruleEvaluation.errors.length > 0) {
+        throw new Error("Recipe hard rule validation을 통과하지 못했습니다.");
+      }
+
+      const sourceProfile = recipe.profile as AidenProfile;
+      const profile = { ...sourceProfile, profile_name: profileNameForRecipe(sourceProfile.profile_name, status) };
+      validateProfile(profile);
+      const credentials = await credentialsFor(uid);
+      if (!credentials) throw new Error("먼저 Fellow 계정을 연결하세요.");
+      const client = new FellowClient(credentials);
+      await client.connect();
+      const saved = await client.upsertByTitle(toFellowPayload(profile));
+      const localId = String(recipe.localId ?? recipe.id ?? recipeId);
+      const profileId = String(saved.id ?? "");
+      await recipeSyncRef(uid, localId).set({
+        status: "manual_synced",
+        sourceStatus: status,
+        profileId,
+        profileName: profile.profile_name,
+        syncedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      return { profile: fromFellowProfile(saved), profileName: profile.profile_name, recipeStatus: status };
+    } catch (reason) {
+      throw new HttpsError("failed-precondition", safeMessage(reason));
+    }
+  },
+);
+
 export const deleteAidenProfile = onCall(
   { region: REGION, secrets: [credentialKey], timeoutSeconds: 30 },
   async (request) => {
@@ -340,7 +391,11 @@ export const syncCatalog = onRequest(
           await client.connect();
           for (const item of accepted) {
             try {
-              const saved = await client.upsertByTitle(toFellowPayload(item.profile));
+              const acceptedProfile = {
+                ...item.profile,
+                profile_name: profileNameForRecipe(item.profile.profile_name, "accepted"),
+              };
+              const saved = await client.upsertByTitle(toFellowPayload(acceptedProfile));
               const profileId = String(saved.id ?? "");
               await recipeSyncRef(principal.uid, String(item.recipe.id)).set({ status: "synced", profileId, syncedAt: FieldValue.serverTimestamp() }, { merge: true });
               aidenResults.push({ recipeId: item.documentId, status: "synced", profileId });

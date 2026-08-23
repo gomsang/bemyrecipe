@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import type { AidenProfile } from "../shared/aiden-profile";
+import { profileNameForRecipe, type AidenProfile } from "../shared/aiden-profile";
 import {
   evaluateRecipeRules,
   getBrewMethodRule,
@@ -195,6 +195,10 @@ function App() {
     setMobileNav(false);
   }
 
+  async function saveRecipeToAiden(recipe: CatalogRecipe) {
+    return callServer<{ recipeId: string }, { profileName: string }>("saveRecipeToAiden", { recipeId: recipe.id });
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -233,6 +237,7 @@ function App() {
           onQuery={setQuery}
           acceptedCount={acceptedCount}
           candidateCount={candidateCount}
+          onSaveToAiden={user ? saveRecipeToAiden : undefined}
         />
       ) : null}
       {authReady && user && view === "aiden" ? (
@@ -271,6 +276,7 @@ type PublicRecipesProps = {
   onQuery: (query: string) => void;
   acceptedCount: number;
   candidateCount: number;
+  onSaveToAiden?: (recipe: CatalogRecipe) => Promise<{ profileName: string }>;
 };
 
 function PublicRecipes(props: PublicRecipesProps) {
@@ -323,7 +329,7 @@ function PublicRecipes(props: PublicRecipesProps) {
             ))}
             {!props.filtered.length ? <div className="empty-list">조건에 맞는 레시피가 없습니다.</div> : null}
           </div>
-          {props.selected ? <RecipeDetail recipe={props.selected} versions={props.versions} onSelectVersion={props.onSelect} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
+          {props.selected ? <RecipeDetail key={props.selected.id} recipe={props.selected} versions={props.versions} onSelectVersion={props.onSelect} onSaveToAiden={props.onSaveToAiden} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
         </div>
       </section>
     </main>
@@ -345,11 +351,14 @@ function vesselLabel(value: string) {
   return value.replaceAll("-", " ").toUpperCase();
 }
 
-function RecipeDetail({ recipe, versions, onSelectVersion }: {
+function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
   recipe: CatalogRecipe;
   versions: CatalogRecipe[];
   onSelectVersion: (id: string) => void;
+  onSaveToAiden?: (recipe: CatalogRecipe) => Promise<{ profileName: string }>;
 }) {
+  const [aidenSaving, setAidenSaving] = useState(false);
+  const [aidenMessage, setAidenMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const serveModeRule = getServeModeRule(recipe.serveMode);
   const brewMethodRule = getBrewMethodRule(recipe.brewMethod);
   const iceStrategyRule = getIceStrategyRule(recipe.preparation.icePlan.strategy);
@@ -370,6 +379,30 @@ function RecipeDetail({ recipe, versions, onSelectVersion }: {
     extensionRequests: recipe.ruleExtensionRequests ?? [],
   });
   const ruleStatus = RECIPE_RULES.ui.ruleStatus[ruleEvaluation.status];
+  const profileStatus = recipe.status === "accepted" || recipe.status === "candidate" ? recipe.status : null;
+  const aidenProfileName = profileStatus ? profileNameForRecipe(recipe.profile.profile_name, profileStatus) : "";
+  const aidenSaveAllowed = Boolean(
+    profileStatus
+    && recipe.brewReady
+    && recipe.validation.valid
+    && ruleEvaluation.status !== "blocked"
+    && !recipe.profile.cold_brew_enabled,
+  );
+
+  async function handleSaveToAiden() {
+    if (!onSaveToAiden || !aidenSaveAllowed) return;
+    setAidenSaving(true);
+    setAidenMessage(null);
+    try {
+      const result = await onSaveToAiden(recipe);
+      setAidenMessage({ kind: "success", text: `Aiden에 ${result.profileName} 프로필을 저장했습니다.` });
+    } catch (reason) {
+      setAidenMessage({ kind: "error", text: reason instanceof Error ? reason.message : "Aiden에 프로필을 저장할 수 없습니다." });
+    } finally {
+      setAidenSaving(false);
+    }
+  }
+
   return (
     <aside className="recipe-detail">
       <div className="detail-topline"><span>{serveModeRule?.label ?? recipe.serveMode.toUpperCase()} / {brewMethodRule?.label ?? recipe.brewMethod.toUpperCase()}</span><span>V{recipe.version}.0</span></div>
@@ -377,6 +410,25 @@ function RecipeDetail({ recipe, versions, onSelectVersion }: {
       <h2>{recipe.bean.name}</h2>
       <p className="detail-summary">{recipe.summary}</p>
       <div className="note-strip">{recipe.bean.tastingNotes.map((note) => <span key={note}>{note}</span>)}</div>
+
+      {onSaveToAiden && profileStatus ? (
+        <section className="aiden-save-panel">
+          <div className="aiden-save-copy">
+            <span>DIRECT TO AIDEN</span>
+            <strong>{aidenProfileName}</strong>
+            <p>{aidenSaveAllowed
+              ? `${profileStatus === "accepted" ? "Accepted" : "Candidate"} 상태를 이름에 표시해 같은 이름의 프로필을 새로 만들거나 업데이트합니다.`
+              : recipe.profile.cold_brew_enabled
+                ? "Cold Brew의 비공식 API mapping이 검증되기 전에는 기기로 보낼 수 없습니다."
+                : "Brew ready와 입력값 검증을 모두 통과한 레시피만 기기로 보낼 수 있습니다."}</p>
+          </div>
+          <button onClick={handleSaveToAiden} disabled={!aidenSaveAllowed || aidenSaving}>
+            {aidenSaving ? <LoaderCircle className="spin" size={15} /> : <Cloud size={15} />}
+            {aidenSaving ? "저장 중…" : "에이든 프로필로 저장"}
+          </button>
+          {aidenMessage ? <p className={`aiden-save-message ${aidenMessage.kind}`}>{aidenMessage.text}</p> : null}
+        </section>
+      ) : null}
 
       <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
 

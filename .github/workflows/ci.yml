@@ -20,6 +20,7 @@ jobs:
       - run: npm ci --prefix functions
       - run: npm run rules:test
       - run: npm run versions:test
+      - run: npm run profiles:test
       - run: npm run catalog:validate
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=high

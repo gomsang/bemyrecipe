@@ -47,4 +47,10 @@ Firebase Auth의 이메일/비밀번호 로그인을 사용하며 서버 작업�
 - local validator 결과 `valid: true`
 - 사용자의 Aiden 연결 완료
 
-동일한 profile name이 있으면 해당 사용자 profile을 수정하고, 없으면 새로 만듭니다. Candidate는 사이트에 보이지만 Aiden에는 자동 등록하지 않습니다.
+자동 등록되는 Accepted의 기기 profile name에는 `[A] `를 붙입니다. 동일한 최종 이름이 있으면 해당 사용자 profile을 수정하고, 없으면 새로 만듭니다. Candidate는 사이트에 보이지만 자동 등록하지 않습니다.
+
+## 상세 화면에서 수동 저장
+
+로그인한 사용자에게만 Candidate와 Accepted 상세 화면의 **에이든 프로필로 저장** 작업을 렌더링합니다. 로그아웃 화면에는 버튼이나 잠금 상태를 표시하지 않습니다.
+
+수동 저장은 공개 Firestore 레시피를 서버에서 다시 읽고 `brew_ready`, 입력값 validation, 현재 ruleset의 hard rule을 확인합니다. 레시피 작성자와 저장 사용자가 달라도 공개 상세 화면에서 자신의 Aiden으로 보낼 수 있습니다. 통과한 Candidate는 `[C] `, Accepted는 `[A] `를 `profile_name` 앞에 붙여 Aiden에 upsert합니다. Markdown 원본 이름은 바꾸지 않습니다. Research Hold, invalid, blocked, 검증되지 않은 Cold Brew profile은 상태와 무관하게 기기 전송을 거부합니다.
