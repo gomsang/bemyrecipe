@@ -3,8 +3,8 @@ type: research-dossier
 bean: ../beans/sbr-ethiopia-harfusa.md
 recipe_lineage: sbr-harfusa-flash-500
 status: sufficient-with-gaps
-searched_at: 2026-08-23
-latest_official_check: 2026-08-23
+searched_at: 2026-08-24
+latest_official_check: 2026-08-24
 prepared_for: "Flash brew · 500ml tumbler · carafe ice + serving ice · ice remaining"
 coverage:
   aiden_official: true
@@ -61,6 +61,7 @@ coverage:
 | Washed Ethiopia 사용자 사이에도 Ode 7에서 bitter, 낮은 온도·fine grind 성공, 공식 Light 성공 등 상반된 보고가 공존한다. | Community conflict | [Washed Ethiopia Aiden discussion](https://www.reddit.com/r/FellowProducts/comments/1hnlr10/new_aiden_user_looking_for_guidance/) | Sidama 등 다른 lot; 조건 불완전 | community 수치를 평균내지 않아야 함을 보여줌 | Low |
 | Harfusa/Hafursa 자료는 Yirgacheffe G1, heirloom, smallholder 맥락을 지지하지만 2024 crop이며 사용자의 exact roaster/lot는 아니다. | Evidence with limitation | [Project Origin · Yirgacheffe G1 Hafursa](https://projectorigin.coffee/wp-content/uploads/2024/08/ETH_Yirgacheffe_2024.pdf) | 다른 crop/seller | station 맥락만 부분 적용; bag facts 대체 금지 | Medium-Low |
 | 내부 315ml v1은 4⅓과 얼음 110g의 근거가 약하고 자체 열수지에서도 얼음 잔존에 실패해 Research Hold다. | Internal evidence | [315ml v1 Research Hold](../recipes/candidates/sbr-harfusa-flash-315-v1.md) | 같은 bean, 다른 cup; 미추출 | 실패한 serving geometry를 반복하지 않는 데 직접 | Medium |
+| 고체와 액체가 0°C에서 공존하면 얼음이 모두 녹을 때까지 온도가 유지된다. 얼음이 남은 평형을 5°C로 놓을 수 없다. | Evidence / physics | [OpenStax · Phase Change and Latent Heat](https://openstax.org/books/college-physics/pages/14-3-phase-change-and-latent-heat) | 순수 물·얼음의 이상 열수지 | Flash 열수지 식 교정에 직접 적용 | High |
 
 ## 분야별 합성
 
@@ -76,7 +77,7 @@ coverage:
 
 온도만으로 베르가못이나 백도를 만든다고 해석하지 않습니다. 25g/280ml의 actual hot ratio 1:11.2는 concentrate이므로 충분한 wetting과 contact가 필요하지만, 최종 strength는 녹은 얼음까지 포함해 판단해야 합니다. 삼다수는 공개 Ca/Mg 기준으로 낮은 경도 범위이나 alkalinity가 없어 ‘산미가 무조건 선명해진다’고 단정하지 않습니다.
 
-열수지는 `HARNESS.md`의 0°C 얼음, 65°C drop, 5°C target 가정을 사용합니다. Hot beverage 230g에 필요한 얼음은 약 163g입니다. 총 230g ice를 넣으면 약 67g이 남습니다. 실제 freezer ice가 0°C보다 낮으면 더 많이 남을 수 있지만, 텀블러 열용량·실내 열유입은 반대 방향이므로 첫 brew 측정이 우선입니다.
+열수지는 얼음 0°C와 65°C drop을 사용합니다. Hot beverage 230g이 0°C까지 내놓는 열은 얼음 약 187.5g을 녹이므로 총 230g 가운데 약 42.5g이 남습니다. 70°C stress에서도 약 28.1g이 남습니다. 고체 얼음의 밀도 0.917g/ml를 반영한 headspace는 약 36.2ml입니다. 실제 freezer ice, 텀블러 열용량과 실내 열유입은 첫 brew에서 교정합니다.
 
 ### 독립 전문가·바리스타
 
@@ -100,15 +101,15 @@ Accepted Recipe와 brew log는 아직 없습니다. 315ml v1은 미추출 Resear
 |---|---|---|---|
 | 공식 Light 99°C flat vs Medium 96°C flat vs 전문가의 더 낮은 declining profile | Bloom 95°C, pulses 94→93→92°C | Medium–Light, 9일차, concentrate의 추출 필요와 orange-peel harshness 위험을 절충 | 정상 drawdown인데 날카롭고 비며 단맛이 없으면 grind 우선; 밸런스는 좋고 후미만 거칠면 last pulse temperature 검토 |
 | 공식 Ode 5⅓ vs 유사 Fellow 4–5⅓ vs community 3–7대 | 5⅓ | 최신 공식 anchor와 유사 bean 범위가 겹치고, 미분/고 dose의 실패 비용이 더 큼 | 빠르고 얇고 시며 단맛 부족이면 1 click finer; 느리고 떫으면 1 click coarser |
-| 더 많은 hot water로 extraction 확보 vs 더 많은 ice로 잔존·headspace 확보 | 25g · 280ml hot · 150g brew ice · 80g serving ice | 40ml headspace와 보수적 67g ice remaining을 유지하면서 initial cold liquid 약 1:15.7 확보 | 약하면 ice가 아니라 drawdown/추출 증상을 먼저 구분; 얼음이 안 남으면 actual output과 cup load 재측정 |
-| 315ml v1의 단순 ice split vs 500ml의 긴 음용 시간 | Brew ice와 serving ice를 별도 역할로 설계 | 카라페 약 8°C 급랭 후 fresh ice가 최종 5°C와 장시간 냉각을 담당 | 카라페에서 얼음이 많이 남거나 텀블러 얼음이 빨리 사라지면 drop temp/ice start temp 가정이 틀린 것 |
+| 더 많은 hot water로 extraction 확보 vs 더 많은 ice로 잔존·headspace 확보 | 25g · 280ml hot · 150g brew ice · 80g serving ice | 고체 얼음 부피 포함 headspace 약 36ml, 70°C stress에서도 약 28g ice remaining | 약하면 ice가 아니라 drawdown/추출 증상을 먼저 구분; 얼음이 안 남으면 actual output과 cup load 재측정 |
+| 315ml의 짧은 음용 vs 500ml의 긴 음용 시간 | Brew ice와 serving ice를 별도 역할로 설계 | carafe에서 급랭하고 80g fresh ice가 음용 중 냉각을 이어 감 | 텀블러 얼음이 빨리 사라지면 drop temp/ice start temp·마시는 시간을 기록 |
 | 삼다수 low-hardness 추정 vs alkalinity 미확인 | 물은 고정하되 profile을 추가 변경하지 않음 | Ca/Mg만으로 acidity buffering을 예측할 수 없음 | 같은 recipe에서 산미가 지나치게 날카롭거나 둔하면 물 성분/다른 물 비교를 별도 실험 |
 
 ## Setting rationale
 
 | Recipe setting | Evidence / inference | Confidence | 첫 brew 검증 |
 |---|---|---|---|
-| 25g / 280ml / 150g + 80g ice | 500ml cup load 460g, headspace 40ml, 0°C model ice remaining 67g | Medium; RF/drop temp 미교정 | carafe final mass, transfer temp, tumbler load, ending ice |
+| 25g / 280ml / 150g + 80g ice | 500ml 질량 460g, 물리 headspace 약 36ml, 65°C/70°C 잔존 얼음 42.5g/28.1g | Medium; RF/drop temp 미교정 | carafe final mass, transfer temp, tumbler load, ending ice |
 | Nominal 1:14 | UI의 machine-assumed 20g과 actual 25g을 의도적으로 분리; bloom 60g 확보 | Medium | 실제 dose 확인, profile 화면 값 |
 | Ode 5⅓ | 공식 Single Brew anchor와 유사 washed Ethiopia 범위의 공통점 | Medium | drawdown, standing water, astringency, clarity |
 | Bloom 1:3 · 45s · 95°C | 실제 bloom 1:2.4; 9일차 gas와 25g bed wetting | Medium | dry pockets, aroma release, bed behavior |
@@ -120,7 +121,7 @@ Accepted Recipe와 brew log는 아직 없습니다. 315ml v1은 미추출 Resear
 - 로스터는 서부로스터스로 확인했지만 외부 exact lot/crop 일치와 실제 roast development는 확인하지 못했습니다. Bag facts를 우선합니다.
 - 삼다수 alkalinity/KH와 실제 bottle TDS는 미기록입니다.
 - Ode Gen 2 zero point, seasoning, 최근 청소 상태는 미기록입니다.
-- RF 2.0g/g, drop temperature 65°C, target 5°C, ice start 0°C는 개인 미교정 가정입니다.
+- RF 2.0g/g, drop temperature 65°C와 ice start 0°C는 개인 미교정 가정입니다.
 - 텀블러 자체의 열용량과 마시는 시간·주변 온도는 열수지에 포함하지 않았습니다.
 - 사용자의 실제 Aiden UI에서 1:14, 28초, 각 온도가 저장되는지 시작 전 확인해야 하며 UI가 최종 기준입니다.
 
@@ -129,7 +130,7 @@ Accepted Recipe와 brew log는 아직 없습니다. 315ml v1은 미추출 Resear
 - 원두 공통 서사는 사용자 bag 정보와 `2026-08-23-harfusa.md`의 출처 범위를 따릅니다. Gedeo의 agroforestry·지역 맥락은 원산지 이야기로만 사용하고, 사용자의 정확한 lot나 생산자 운영 방식으로 단정하지 않습니다.
 - 가공 챕터에는 **Washed라는 확인 사실**과 그 방식이 일반적으로 지향하는 깨끗한 향미 표현을 분리해 씁니다. 이 lot의 발효 시간, 세척 횟수, 건조 방식은 미확인으로 표시합니다.
 - 로스팅 챕터에는 **서부로스터스, Medium–Light와 2026-08-14 roast date라는 확인 사실**을 반영합니다. 열원, batch size, development time, 색도는 확인되지 않았으므로 향미의 원인으로 단정하지 않습니다.
-- 500ml 전용 추출 서사는 150g brew ice로 급랭한 뒤 80g fresh serving ice로 긴 음용 시간의 냉각을 맡기는 두 단계 구조, 40ml headspace, 보수적 열수지에서 약 67g의 잔존 얼음을 설명합니다.
+- 500ml 전용 추출 서사는 150g brew ice로 급랭한 뒤 80g fresh serving ice로 긴 음용 시간의 냉각을 맡기는 두 단계 구조, 약 36ml의 물리 headspace, 70°C stress에서도 약 28g의 잔존 얼음을 설명합니다.
 - 첫 추출 뒤 실제 output, transfer temperature, 남은 얼음과 맛의 흐름이 기록되면 일반적 지역 설명보다 개인 brew log를 우선해 다음 버전의 Guide를 고칩니다.
 
 ## Gate 판정

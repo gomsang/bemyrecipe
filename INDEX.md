@@ -1,6 +1,6 @@
 # ohmycoffee Index
 
-마지막 갱신: 2026-08-23
+마지막 갱신: 2026-08-24
 
 ## 현재 상태
 
@@ -8,9 +8,9 @@
 - 웹 UI: 공개 Accepted/Candidates 열람, 추출 레시피/드링크 가이드 reader, 로그인 후 개인 Aiden·token 관리
 - 활성 원두: 1
 - 활성 recipe lineage: 2
-- 총 recipe version: 3
+- 총 recipe version: 4
 - Accepted recipe: 0
-- Candidate recipe: 3
+- Candidate recipe: 4
 - 총 brew log: 0
 - Research Dossier: 3 (`complete` 1, `sufficient-with-gaps` 2)
 
@@ -18,7 +18,7 @@
 
 | 원두 | 상태 | 최신 recipe | Brew 수 | 다음 행동 |
 |---|---|---|---:|---|
-| [SBR · Ethiopia Yirgacheffe Harfusa Washed G1](beans/sbr-ethiopia-harfusa.md) | 활성 | [SBR · 315ml Split-ice Flash v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) | 0 | v2 추출 후 맛·drawdown·ice remaining 기록 |
+| [SBR · Ethiopia Yirgacheffe Harfusa Washed G1](beans/sbr-ethiopia-harfusa.md) | 활성 | [SBR · 315ml Split-ice Flash v3](recipes/candidates/sbr-harfusa-flash-315-v3.md) | 0 | v3 또는 500ml v1 추출 후 맛·drawdown·ice remaining 기록 |
 
 ## Recipe lineage
 
@@ -27,7 +27,8 @@
 | Version | 상태 | 핵심 설정 | 검증 상태 | 로그 |
 |---|---|---|---|---|
 | [v1](recipes/candidates/sbr-harfusa-flash-315-v1.md) | Candidate · Research Hold | Legacy provisional: 20g · 225ml · 96→95→94°C | `brew_ready: false`; intake blocked | 없음 |
-| [v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) | Candidate | 17g · 190ml · brew ice 110g · serving ice 20g · Ode 5⅓ · 94→92°C | `brew_ready: true`; 미추출 | 없음 |
+| [v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) | Candidate · Research Hold | 17g · 190ml · brew ice 110g · serving ice 20g · Ode 5⅓ · 94→92°C | 상변화 계산 교정에서 70°C 잔존 얼음 0g; 추출 금지 | 없음 |
+| [v3](recipes/candidates/sbr-harfusa-flash-315-v3.md) | Candidate | 16g · 180ml · brew ice 120g · serving ice 22g · Ode 5⅓ · 94→92°C | `brew_ready: true`; 70°C stress 잔존 얼음 12.1g | 없음 |
 
 ### SBR · Harfusa · Flash brew · 500ml Tumbler
 
@@ -42,7 +43,8 @@
 ## Candidate Recipes
 
 - [SBR · Harfusa · 315ml Flash brew · v1](recipes/candidates/sbr-harfusa-flash-315-v1.md) — 사용자 채택 전 / Research Hold / 추출 금지
-- [SBR · Harfusa · 315ml Split-ice Flash brew · v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) — 사용자 채택 전 / brew ready
+- [SBR · Harfusa · 315ml Split-ice Flash brew · v2](recipes/candidates/sbr-harfusa-flash-315-v2.md) — 열수지 교정으로 Research Hold / 추출 금지
+- [SBR · Harfusa · 315ml Split-ice Flash brew · v3](recipes/candidates/sbr-harfusa-flash-315-v3.md) — 사용자 채택 전 / brew ready / 최신
 - [SBR · Harfusa · 500ml Tumbler Flash brew · v1](recipes/candidates/sbr-harfusa-flash-500-v1.md) — 사용자 채택 전 / brew ready
 
 ## Research Dossiers
@@ -53,8 +55,8 @@
 
 ## 다음 교정 우선순위
 
-1. 315ml v2 첫 brew에서 exact filter, one-green-dot selector, carafe output, transfer 온도, drawdown, ice remaining 측정
-2. 315ml v2 추출 직후와 5분 후의 베르가못 clarity·백도 sweetness를 비교해 실제 우선순위 확인
+1. 315ml v3 첫 brew에서 exact filter, one-green-dot selector, carafe output, transfer 온도, drawdown, ice remaining 측정
+2. 315ml v3 추출 직후와 5분 후의 베르가못 clarity·백도 sweetness를 비교해 실제 우선순위 확인
 3. Filter가 Fellow 동봉 white paper라면 필요할 때 rinse/no-rinse 한 변수 paired test
 4. 공식 Single selector에서 dry edge/crater와 거친 맛이 반복될 때만 Batch selector A/B 검토
 5. Ode Gen 2 calibration/seasoning 상태 기록

@@ -69,6 +69,9 @@ export type BeanStory = {
   facts: StoryFact[];
   unknowns: string[];
   sources: StorySource[];
+  processJourney: Array<{ step: string; title: string; body: string; scope: string }>;
+  tastingLexicon: Array<{ term: string; cue: string; distinction: string }>;
+  glossary: Array<{ term: string; definition: string }>;
 };
 
 export type DrinkGuide = {
@@ -94,6 +97,9 @@ export type BrewSettings = {
   grinder: string;
   grindSetting: string;
   targetTempC: number;
+  retentionFactor: number;
+  dropTempC: number;
+  minHeadspaceMl: number;
 };
 
 export type PrepStep = {

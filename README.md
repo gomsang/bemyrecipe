@@ -1,6 +1,6 @@
 # bemyrecipe
 
-Fellow Aiden 레시피를 Codex 대화로 만들고, Markdown 원본·공개 웹 카탈로그·개인 Aiden 프로필을 한 흐름으로 관리합니다.
+대화로 만든 Fellow Aiden 레시피를 Markdown에 남기고, 웹에서 읽고, 내 Aiden으로 보내는 작은 개인 도구입니다.
 
 사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `[C]`, `[A]` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
 
@@ -31,7 +31,9 @@ Firebase 값이 없어도 `public/catalog.json`으로 만든 로컬 카탈로그
 
 Codex는 `AGENTS.md`의 intake와 research gate를 거친 뒤 Candidate를 만듭니다. 추출 뒤 맛과 시간을 알려주면 log를 남기고, 한 번에 하나의 primary variable만 바꿉니다.
 
-새 Candidate를 만들 때에는 드링크 가이드도 함께 작성합니다. `beans/*.md`에는 지역·생산 구조·품종·고도·가공·로스팅처럼 version에 공통인 사실과 출처를, `recipes/*.md`에는 해당 추출의 의도와 마시는 순서를 저장합니다. 같은 이름의 다른 crop이나 지역 설명은 context로 표시하고, 확인되지 않은 농장·품종·가공·로스팅 세부를 지어내지 않습니다.
+독자에게 보이는 한국어를 다듬을 때는 선택적으로 [`humanize-korean`](https://github.com/epoko77-ai/im-not-ai) Codex skill을 쓸 수 있습니다. Codex CLI 0.121.0 이상에서 설치한 뒤 `$humanize-korean`으로 실행합니다. 이 저장소의 `AGENTS.md`는 skill이 있을 때 레시피와 드링크 가이드의 문체 점검에 사용하되, 수치·인용·출처 범위는 건드리지 않도록 정해 둡니다.
+
+새 Candidate에는 드링크 가이드가 함께 붙습니다. 단순한 레시피 해설이 아니라, 커피를 마시는 사람이 산지와 품종의 역사, 가공 과정, 로스팅, 봉투의 향미 표현을 읽을 수 있는 짧은 매거진에 가깝습니다. 추출자를 위한 내용은 `WHY THIS BREW`에만 둡니다. `beans/*.md`가 공통 사실과 출처를, `recipes/*.md`가 이 버전의 추출 의도와 마시는 흐름을 맡습니다. 같은 이름의 다른 crop은 참고 맥락으로만 쓰며, 확인되지 않은 농장이나 발효 이야기를 채워 넣지 않습니다.
 
 채택은 명시적으로 말해야 합니다.
 
@@ -46,7 +48,7 @@ npm run catalog:sync
 
 ### 레시피 version 관리
 
-사이트는 Markdown 파일 수만큼 카드를 만들지 않습니다. 같은 `lineage`의 파일은 하나의 레시피로 묶고 최신 version만 목록에 표시합니다. 상세 화면의 **VERSION HISTORY**에서 v1, v2 등 이전 설정과 변경 이유·실제 변경값·성공 기준을 선택해 비교할 수 있습니다.
+사이트는 Markdown 파일 수만큼 카드를 늘리지 않습니다. 같은 `lineage`를 한 레시피로 묶고 최신 version만 목록에 보여 줍니다. 이전 설정은 상세 화면 맨 아래의 접힌 **VERSION HISTORY**에서 골라 비교할 수 있습니다.
 
 같은 원두, HOT/ICED mode, brew method, cup, basket, vessel, ice goal에서 설정만 바뀌면 새 이름을 만들지 않고 `<lineage>-v<number>.md`로 올립니다. 단, 같은 농장·품종이라도 로스터가 다르면 별도 bean과 lineage입니다. 짧은 `roaster_code`를 파일·웹 제목·Aiden profile name에 넣어 구분하고, 확인되지 않았을 때만 `UNK`를 씁니다. 각 파일의 `revision` frontmatter가 parent와 변경 내용을 기계가 읽을 수 있게 보존합니다. 전체 convention은 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md#lineage와-version)에 있습니다.
 
@@ -75,6 +77,8 @@ Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의
 - **Serving ice**: 추출이 끝난 뒤 음용 컵에 새로 넣습니다. 마시는 동안 차가움을 유지하고 얼음이 남도록 하는 몫입니다.
 
 필터 종류와 조건부 린싱, 린스 물 폐기, 물리 shower selector, 얼음 투입, 분쇄·도징, 추출 후 swirl, 이송 순서는 `prep_steps`와 `control_conditions`에 저장됩니다. UI의 **PREPARATION**은 이 값을 그대로 표시합니다. 상세 필드와 HOT/ICED 예시는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md)를 참고하십시오.
+
+Flash recipe는 낙하 온도를 5°C 높인 조건도 함께 검사합니다. 얼음이 남아 있는 평형은 약 0°C라는 상변화 원칙을 적용하고, 고체 얼음의 부피까지 headspace에 포함합니다. `remain_while_drinking` 목표라면 두 조건 모두 얼음 10g 이상과 컵별 최소 여유를 통과해야 합니다.
 
 ## Ruleset
 
@@ -147,6 +151,7 @@ npm run deploy:public
 ```bash
 npm run catalog:validate
 npm run rules:test
+npm run thermal:test
 npm run profiles:test
 npm run build
 npm audit --omit=dev
@@ -159,8 +164,9 @@ npm --prefix functions audit --omit=dev
 - pulse 개수와 온도 배열 길이
 - HOT 레시피의 얼음 0g 규칙
 - ICED 레시피의 ice plan과 preparation step
+- Flash 레시피의 0°C 상변화 열수지, +5°C stress와 고체 얼음 부피 headspace
 - `brew_ready: true` 레시피의 실행 순서 존재 여부
-- bean story의 장소·지역·사람·품종·고도·가공·로스팅 장과 출처 범위
+- bean story의 장소·지역·사람·품종·고도·가공·로스팅, 가공 단계, 감각어, 작은 사전과 출처 범위
 - recipe Drink Guide의 추출 의도·핵심 선택·serving ritual·taste journey
 - 등록되지 않은 새 통제조건의 review와 system-change proposal
 

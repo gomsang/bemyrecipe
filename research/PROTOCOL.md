@@ -91,7 +91,7 @@ Roaster/barista의 공개 Aiden profile을 참고하면 소개 페이지와 실�
 
 ### H. Drink Guide 근거
 
-숫자 설정과 별개로, 사용자가 한 잔을 이해하며 마실 수 있는 서사 근거를 조사합니다.
+숫자 설정과 별개로, 잔을 받아 든 사람이 커피를 이해하며 마실 수 있는 서사 근거를 조사합니다. 추출자를 위한 설명은 `WHY THIS BREW`에만 둡니다.
 
 - exact bag/lot에서 확인되는 장소, 생산자 또는 station, 고도, 품종, 가공, roast level/date
 - 지역의 지리·문화·agroforestry 맥락은 UNESCO, 공공기관, 연구기관처럼 적용 범위가 명확한 자료 우선
@@ -100,8 +100,12 @@ Roaster/barista의 공개 Aiden profile을 참고하면 소개 페이지와 실�
 - 가공 방식이 cup에 미칠 수 있는 방향과, 실제 lot에서 보장할 수 없는 부분
 - roast level/date와 추출 선택의 관계. roaster·roaster type·development가 없으면 추측 금지
 - 생산자 이름이나 농장 서사를 확인할 수 없을 때 이를 감추거나 만들어내지 않기
+- 확인된 가공명을 체리 선별, 과육 제거, 발효·점액질 제거, 세척, 건조의 흐름으로 풀 수 있는 1차 또는 전문 자료
+- 품종명의 기원과 역사, `Heirloom`처럼 넓은 유통 표기가 실제로 뜻하는 범위
+- 봉투의 tasting note를 향·맛·질감으로 번역하고, 닮았지만 불쾌할 수 있는 감각과 구분하는 독자용 언어
+- kebele, agroforestry, parchment처럼 본문 이해를 막는 낯선 용어의 짧은 설명
 
-Dossier와 bean story에는 source scope를 `exact lot`, `station context`, `regional context`, `variety context`, `brew context`로 남깁니다. 드링크 가이드의 목적은 길게 쓰는 것이 아니라, 사실과 맥락을 구분한 채 장소에서 잔까지 이어지는 이해 가능한 흐름을 만드는 것입니다.
+Dossier와 bean story에는 source scope를 `exact lot`, `station context`, `regional context`, `variety context`, `brew context`로 남깁니다. 길이만 늘리지 않습니다. 실제로 새로 알게 되는 지식이 있고, 사실과 넓은 맥락의 경계가 보이며, 장소에서 잔까지 흐름이 이어져야 합니다.
 
 ## 3. 출처 기록 형식
 

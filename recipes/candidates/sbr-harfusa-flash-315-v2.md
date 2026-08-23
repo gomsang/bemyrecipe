@@ -5,7 +5,7 @@ storage: candidate
 bean: ../../beans/sbr-ethiopia-harfusa.md
 research_dossier: ../../research/2026-08-23-harfusa.md
 research_status: sufficient-with-gaps
-brew_ready: true
+brew_ready: false
 lineage: sbr-harfusa-flash-315
 version: 2
 revision:
@@ -29,7 +29,7 @@ similar_recipes:
   - sbr-harfusa-flash-315-v1.md
   - sbr-harfusa-flash-500-v1.md
 created: 2026-08-23
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve
@@ -41,15 +41,15 @@ control_conditions:
 rule_exceptions: []
 rule_extension_requests: []
 drink_guide:
-  status: ready
+  status: research_hold
   title: "차가운 잔에서, 베르가못이 먼저 열리는 순간"
   deck: >-
-    Gedeo 고원의 washed coffee를 315ml 한 잔에 또렷하게 담는다. 급랭은 carafe에서 끝내고, 새 얼음은 잔에 남겨 첫 향과 마지막 온도를 함께 지키는 레시피다.
-  estimated_read_minutes: 5
+    향의 밀도와 시원함을 함께 지키려 했던 두 번째 계산이다. 상변화 식을 바로잡은 뒤 70°C 보수 조건에서 얼음이 모두 녹는 것으로 확인돼 실행을 보류한다. 실제 추출은 v3를 사용한다.
+  estimated_read_minutes: 8
   brew_story: >-
     17g의 coffee에 Aiden water 190ml를 써 진한 hot concentrate를 만들고, carafe의 brew ice 110g으로 바로 식힌다. 315ml 잔에는 fresh serving ice 20g만 따로 둔다. 두 얼음을 나누는 이유는 단순하다. 하나는 추출 직후의 열을 받고, 다른 하나는 마시는 동안의 시간을 맡는다. 95°C bloom에서 시작해 94→92°C로 완만하게 낮춘 것은 Harfusa의 향을 충분히 열되, 오렌지 껍질 같은 마르는 끝맛은 첫 baseline에서 경계하기 위해서다.
   serving_ritual: >-
-    Drip finish 뒤 carafe를 10–15초 부드럽게 돌려 농도와 온도를 맞춘다. fresh serving ice를 담은 315ml 잔으로 곧바로 옮기고 두세 번만 가볍게 섞는다. 첫 모금을 서두르지 말고 향을 먼저 맡은 뒤, 5분 후 같은 노트를 다시 찾아본다.
+    이 version은 실행하지 않는다. v3로 내린 잔을 받으면 첫 모금을 서두르지 말고 향을 먼저 맡은 뒤, 5분 후 같은 노트를 다시 찾아본다.
   brew_choices:
     - label: "CONCENTRATE"
       value: "17g · 190ml"
@@ -152,27 +152,28 @@ batch_pulse_temps_c: [94]
 retention_factor: 2.0
 drop_temp_c: 65
 target_temp_c: 5
+minimum_headspace_ml: 20
 ---
 
 # SBR · Harfusa · 315ml Split-ice Flash brew · v2
 
-상태: **Candidate — 사용자 채택 전 / brew ready**
+상태: **Candidate — 열수지 교정으로 Research Hold**
 
-Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
+Research/Brew gate: **sufficient-with-gaps / brew_ready: false**
 
 ## 요청 충분성
 
 - Decision-critical 정보: **complete**
 - 원두: Ethiopia Yirgacheffe Harfusa Washed G1 · Medium–Light · roast 2026-08-14
 - 서빙: 315ml 유리잔 · carafe brew ice와 fresh serving ice를 나눠 쓰는 Flash brew · 마시는 동안 얼음 잔존
-- 컵 적재: PROFILE의 최소 권장 headspace 20ml를 적용하고, 계산상 29ml를 확보
+- 컵 적재: 고체 얼음 부피까지 반영하면 약 29ml headspace지만, 70°C 보수 조건에서 잔존 얼음 목표에 실패
 - 맛: 별도 단일 우선순위가 없으므로 베르가못 clarity와 백도 sweetness의 균형을 보는 baseline
 - 물: 제주삼다수
 
 ## 규칙 평가
 
-- Ruleset: **v2**
-- Hard constraints: **pass** — ICED/FLASH, split ice, rinse-water 폐기, ordered prep가 일치함
+- Ruleset: **v3**
+- Hard constraints: **blocked** — 실행 순서는 맞지만 교정된 flash 열수지의 잔존 얼음 기준을 통과하지 못함
 - Advisory review: **없음**
 - Rule exception: **없음**
 - System change proposal: **없음**. 얼음 온도·형태가 실제 결과를 크게 바꾸면 통제조건을 보존하고 ruleset 확장을 별도 제안함
@@ -207,7 +208,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 | 얼음 | 위치와 시점 | 역할 | 이 레시피에서의 해석 |
 |---|---|---|---|
 | Brew ice · 110g | 추출 **전**, 빈 Aiden carafe | 약 156g의 뜨거운 추출액을 즉시 급랭 | 65°C 가정에서는 거의 전부 녹는 것이 정상 |
-| Serving ice · 20g | 추출 **후**, 이송 직전 315ml 유리잔 | 급랭을 마무리하고 음용 중 얼음을 유지 | 열수지상 약 19g 잔존 예상; 실제 얼음 형태와 온도에 따라 달라짐 |
+| Serving ice · 20g | 추출 **후**, 이송 직전 315ml 유리잔 | 급랭을 마무리하고 음용 중 얼음을 유지 | 교정 모델에서 65°C 약 2.7g, 70°C 0g 잔존이라 목표에 부족 |
 
 Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린싱합니다. Aiden 동봉 필터는 제조사 지침상 rinse가 필수는 아니지만 exact filter가 아직 미기록이므로, 이번 version에서는 방식을 바꾸지 않습니다. Aiden 위에서 린싱했다면 carafe에 받은 물을 완전히 버린 뒤 brew ice를 넣습니다. 린스 물은 selected water 190ml나 얼음 130g에 포함하지 않습니다.
 
@@ -253,10 +254,10 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 | 예상 hot beverage | 156g | 190 − 34 |
 | 예상 cup load | 286g | 156 + 110 + 20 |
 | 예상 headspace | 29ml | 315 − 286; 개인 최소 권장 20ml 충족, 실제 잔에서는 검증 필요 |
-| 5°C 도달 필요 얼음 | 약 111g | hot beverage 156g, drop 65°C, ice 0°C 가정 |
-| 예상 잔존 얼음 | 약 19g | 총 ice 130 − 필요 ice 110.5 |
-| 낙하 70°C 민감도 | 약 10g 잔존 | 미교정 drop temperature가 높을 때의 보수 확인 |
-| 시작 시 예상 cold liquid | 약 267g · 1:15.68 | 156g coffee + 약 111g 녹은 얼음; 잔존 얼음 제외 |
+| 0°C까지 녹일 수 있는 얼음 | 약 127.3g | hot beverage 156g, drop 65°C, ice 0°C 가정 |
+| 예상 잔존 얼음 | 약 2.7g | 얼음이 남는 동안 혼합물은 약 0°C; 기존 5°C 식은 적용 불가 |
+| 낙하 70°C 민감도 | 0g 잔존 · 약 1.9°C | 총 ice가 모두 녹아 사용자 목표 실패 |
+| 65°C 예상 점유 / headspace | 약 286.2ml / 28.8ml | 액체와 밀도 0.917g/ml인 고체 얼음의 부피 합산 |
 | 모든 얼음이 결국 녹을 때 | 약 286g · 1:16.82 | 실제 장시간 희석의 상한 근사 |
 
 ## Harness check
@@ -270,7 +271,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 - ⚠️ 실제 dose는 machine-assumed dose보다 25.3% 많음 — 화면 안내 대신 17.0g 사용
 - ✅ Actual bloom 1:2.39 — 최소 wetting 경고선보다 큼
 - ✅ 예상 headspace 29ml — `glass-315` 최소 권장 20ml 충족
-- ✅ 65°C 모델에서 약 19g, 70°C 민감도에서도 약 10g ice remaining
+- ❌ 65°C 약 2.7g, 70°C 0g ice remaining — v3 전에는 추출하지 않음
 - ⚠️ 29ml는 Harness상 `타이트, 실제 검증 필요` 범주의 상단이며 얼음 모양·거품에 따라 체적이 달라짐
 - ⚠️ RF, drop temperature, glass 열용량, freezer ice 온도와 형태는 미교정
 - ⚠️ 삼다수 alkalinity/KH와 Ode calibration/seasoning 상태가 미기록
@@ -297,7 +298,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 
 | Setting | 선택 이유 | Dossier 근거 | 신뢰도 |
 |---|---|---|---|
-| 17g / 190ml / ice 110g+20g | 기존 actual 1:11대 농축 비율을 유지하면서 286g cup load, 29ml headspace, 10g 이상의 보수적 ice remaining을 동시에 확보 | Harness 열수지 + 확정된 split geometry | Medium |
+| 17g / 190ml / ice 110g+20g | 당시 계산식은 5°C에서 고체 얼음이 남는 상태를 가정해 잔존량을 과대평가했다. v3에서 교정 | Harness 열수지 재검토 | Retired |
 | Nominal 1:14 | Machine-assumed 13.6g으로 bloom 40.7g을 만들고 실제 17g concentrate와 분리 | Aiden no-scale 공식 자료 + Harness 계산 | Medium |
 | Ode 5⅓ | Fellow의 현재 Single Brew 출발점이며 개인 drawdown 자료가 없는 상태에서 가장 재현 가능한 anchor | Fellow 공식 + Dossier의 상충 자료 | Medium |
 | Bloom 1:3 · 45초 · 95°C | roast 9일차 17g bed에 actual 1:2.39 wetting을 만들고 공식 Light 45초를 유지 | Fellow Light profile + roast age | Medium |
@@ -319,7 +320,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 
 - v1은 `brew_ready: false`인 Research Hold 기록이라 실제 시음값을 바꾸는 sensory revision이 아닙니다. v2는 intake gate를 완료하고 실행 불가능한 serving geometry를 바로잡은 **gate-completion baseline / serving-geometry correction**입니다.
 - Split-ice Flash brew, 균형형 향미 목표, 제주삼다수, 최소 20ml headspace 조건을 확정했습니다.
-- 20g/225ml/110g total ice를 17g/190ml/130g total ice로 재설계해 예상 headspace를 20→29ml, ice remaining을 0g 미만 가능성→약 19g으로 바꿨습니다.
+- 20g/225ml/110g total ice를 17g/190ml/130g total ice로 재설계했지만, 2026-08-24 상변화 계산 교정에서 잔존 얼음 목표를 충족하지 못한 것으로 판정했습니다.
 - 근거가 약했던 Ode 4⅓을 현재 공식 Single Brew anchor 5⅓으로, bloom/pulse를 현재 공식 baseline과 500ml Candidate의 적용 조건에 맞춰 재설정했습니다.
 - 다음 실제 brew부터는 한 번에 primary variable 하나만 변경합니다.
 

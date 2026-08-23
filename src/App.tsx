@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   BookOpenText,
   Check,
+  ChevronDown,
   ChevronRight,
   CircleAlert,
   CircleCheckBig,
@@ -143,6 +144,10 @@ function App() {
           && Boolean(recipe.revision?.summary)
           && Boolean(recipe.drinkGuide?.title)
           && Boolean(recipe.bean?.story?.headline)
+          && (recipe.bean?.story?.processJourney?.length ?? 0) >= 4
+          && (recipe.bean?.story?.tastingLexicon?.length ?? 0) >= 3
+          && (recipe.bean?.story?.glossary?.length ?? 0) >= 4
+          && Number.isFinite(recipe.brew?.minHeadspaceMl)
           && Boolean(recipe.bean?.roasterCode)
           && Number.isInteger(recipe.versionCount)
         ))) return;
@@ -289,7 +294,7 @@ function PublicRecipes(props: PublicRecipesProps) {
     <main>
       <section className="hero">
         <div className="eyebrow"><span /> PERSONAL BREW INDEX</div>
-        <h1>좋은 한 잔은<br /><em>기록에서</em> 시작됩니다.</h1>
+        <h1>좋은 한 잔은<br /><span className="hero-accent">기록에서</span> 시작됩니다.</h1>
         <p>원두의 맥락과 실제 추출 결과를 함께 쌓아가는 Fellow Aiden 레시피 아카이브.</p>
         <div className="hero-counts">
           <button onClick={() => props.onStatus("accepted")}><strong>{String(props.acceptedCount).padStart(2, "0")}</strong><span>ACCEPTED</span><ArrowUpRight size={16} /></button>
@@ -450,8 +455,6 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
       </div>
 
       {detailView === "brew" ? <>
-        <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
-
         <div className="metric-grid">
           <Metric icon={<Coffee />} label="DOSE" value={`${recipe.brew.doseG}g`} />
           <Metric icon={<Waves />} label="BREW WATER" value={`${recipe.brew.brewWaterG}ml`} />
@@ -539,7 +542,8 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
         ))}
         </section>
       </> : <DrinkGuideReader recipe={recipe} />}
-      <div className="source-line"><ShieldCheck size={15} /><span>{recipe.validation.valid ? "Aiden 입력값 검증 완료" : "입력값 확인 필요"}</span><span>{recipe.created}</span></div>
+      <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
+      <div className="source-line"><ShieldCheck size={15} /><span>{!recipe.brewReady ? "Research Hold · 실행 보류" : recipe.validation.valid ? "Aiden 입력값 검증 완료" : "입력값 확인 필요"}</span><span>{recipe.created}</span></div>
     </aside>
   );
 }
@@ -589,8 +593,38 @@ function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
         ))}
       </div>
 
+      <div className="guide-intro">
+        <span>02 · FROM CHERRY TO GREEN</span>
+        <h3>Washed라는 한 단어 안에서 일어나는 일</h3>
+        <p>가공명은 맛의 별명이 아니라 체리를 생두로 바꾸는 작업의 묶음입니다. 이번 로트에서 확인된 사실과 일반 공정, 같은 이름의 다른 crop 자료를 구분해 읽습니다.</p>
+      </div>
+      <div className="process-journey">
+        {story.processJourney.map((item) => (
+          <article key={`${item.step}-${item.title}`}>
+            <span>{item.step}</span>
+            <div><small>{item.scope}</small><h4>{item.title}</h4><p>{item.body}</p></div>
+          </article>
+        ))}
+      </div>
+
+      <div className="guide-intro">
+        <span>03 · TASTING LANGUAGE</span>
+        <h3>봉투의 세 단어를 마시는 법</h3>
+        <p>컵노트는 첨가물이나 정답이 아니라 향과 맛을 함께 찾기 위한 비유입니다. 비슷해 보이는 감각과 무엇이 다른지도 같이 살펴봅니다.</p>
+      </div>
+      <div className="tasting-lexicon">
+        {story.tastingLexicon.map((item) => (
+          <article key={item.term}><span>{item.term}</span><p>{item.cue}</p><small>{item.distinction}</small></article>
+        ))}
+      </div>
+
+      <div className="guide-glossary">
+        <div className="detail-section-title"><span>작은 사전</span><span>{story.glossary.length} WORDS</span></div>
+        {story.glossary.map((item) => <div key={item.term}><strong>{item.term}</strong><p>{item.definition}</p></div>)}
+      </div>
+
       <div className="guide-intro guide-brew-intro">
-        <span>02 · WHY THIS BREW</span>
+        <span>04 · WHY THIS BREW</span>
         <h3>이 한 잔을 이렇게 설계한 이유</h3>
         <p>{guide.brewStory}</p>
       </div>
@@ -601,7 +635,7 @@ function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
       </div>
 
       <div className="guide-intro guide-taste-intro">
-        <span>03 · HOW TO DRINK</span>
+        <span>05 · HOW TO DRINK</span>
         <h3>온도가 움직이는 동안 찾아볼 것</h3>
         <p>{guide.servingRitual}</p>
       </div>
@@ -640,8 +674,12 @@ function VersionHistory({ recipe, versions, onSelect }: {
   const revision = revisionFor(recipe);
   const latestVersion = Math.max(...versions.map((item) => item.version));
   return (
-    <section className="version-program">
-      <div className="detail-section-title"><span>VERSION HISTORY</span><span>{versions.length} {versions.length === 1 ? "REVISION" : "REVISIONS"}</span></div>
+    <details className="version-program">
+      <summary>
+        <span><small>RECIPE ARCHIVE</small><strong>VERSION HISTORY &amp; SELECTED CHANGE</strong></span>
+        <span>{versions.length} {versions.length === 1 ? "REVISION" : "REVISIONS"}<ChevronDown size={15} /></span>
+      </summary>
+      <div className="version-program-body">
       <div className="version-list">
         {versions.map((item) => {
           const itemRevision = revisionFor(item);
@@ -651,7 +689,7 @@ function VersionHistory({ recipe, versions, onSelect }: {
               <span className="version-copy">
                 <small>{REVISION_KIND_LABELS[itemRevision.kind]}{item.version === latestVersion ? " · LATEST" : ""} · {item.created}</small>
                 <strong>{itemRevision.summary}</strong>
-                <i>{item.status.toUpperCase()}</i>
+                <i>{item.brewReady ? item.status.toUpperCase() : "RESEARCH HOLD"}</i>
               </span>
               <ChevronRight size={14} />
             </button>
@@ -667,7 +705,8 @@ function VersionHistory({ recipe, versions, onSelect }: {
           <div className="success-criteria"><span>SUCCESS CRITERIA</span>{revision.successCriteria.map((criterion) => <p key={criterion}>{criterion}</p>)}</div>
         ) : null}
       </div>
-    </section>
+      </div>
+    </details>
   );
 }
 

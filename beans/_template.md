@@ -52,6 +52,42 @@ story:
       title: ""
       body: ""
       evidence: brew_context
+  process_journey:
+    - step: "01"
+      title: ""
+      body: ""
+      scope: "GENERAL PROCESS CONTEXT"
+    - step: "02"
+      title: ""
+      body: ""
+      scope: "EXACT LOT 또는 CONTEXT"
+    - step: "03"
+      title: ""
+      body: ""
+      scope: "EXACT LOT 또는 CONTEXT"
+    - step: "04"
+      title: ""
+      body: ""
+      scope: "EXACT LOT 또는 CONTEXT"
+  tasting_lexicon:
+    - term: ""
+      cue: ""
+      distinction: ""
+    - term: ""
+      cue: ""
+      distinction: ""
+    - term: ""
+      cue: ""
+      distinction: ""
+  glossary:
+    - term: ""
+      definition: ""
+    - term: ""
+      definition: ""
+    - term: ""
+      definition: ""
+    - term: ""
+      definition: ""
   facts: []
   unknowns: []
   sources: []

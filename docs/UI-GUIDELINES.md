@@ -24,17 +24,23 @@ Apple HIG는 쉽게 읽을 수 있는 크기, 지나치게 가는 weight 회피,
 
 상세 화면의 첫 단계는 두 가지다.
 
-1. `추출 레시피`: 실행값, version history, ice plan, preparation, rules
+1. `추출 레시피`: 실행값, ice plan, preparation, rules
 2. `드링크 가이드`: 원두 배경, 이 version의 추출 의도, 마시는 순서, 출처 범위
 
 두 mode는 같은 중요도의 tab으로 표시한다. 로그인하지 않은 사용자에게는 Aiden이나 token 기능의 빈 자리, 잠금 표시, 가입 유도문을 보여 주지 않는다.
+
+`VERSION HISTORY`와 `SELECTED CHANGE`는 현재 추출을 실행하는 데 필요한 정보가 아니다. 상세 화면 맨 아래의 하나의 접이식 archive에 묶고 기본값은 닫힘으로 둔다. 어느 tab을 보고 있든 같은 위치에서 열 수 있어야 한다.
 
 ## Drink Guide reader
 
 - 첫 화면은 제목, 한 문단 소개, 예상 독서 시간으로 시작한다.
 - 원두 fact는 label/value/source note가 있는 grid로 보여 준다.
-- 긴 본문은 `THE COFFEE → WHY THIS BREW → HOW TO DRINK → SOURCES` 순서로 나눈다.
+- 긴 본문은 `THE COFFEE → FROM CHERRY TO GREEN → TASTING LANGUAGE → WHY THIS BREW → HOW TO DRINK → SOURCES` 순서로 나눈다.
 - 각 coffee chapter는 `LOT FACT`, `STATION CONTEXT`, `REGIONAL CONTEXT`, `VARIETY CONTEXT`, `BREW CONTEXT` 중 하나를 표시한다.
+- `FROM CHERRY TO GREEN`은 가공명을 최소 네 단계의 과정으로 풀고, 일반 공정인지 exact-lot 사실인지 범위를 붙인다.
+- `TASTING LANGUAGE`는 봉투의 컵노트를 첨가물이나 정답처럼 말하지 않고, 찾아볼 감각과 구분할 감각을 함께 제시한다.
+- 낯선 산지·가공 용어는 본문을 반복하지 않는 작은 사전으로 모은다.
+- 전체 guide는 마시는 사람을 위한 글이다. 추출 설정을 설명하는 장은 `WHY THIS BREW` 하나뿐이다.
 - `unknowns`는 숨기지 않고 출처 바로 앞에 둔다.
 - Source는 직접 링크와 적용 범위를 함께 표시한다. 출처 수만 많은 장식용 목록은 만들지 않는다.
 - Research Hold version은 guide를 지우지 않되, 실행용이 아니라는 경고를 제목 앞에 표시한다.

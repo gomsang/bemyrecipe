@@ -1,8 +1,8 @@
 # Recipe rule governance
 
-## 목적
+## 이 규칙이 하는 일
 
-규칙은 레시피를 획일화하기 위한 목록이 아니다. 현재 Aiden과 데이터 구조에서 실행할 수 없는 설정은 막고, 아직 모델링하지 못한 좋은 아이디어는 잃지 않기 위한 장치다.
+실행할 수 없는 레시피는 막되, 아직 코드가 모르는 좋은 아이디어까지 버리지는 않습니다. 그 경계를 관리하는 문서입니다.
 
 중앙 source는 `shared/recipe-rules.ts`다. 사이트 UI와 Markdown catalog builder가 이 파일을 함께 사용한다.
 
@@ -18,6 +18,8 @@
 - 린스 물을 버리지 않아 계산하지 않은 물이 남는 구조
 - pulse count와 온도 배열 길이 불일치
 - `brew_ready: true`인데 필수 실행 단계가 없는 상태
+- 얼음이 남아야 하는 Flash recipe가 기본 또는 +5°C 조건에서 잔존 얼음 10g을 확보하지 못한 상태
+- 고체 얼음 부피를 포함한 headspace가 recipe의 `minimum_headspace_ml`보다 작은 상태
 
 Hard constraint는 `rule_exceptions`로 우회할 수 없다.
 
@@ -36,7 +38,7 @@ Hard constraint는 `rule_exceptions`로 우회할 수 없다.
 ## Markdown 계약
 
 ```yaml
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve

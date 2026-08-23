@@ -89,7 +89,7 @@ Accepted recipe를 먼저 참고합니다. 다만 같은 나라나 같은 roast�
 
 ## 2.2 Drink Guide gate
 
-숫자 레시피와 드링크 가이드는 같은 조사에서 출발하지만 역할이 다릅니다. 원두 파일의 `story`는 recipe version이 바뀌어도 유지되는 장소·사람·품종·고도·가공·로스팅 맥락을 소유하고, recipe의 `drink_guide`는 해당 version의 추출 의도·서빙·맛의 시간축을 소유합니다. Catalog builder가 둘을 합쳐 한 편의 가이드로 만듭니다.
+숫자 레시피와 드링크 가이드는 같은 조사에서 출발하지만 역할이 다릅니다. 드링크 가이드의 주 독자는 내리는 사람이 아니라 잔을 받아 마시는 사람입니다. 원두 파일의 `story`는 recipe version이 바뀌어도 유지되는 장소·사람·품종·고도·가공·로스팅 맥락을 소유하고, recipe의 `drink_guide`는 해당 version의 추출 의도·서빙·맛의 시간축을 소유합니다. Catalog builder가 둘을 합쳐 한 편의 가이드로 만듭니다.
 
 모든 bean story는 다음 장을 포함합니다.
 
@@ -101,9 +101,11 @@ Accepted recipe를 먼저 참고합니다. 다만 같은 나라나 같은 roast�
 6. `process`: 확인된 가공명과, exact crop에 적용할 수 있는 세부 가공 정보의 범위
 7. `roast`: roaster·배전도·roast date와 추출 맥락. 확인되지 않은 열원, development, color는 추측 금지
 
+설명은 확인표가 아니라 짧은 매거진처럼 읽혀야 합니다. `process_journey`에서는 확인된 가공명을 체리 선별, 과육 제거, 발효·점액질 제거, 세척, 건조 같은 실제 단계로 풀고 각 단계의 적용 범위를 표시합니다. `tasting_lexicon`은 봉투의 컵노트를 향·맛·질감으로 번역하고 비슷하지만 불쾌할 수 있는 감각과 구분합니다. `glossary`는 kebele, landrace, parchment처럼 처음 보는 독자가 막힐 말을 짧게 설명합니다. 품종은 이름만 적지 말고 기원·역사·유전적 의미를 다루고, 지역과 고도·가공·로스팅은 서로 영향을 주는 조건으로 설명합니다.
+
 `story.sections[].evidence`는 `exact_lot`, `station_context`, `regional_context`, `variety_context`, `brew_context` 중 하나입니다. 문장 안에서도 직접 확인된 사실과 넓은 맥락을 구분합니다. 유명 산지의 전형적인 향미를 이번 lot의 맛으로 단정하지 않습니다.
 
-Recipe `drink_guide`는 다음을 포함합니다.
+Recipe `drink_guide`에서 추출자를 위한 설명은 **WHY THIS BREW**뿐입니다. 나머지 장은 마시는 사람이 커피의 배경과 감각을 이해하도록 씁니다. 다음을 포함합니다.
 
 - 이 version만의 제목과 한 문단 소개
 - dose, water, ice, grind, temperature, pulse 중 핵심 선택과 이유
@@ -177,26 +179,35 @@ Headspace 판정:
 
 ## 4. Flash brew 열수지 근사
 
-아래 계산은 얼음이 0°C이고, 용기·공기·추출 중 열손실을 무시한 1차 근사입니다.
+아래 계산은 얼음이 0°C이고, 용기·공기·추출 중 열손실을 무시한 보수 근사입니다. 고체 얼음과 액체 물이 함께 남아 있는 평형은 약 0°C입니다. 얼음이 남으면서 액체가 5°C라는 상태를 계산하지 않습니다.
 
 기호:
 
 - `B`: estimated hot beverage (g)
 - `Td`: 커피가 얼음에 닿을 때의 실제 온도(°C)
-- `Tt`: 목표 온도(°C)
 - 물의 비열 `c = 4.186 J/g°C`
 - 얼음 융해열 `Lf = 333.55 J/g`
+- 고체 얼음 밀도 `ρice = 0.917g/ml`
 
 ```text
-iceNeededG = B × c × (Td - Tt) / (Lf + c × Tt)
-estimatedIceRemainingG = max(0, BI + SI - iceNeededG)
+iceMeltAtZeroG = B × c × Td / Lf
+estimatedMeltedIceG = min(BI + SI, iceMeltAtZeroG)
+estimatedIceRemainingG = max(0, BI + SI - estimatedMeltedIceG)
+estimatedOccupiedVolumeMl = B + estimatedMeltedIceG + estimatedIceRemainingG / ρice
+estimatedHeadspaceMl = Cup - estimatedOccupiedVolumeMl
+```
+
+얼음이 전부 녹을 때만 남은 에너지로 최종 액체 온도를 계산합니다.
+
+```text
+finalLiquidTempC = (B × c × Td - (BI + SI) × Lf) / (c × (B + BI + SI))
 ```
 
 판정:
 
-- `estimatedIceRemainingG < 5g`: 얼음이 모두 녹을 가능성
-- `5–9g`: 경계
-- `10g 이상`: 목표 후보
+- `ice_goal: remain_while_drinking`인 brew-ready Flash recipe는 `drop_temp_c`와 `drop_temp_c + 5°C`에서 모두 10g 이상 남아야 합니다.
+- 두 조건에서 고체 얼음 부피를 포함한 headspace가 `minimum_headspace_ml` 이상이어야 합니다.
+- 얼음이 남는 계산 결과의 온도는 약 0°C이며, 실제 서빙 온도는 비평형 이송·용기·공기·냉동고 온도 때문에 달라질 수 있습니다.
 
 이 계산을 레시피의 진실로 취급하지 않습니다. 실제 낙하 온도, 최종 무게, 얼음 잔존을 기록해 `PROFILE.md`를 교정합니다.
 

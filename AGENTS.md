@@ -20,9 +20,11 @@ Read these files before recipe work:
 
 Markdown files are the database. Update them as part of the requested work; do not merely print a recipe in chat and leave the repository stale.
 
-Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
+Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, `minimum_headspace_ml`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
 
-Every recipe must also ship with a Drink Guide. Store reusable, sourced coffee context in the linked bean file's `story` frontmatter and version-specific brewing/serving narrative in the recipe's `drink_guide` frontmatter. Cover place, region, people or production structure, variety, altitude, process, roast, uncertainty, why the settings were chosen, and what to notice while drinking. Separate exact-lot facts from station, regional, variety, and brew context. Never invent a farm, producer, cultivar, fermentation detail, or roast method to make the story feel complete.
+Every recipe must also ship with a Drink Guide. Its primary reader is the person drinking the coffee, not the brewer; only **WHY THIS BREW** is brewer-facing. Store reusable, sourced coffee context in the linked bean file's `story` frontmatter and version-specific brewing/serving narrative in the recipe's `drink_guide` frontmatter. Cover place, region, people or production structure, variety history and meaning, altitude, process stages, roast, a tasting-note lexicon, glossary, uncertainty, why the settings were chosen, and what to notice while drinking. Separate exact-lot facts from station, regional, variety, and brew context. Never invent a farm, producer, cultivar, fermentation detail, or roast method to make the story feel complete.
+
+If the `humanize-korean` skill is installed, use it after facts, citations, and recipe values are settled to polish reader-facing Korean recipe and Drink Guide prose. Do not let prose editing change numeric settings, quotations, source scope, confidence labels, or citations. Agent-only control documents are exempt.
 
 Every recipe also belongs to a versioned `lineage`. When bean, serve mode, brew method, beverage style, cup, basket, vessel, and ice goal are unchanged, recipe-setting changes must become the next version in the same lineage—not a new recipe card. Record the machine-readable `revision` block from `docs/RECIPE-SCHEMA.md`; the prose `Changed from previous version` section alone is not sufficient.
 
@@ -43,7 +45,7 @@ When the user provides a bean and serving goal:
 9. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate`, `brew_ready: true`, and a version-specific `drink_guide`.
 10. Run every calculation and validation in `HARNESS.md`.
 11. Update `INDEX.md`.
-12. Run `npm run rules:test`, `npm run versions:test`, `npm run catalog:validate`, and `npm run catalog:build`.
+12. Run `npm run rules:test`, `npm run thermal:test`, `npm run versions:test`, `npm run catalog:validate`, and `npm run catalog:build`.
 13. If `CATALOG_SYNC_URL` and `CATALOG_SYNC_TOKEN` are available locally, run `npm run catalog:sync`.
 14. Reply with a compact Markdown brew card: preparation, exact Aiden inputs, Harness calculations, evidence-to-setting rationale, uncertainty, what to observe, and any ruleset expansion proposal.
 
@@ -131,6 +133,7 @@ Source prestige alone does not make a recipe setting transferable. Always record
 - Record filter-rinse water and whether it must be discarded. Never let unrecorded rinse water change the beverage balance.
 - Store preparation details as ordered `prep_steps`, not only as prose below the frontmatter.
 - Check expected beverage output, cup load, and headspace.
+- For flash brew, use the shared 0°C phase-change model. If solid ice remains, the equilibrium estimate is 0°C; do not combine remaining solid ice with a 5°C equilibrium. Include solid-ice volume in headspace and test `drop_temp_c + 5°C`.
 - Treat flash-brew thermal balance as an estimate until personal drop temperature, final weight, and remaining ice calibrate it.
 - Treat grinder settings as calibrated starting points, not universal particle sizes.
 - Compare every Ode setting with Fellow's current volume-specific starting point, then justify deviations using roast, basket, dose, drawdown risk, expert measurement, or personal logs.

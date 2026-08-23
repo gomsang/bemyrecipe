@@ -27,6 +27,18 @@ story:
     - label: "ALTITUDE"
       value: "1,800–2,100m"
       note: "봉투 표기"
+  process_journey:
+    - step: "01"
+      title: "체리 선별"
+      body: "독자가 이해할 수 있는 공정 설명"
+      scope: "GENERAL WASHED CONTEXT"
+  tasting_lexicon:
+    - term: "베르가못"
+      cue: "잔에서 찾아볼 향"
+      distinction: "비슷한 감각과 구분할 점"
+  glossary:
+    - term: "Kebele"
+      definition: "짧고 정확한 독자용 설명"
   unknowns:
     - "개별 생산자와 세부 cultivar"
   sources:
@@ -36,7 +48,7 @@ story:
       note: "지역, 고도, 가공, roast"
 ```
 
-`story.sections`에는 `place`, `region`, `people`, `variety`, `altitude`, `process`, `roast`가 모두 필요합니다. `evidence` 허용값은 `exact_lot`, `station_context`, `regional_context`, `variety_context`, `brew_context`입니다. 같은 이름의 과거 crop이나 가까운 지역 자료는 exact-lot 사실을 대신할 수 없습니다.
+`story.sections`에는 `place`, `region`, `people`, `variety`, `altitude`, `process`, `roast`가 모두 필요합니다. 독자가 가공을 과정으로 이해할 수 있도록 `process_journey` 4개 이상, 컵노트를 실제 감각으로 번역하는 `tasting_lexicon` 3개 이상, 낯선 말을 푸는 `glossary` 4개 이상도 둡니다. `evidence` 허용값은 `exact_lot`, `station_context`, `regional_context`, `variety_context`, `brew_context`입니다. 같은 이름의 과거 crop이나 가까운 지역 자료는 exact-lot 사실을 대신할 수 없습니다.
 
 Recipe 예시:
 
@@ -107,7 +119,7 @@ revision:
 ## Ruleset과 통제조건
 
 ```yaml
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve
@@ -150,6 +162,8 @@ brew_method: flash     # standard | flash | cold_drip
 | `cold_brew` | Aiden Cold Brew 프로그램 | `cold_drip`; 현재 자동 기기 전송 제외 |
 
 `iced`는 Aiden의 Cold Brew 스위치를 뜻하지 않습니다. Flash brew는 `serve_mode: iced`, `brew_method: flash`, `cold_brew_enabled: false`입니다.
+
+Flash recipe는 `retention_factor`, `drop_temp_c`, `target_temp_c`와 함께 컵별 최소 여유인 `minimum_headspace_ml`을 기록합니다. Validator는 0°C 상변화 모델로 `drop_temp_c`와 5°C 높은 stress 조건을 계산합니다. `ice_goal: remain_while_drinking`이면 두 조건 모두 잔존 얼음 10g 이상이어야 하고, 고체 얼음의 부피까지 포함한 headspace가 `minimum_headspace_ml` 이상이어야 합니다.
 
 ## 필터 린싱
 

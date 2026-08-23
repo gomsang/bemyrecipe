@@ -26,6 +26,8 @@ Codex는 `AGENTS.md`에 따라 `PROFILE.md`, `HARNESS.md`, `INTAKE.md`, 조사 d
 Candidate 생성·수정 후:
 
 ```bash
+npm run rules:test
+npm run thermal:test
 npm run catalog:validate
 npm run catalog:build
 npm run catalog:sync

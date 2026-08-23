@@ -2,7 +2,7 @@
 
 ## 원칙
 
-레시피 원본은 Git으로 버전 관리하는 Markdown입니다. Firestore는 공개 사이트와 개인 동기화 상태를 위한 저장소입니다. Aiden은 Accepted 레시피의 배포 대상이지 원본 저장소가 아닙니다.
+레시피 원본은 Git으로 버전 관리하는 Markdown입니다. Firestore에는 사이트가 읽을 사본과 개인 동기화 상태만 둡니다. Aiden은 Accepted 레시피가 도착하는 곳이지 원본을 고치는 곳이 아닙니다.
 
 ```text
 Codex chat
@@ -24,7 +24,7 @@ Browser
 
 빌드 시 `scripts/build-catalog.ts`가 Markdown을 검증해 `public/catalog.json`을 만듭니다. 정적 파일만으로도 공개 사이트가 열립니다. Firestore에 동기화된 레시피가 있으면 사이트가 최신 원격 카탈로그를 사용합니다.
 
-원두의 재사용 가능한 `story`는 bean Markdown이 소유하고, version별 `drink_guide`는 recipe Markdown이 소유합니다. Catalog builder는 둘을 recipe의 `drinkGuide`로 합성합니다. 공개 UI는 **추출 레시피 / 드링크 가이드** 두 독서 모드를 제공하지만 어느 쪽도 브라우저가 만든 별도 원본이 아닙니다.
+원두에 공통인 `story`는 bean Markdown에, version마다 달라지는 `drink_guide`는 recipe Markdown에 씁니다. Catalog builder가 둘을 `drinkGuide` 하나로 합칩니다. 브라우저의 **추출 레시피 / 드링크 가이드**는 같은 원본을 두 방식으로 읽는 화면이며 별도의 글을 저장하지 않습니다.
 
 화면의 타이포그래피·breakpoint·상세 정보 순서·Drink Guide reader 규칙은 [UI-GUIDELINES.md](UI-GUIDELINES.md)에 둡니다.
 

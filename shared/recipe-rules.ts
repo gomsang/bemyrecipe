@@ -1,5 +1,5 @@
 export const RECIPE_RULES = {
-  version: 2,
+  version: 3,
   ui: {
     serveModes: {
       hot: {

@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { AidenProfile } from "../shared/aiden-profile";
 import { validateAidenProfile } from "../shared/aiden-profile";
+import { estimateFlashThermalBalance } from "../shared/flash-thermal";
 import {
   evaluateRecipeRules,
   type RuleException,
@@ -65,6 +66,9 @@ function readBeanStory(data: Record<string, unknown>): BeanStory {
   const sections = Array.isArray(story.sections) ? story.sections.map(record) : [];
   const facts = Array.isArray(story.facts) ? story.facts.map(record) : [];
   const sources = Array.isArray(story.sources) ? story.sources.map(record) : [];
+  const processJourney = Array.isArray(story.process_journey) ? story.process_journey.map(record) : [];
+  const tastingLexicon = Array.isArray(story.tasting_lexicon) ? story.tasting_lexicon.map(record) : [];
+  const glossary = Array.isArray(story.glossary) ? story.glossary.map(record) : [];
   return {
     headline: String(story.headline ?? "").trim(),
     deck: String(story.deck ?? "").trim(),
@@ -86,6 +90,21 @@ function readBeanStory(data: Record<string, unknown>): BeanStory {
       url: source.url ? String(source.url).trim() : null,
       scope: String(source.scope ?? "").trim(),
       note: String(source.note ?? "").trim(),
+    })),
+    processJourney: processJourney.map((item) => ({
+      step: String(item.step ?? "").trim(),
+      title: String(item.title ?? "").trim(),
+      body: String(item.body ?? "").trim(),
+      scope: String(item.scope ?? "").trim(),
+    })),
+    tastingLexicon: tastingLexicon.map((item) => ({
+      term: String(item.term ?? "").trim(),
+      cue: String(item.cue ?? "").trim(),
+      distinction: String(item.distinction ?? "").trim(),
+    })),
+    glossary: glossary.map((item) => ({
+      term: String(item.term ?? "").trim(),
+      definition: String(item.definition ?? "").trim(),
     })),
   };
 }
@@ -291,6 +310,9 @@ export function buildCatalog(): Catalog {
         grinder: String(data.grinder ?? ""),
         grindSetting: String(data.grind_setting ?? ""),
         targetTempC: Number(data.target_temp_c),
+        retentionFactor: Number(data.retention_factor),
+        dropTempC: Number(data.drop_temp_c),
+        minHeadspaceMl: Number(data.minimum_headspace_ml),
       },
       preparation,
       drinkGuide: readDrinkGuide(data, bean.story),
@@ -303,7 +325,7 @@ export function buildCatalog(): Catalog {
       sourcePath: path.relative(REPO_ROOT, file),
       summary: summaryFromMarkdown(parsed.content),
     };
-    recipe.validation.errors.push(...validateRevisionShape(recipe), ...validateDrinkGuide(recipe), ...validateRoasterIdentity(recipe));
+    recipe.validation.errors.push(...validateRevisionShape(recipe), ...validateDrinkGuide(recipe), ...validateRoasterIdentity(recipe), ...validateFlashThermalBalance(recipe));
     recipe.validation.valid = recipe.validation.errors.length === 0;
     return recipe;
   });
@@ -340,12 +362,42 @@ function validateDrinkGuide(recipe: CatalogRecipe): string[] {
   }
   if (story.facts.length < 6 || story.facts.some((fact) => !fact.label || !fact.value)) errors.push("drink_guide.bean_story.facts: 확인 가능한 원두 fact가 6개 이상 필요합니다.");
   if (story.sources.length < 3 || story.sources.some((source) => !source.label || !source.scope)) errors.push("drink_guide.bean_story.sources: 범위를 표시한 출처가 3개 이상 필요합니다.");
+  if (story.processJourney.length < 4 || story.processJourney.some((item) => !item.step || !item.title || !item.body || !item.scope)) errors.push("drink_guide.bean_story.process_journey: 범위를 표시한 가공 단계가 4개 이상 필요합니다.");
+  if (story.tastingLexicon.length < 3 || story.tastingLexicon.some((item) => !item.term || !item.cue || !item.distinction)) errors.push("drink_guide.bean_story.tasting_lexicon: 감각어 해설이 3개 이상 필요합니다.");
+  if (story.glossary.length < 4 || story.glossary.some((item) => !item.term || !item.definition)) errors.push("drink_guide.bean_story.glossary: 독자를 위한 용어 해설이 4개 이상 필요합니다.");
   if (!guide.title || !guide.deck || !guide.brewStory || !guide.servingRitual) errors.push("drink_guide.recipe_story.missing: title, deck, brew_story, serving_ritual이 필요합니다.");
   if (!Number.isInteger(guide.estimatedReadMinutes) || guide.estimatedReadMinutes < 1 || guide.estimatedReadMinutes > 15) errors.push("drink_guide.read_time.invalid: estimated_read_minutes는 1–15분 정수여야 합니다.");
   if (guide.brewChoices.length < 3 || guide.brewChoices.some((choice) => !choice.label || !choice.value || !choice.reason)) errors.push("drink_guide.brew_choices: 값과 이유가 있는 brew choice가 3개 이상 필요합니다.");
   if (guide.tasteJourney.length < 3 || guide.tasteJourney.some((item) => !item.moment || !item.cue)) errors.push("drink_guide.taste_journey: moment와 cue가 있는 tasting 단계가 3개 이상 필요합니다.");
   if (recipe.brewReady && guide.status !== "ready") errors.push("drink_guide.status: brew_ready recipe의 drink_guide.status는 ready여야 합니다.");
   if (!recipe.brewReady && guide.status !== "research_hold") errors.push("drink_guide.status: Research Hold recipe의 drink_guide.status는 research_hold여야 합니다.");
+  return errors;
+}
+
+function validateFlashThermalBalance(recipe: CatalogRecipe): string[] {
+  if (!recipe.brewReady || recipe.serveMode !== "iced" || recipe.brewMethod !== "flash") return [];
+  const errors: string[] = [];
+  const { retentionFactor, dropTempC, minHeadspaceMl } = recipe.brew;
+  if (![retentionFactor, dropTempC, minHeadspaceMl].every(Number.isFinite) || retentionFactor <= 0 || dropTempC <= 0 || minHeadspaceMl < 0) {
+    return ["thermal.input.invalid: flash recipe에는 유효한 retention_factor, drop_temp_c, minimum_headspace_ml이 필요합니다."];
+  }
+  const input = {
+    selectedWaterG: recipe.brew.brewWaterG,
+    doseG: recipe.brew.doseG,
+    retentionFactor,
+    brewIceG: recipe.brew.brewIceG,
+    servingIceG: recipe.brew.servingIceG,
+    dropTempC,
+    cupCapacityMl: recipe.brew.cupCapacityMl,
+  };
+  const base = estimateFlashThermalBalance(input);
+  const stress = estimateFlashThermalBalance({ ...input, dropTempC: dropTempC + 5 });
+  if (recipe.controlConditions.ice_goal === "remain_while_drinking" && (base.remainingIceG < 10 || stress.remainingIceG < 10)) {
+    errors.push(`thermal.ice_remaining: 0°C ice model에서 base/stress 잔존 얼음이 각각 ${base.remainingIceG.toFixed(1)}g/${stress.remainingIceG.toFixed(1)}g입니다. 두 조건 모두 10g 이상이어야 합니다.`);
+  }
+  if (base.estimatedHeadspaceMl < minHeadspaceMl || stress.estimatedHeadspaceMl < minHeadspaceMl) {
+    errors.push(`thermal.headspace: 고체 얼음 부피를 포함한 base/stress headspace가 각각 ${base.estimatedHeadspaceMl.toFixed(1)}ml/${stress.estimatedHeadspaceMl.toFixed(1)}ml입니다. minimum_headspace_ml ${minHeadspaceMl}ml 이상이어야 합니다.`);
+  }
   return errors;
 }
 

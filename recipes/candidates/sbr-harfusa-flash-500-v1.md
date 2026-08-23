@@ -24,7 +24,7 @@ acceptance_note: null
 similar_recipes:
   - sbr-harfusa-flash-315-v1.md
 created: 2026-08-23
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve
@@ -40,11 +40,11 @@ drink_guide:
   title: "긴 한 잔을 위한 두 번의 냉각"
   deck: >-
     500ml 텀블러를 채우되 넘치지 않고, 마지막 모금까지 얼음이 남도록 설계했다. Harfusa의 밝은 향을 처음에만 번쩍이는 인상으로 끝내지 않고 오래 이어 가는 버전이다.
-  estimated_read_minutes: 5
+  estimated_read_minutes: 8
   brew_story: >-
-    25g coffee와 Aiden water 280ml로 충분한 양의 hot concentrate를 만들고, carafe의 brew ice 150g이 첫 번째 냉각을 맡는다. 텀블러에는 fresh serving ice 80g을 따로 둬 두 번째 냉각과 장시간 보냉을 맡긴다. 예상 적재량은 460g으로 40ml headspace를 남기고, 보수적인 열수지에서도 약 67g의 얼음이 남을 수 있는 구성이다. 25g bed의 흐름을 고려해 pulse 간격은 공식 23초보다 5초 늘렸다.
+    25g coffee와 Aiden water 280ml로 hot concentrate를 만들고, carafe의 brew ice 150g이 첫 번째 냉각을 맡는다. 텀블러에는 fresh serving ice 80g을 따로 둬 두 번째 냉각과 장시간 보냉을 맡긴다. 고체 얼음의 부피까지 계산하면 65°C 기준 약 36ml headspace와 42.5g의 얼음이 남는다. 낙하 온도를 70°C로 높인 조건에서도 약 28g이 남는다. 25g bed의 흐름을 고려해 pulse 간격은 공식 23초보다 5초 늘렸다.
   serving_ritual: >-
-    완료 차임 뒤 drip finish까지 기다리고 carafe를 10–15초 부드럽게 돌린다. 텀블러에 fresh serving ice 80g을 넣은 직후 전부 옮기고 두세 번만 섞는다. 첫 모금과 5분 뒤를 비교하고, 마지막에는 온도뿐 아니라 남은 얼음의 양과 희석된 뒤의 단맛을 함께 본다.
+    뚜껑을 닫기 전에 한 번 향을 맡는다. 첫 모금에서는 감귤의 선명함과 백도의 둥근 단맛을 보고, 5분 뒤에는 희석이 진행된 뒤에도 두 인상이 따로 남는지 비교한다. 긴 한 잔의 마지막에는 남은 얼음과 함께 단맛이 얼마나 이어졌는지 살핀다.
   brew_choices:
     - label: "CONCENTRATE"
       value: "25g · 280ml"
@@ -53,8 +53,8 @@ drink_guide:
       value: "150g + 80g"
       reason: "carafe에서 급랭한 뒤 fresh ice 80g을 텀블러에 남겨 음용 시간을 확보한다."
     - label: "HEADSPACE"
-      value: "약 40ml"
-      reason: "이송과 얼음 움직임을 고려해 텀블러를 끝까지 채우지 않는다."
+      value: "약 36ml"
+      reason: "고체 얼음의 밀도까지 반영해도 개인 최소 30ml보다 여유가 있다."
     - label: "PULSE"
       value: "3회 · 28초"
       reason: "25g의 비교적 큰 single-serve bed에서 overflow와 과도한 교반 위험을 낮추는 baseline이다."
@@ -147,6 +147,7 @@ batch_pulse_temps_c: [94]
 retention_factor: 2.0
 drop_temp_c: 65
 target_temp_c: 5
+minimum_headspace_ml: 30
 ---
 
 # SBR · Harfusa · 500ml Tumbler Flash brew · v1
@@ -165,7 +166,7 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 
 ## 규칙 평가
 
-- Ruleset: **v2**
+- Ruleset: **v3**
 - Hard constraints: **pass** — ICED/FLASH, split ice, rinse-water 폐기, ordered prep가 일치함
 - Advisory review: **없음**
 - Rule exception: **없음**
@@ -213,7 +214,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 | Brew ice · carafe | **150g** |
 | Serving ice · tumbler | **80g** |
 | 컵 | 500ml tumbler |
-| 예상 적재 / headspace | 460g / 40ml |
+| 예상 적재 질량 / 물리 headspace | 460g / 약 36ml |
 | 분쇄도 | Ode Gen 2 Stock Burr · **5⅓** |
 | 물 | 제주삼다수 |
 | Basket | Single Serve cone |
@@ -246,10 +247,10 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 | 예상 retained water | 50g | RF 2.0g/g 가정 |
 | 예상 hot beverage | 230g | 280 − 50 |
 | 예상 cup load | 460g | 230 + 150 + 80 |
-| 예상 headspace | 40ml | 500 − 460; 개인 권장 30ml 충족 |
-| 5°C 도달 필요 얼음 | 약 163g | hot beverage 230g, drop 65°C, ice 0°C 가정 |
-| 예상 잔존 얼음 | 약 67g | 총 ice 230 − 필요 ice 163 |
-| 시작 시 예상 cold liquid | 약 393g · 1:15.72 | 230g coffee + 약 163g 녹은 얼음; 잔존 얼음 제외 |
+| 0°C까지 녹일 수 있는 얼음 | 약 187.5g | hot beverage 230g, drop 65°C, ice 0°C 가정 |
+| 예상 잔존 얼음 | 약 42.5g | 얼음이 남는 동안 혼합물은 약 0°C |
+| 낙하 70°C 민감도 | 약 28.1g 잔존 | +5°C 보수 조건에서도 10g 기준 통과 |
+| 65°C 예상 점유 / headspace | 약 463.8ml / 36.2ml | 액체와 밀도 0.917g/ml인 고체 얼음의 부피 합산 |
 | 모든 얼음이 결국 녹을 때 | 약 460g · 1:18.40 | 실제 장시간 희석의 상한 근사 |
 
 ## Harness check
@@ -262,8 +263,8 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 - ✅ Pulse count 3과 pulse temperature 3개 일치
 - ⚠️ 실제 dose는 machine-assumed dose보다 25% 많음 — 화면 안내 대신 25.0g 사용
 - ✅ Actual bloom 1:2.40 — 최소 wetting 경고선보다 큼
-- ✅ 예상 headspace 40ml — `tumbler-500` 최소 권장 30ml 충족
-- ✅ 0°C 보수 모델에서도 약 67g ice remaining
+- ✅ 65°C/70°C 물리 headspace 약 36.2/37.5ml — `tumbler-500` 최소 30ml 충족
+- ✅ 0°C ice model에서 65°C 약 42.5g, 70°C 약 28.1g ice remaining
 - ⚠️ RF, drop temperature, 텀블러 열용량, freezer ice 온도는 미교정
 - ⚠️ 삼다수 Ca/Mg는 낮은 범위지만 alkalinity/KH가 없어 산미 효과를 단정하지 않음
 - ⚠️ 시작 전 실제 Aiden UI에서 ratio·28초·각 온도 저장 가능 여부 확인; UI가 최종 기준
@@ -289,7 +290,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 
 | Setting | 선택 이유 | Dossier 근거 | 신뢰도 |
 |---|---|---|---|
-| 25g / 280ml / ice 150g+80g | 460g cup load, 40ml headspace, 보수 모델 67g ice remaining | 열수지 + 사용자 승인 geometry | Medium |
+| 25g / 280ml / ice 150g+80g | 460g 질량, 물리 headspace 약 36ml, +5°C 보수 모델에서도 약 28g ice remaining | 상변화 열수지 + 사용자 승인 geometry | Medium |
 | Nominal 1:14 | Machine-assumed 20g으로 bloom 60g을 만들고 실제 25g concentrate와 분리 | Aiden no-scale 공식 자료 + Harness 계산 | Medium |
 | Ode 5⅓ | 공식 Single Brew 시작점이며 유사 Medium–Light washed Ethiopia 4–5⅓의 굵은 끝 | Fellow 공식 + 유사 bean | Medium |
 | Bloom 1:3 · 45s · 95°C | 9일차 25g bed에 actual 1:2.4 wetting, 공식 Light 45초를 보수적으로 채택 | Fellow profiles + roast age | Medium |

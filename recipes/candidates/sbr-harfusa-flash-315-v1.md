@@ -22,7 +22,7 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: 2026-08-23
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve
@@ -38,7 +38,7 @@ drink_guide:
   title: "좋은 레시피가 되지 못한 첫 계산도 남겨 둔다"
   deck: >-
     Harfusa의 이야기는 그대로지만, 이 version의 추출 숫자는 권하지 않는다. 315ml 안에서 급랭과 잔존 얼음을 함께 해결하지 못했던 첫 시도를 보존한 기록이다.
-  estimated_read_minutes: 4
+  estimated_read_minutes: 8
   brew_story: >-
     225ml의 뜨거운 물과 110g의 전체 얼음은 약 185g의 뜨거운 추출액을 5°C까지 식히기에 부족할 가능성이 컸다. 여기에 20ml뿐인 headspace와 근거가 약한 Ode 4⅓ 설정이 겹쳤다. 이 version을 숨기지 않는 이유는 다음 version이 왜 dose와 물, 얼음, 분쇄를 다시 계산했는지 한눈에 비교하기 위해서다.
   serving_ritual: >-
@@ -110,6 +110,7 @@ batch_pulse_temps_c: [96]
 retention_factor: 2.0
 drop_temp_c: 65
 target_temp_c: 5
+minimum_headspace_ml: 20
 ---
 
 # SBR · Harfusa · 315ml Flash brew · v1
@@ -131,7 +132,7 @@ target_temp_c: 5
 
 ## 규칙 평가
 
-- Ruleset: **v2**
+- Ruleset: **v3**
 - Hard constraints: **pass** — 기록 보존용 profile 값과 ice plan 구조는 유효함
 - Advisory review: **Research Hold** — `brew_ready: false`이므로 실행 레시피로 사용하지 않음
 - Rule exception: **없음**

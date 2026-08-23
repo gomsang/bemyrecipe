@@ -21,7 +21,7 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: YYYY-MM-DD
-ruleset_version: 2
+ruleset_version: 3
 control_conditions:
   basket: single_serve
   shower_selector: single_serve
@@ -121,6 +121,7 @@ batch_pulse_temps_c: [0]
 retention_factor: 2.0
 drop_temp_c: 65
 target_temp_c: 5
+minimum_headspace_ml: 20
 ---
 
 # Recipe name · v1
@@ -136,7 +137,7 @@ Research/Brew gate: **blocked / brew_ready: false**
 
 ## 규칙 평가
 
-- Ruleset: v2
+- Ruleset: v3
 - Hard constraints: pass / blocked
 - Advisory review:
 - 새 통제조건 또는 허용값:
