@@ -33,7 +33,54 @@ export type CatalogBean = {
   process: string;
   roastLevel: string;
   roastDate: string;
+  roaster: string;
+  roasterCode: string;
   tastingNotes: string[];
+  story: BeanStory;
+};
+
+export type StoryEvidence = "exact_lot" | "station_context" | "regional_context" | "variety_context" | "brew_context";
+
+export type StorySection = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  evidence: StoryEvidence;
+};
+
+export type StoryFact = {
+  label: string;
+  value: string;
+  note: string;
+};
+
+export type StorySource = {
+  label: string;
+  url: string | null;
+  scope: string;
+  note: string;
+};
+
+export type BeanStory = {
+  headline: string;
+  deck: string;
+  sections: StorySection[];
+  facts: StoryFact[];
+  unknowns: string[];
+  sources: StorySource[];
+};
+
+export type DrinkGuide = {
+  status: "ready" | "research_hold";
+  title: string;
+  deck: string;
+  estimatedReadMinutes: number;
+  brewStory: string;
+  servingRitual: string;
+  brewChoices: Array<{ label: string; value: string; reason: string }>;
+  tasteJourney: Array<{ moment: string; cue: string }>;
+  coffeeStory: BeanStory;
 };
 
 export type BrewSettings = {
@@ -97,6 +144,7 @@ export type CatalogRecipe = {
   profile: AidenProfile;
   brew: BrewSettings;
   preparation: PreparationPlan;
+  drinkGuide: DrinkGuide;
   rulesetVersion: number | null;
   controlConditions: Record<string, unknown>;
   ruleExceptions: RuleException[];

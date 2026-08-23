@@ -14,6 +14,7 @@ coverage:
   aiden_community: false
   bean_specific: false
   internal_recipes: false
+  drink_guide_story: false
 ---
 
 # Bean · Research Dossier

@@ -2,11 +2,11 @@
 type: recipe
 status: candidate
 storage: candidate
-bean: ../../beans/ethiopia-harfusa.md
+bean: ../../beans/sbr-ethiopia-harfusa.md
 research_dossier: ../../research/2026-08-23-harfusa.md
 research_status: sufficient-with-gaps
 brew_ready: false
-lineage: harfusa-flash-315
+lineage: sbr-harfusa-flash-315
 version: 1
 revision:
   kind: baseline
@@ -33,6 +33,33 @@ control_conditions:
   ice_goal: remain_while_drinking
 rule_exceptions: []
 rule_extension_requests: []
+drink_guide:
+  status: research_hold
+  title: "좋은 레시피가 되지 못한 첫 계산도 남겨 둔다"
+  deck: >-
+    Harfusa의 이야기는 그대로지만, 이 version의 추출 숫자는 권하지 않는다. 315ml 안에서 급랭과 잔존 얼음을 함께 해결하지 못했던 첫 시도를 보존한 기록이다.
+  estimated_read_minutes: 4
+  brew_story: >-
+    225ml의 뜨거운 물과 110g의 전체 얼음은 약 185g의 뜨거운 추출액을 5°C까지 식히기에 부족할 가능성이 컸다. 여기에 20ml뿐인 headspace와 근거가 약한 Ode 4⅓ 설정이 겹쳤다. 이 version을 숨기지 않는 이유는 다음 version이 왜 dose와 물, 얼음, 분쇄를 다시 계산했는지 한눈에 비교하기 위해서다.
+  serving_ritual: >-
+    이 가이드는 추출 순서가 아니라 보류 안내다. 실제로 마실 때에는 v2 또는 그 이후의 brew-ready version을 선택하고, 이 version은 VERSION HISTORY에서 설계 변경을 읽는 용도로만 사용한다.
+  brew_choices:
+    - label: "STATUS"
+      value: "RESEARCH HOLD"
+      reason: "intake와 열수지 gate를 통과하지 못해 추출 카드로 사용할 수 없다."
+    - label: "ICE BALANCE"
+      value: "90g + 20g"
+      reason: "계산상 5°C까지 필요한 약 131g보다 적어 잔존 얼음 목표와 충돌했다."
+    - label: "HEADSPACE"
+      value: "20ml"
+      reason: "315ml 유리잔에서 이송과 얼음 움직임을 감안하면 지나치게 타이트했다."
+  taste_journey:
+    - moment: "추출 전"
+      cue: "이 version은 brew_ready가 아니다. 숫자를 Aiden에 입력하지 않는다."
+    - moment: "비교할 때"
+      cue: "v2에서 17g·190ml와 더 많은 brew ice로 geometry가 어떻게 바뀌었는지 본다."
+    - moment: "기록의 의미"
+      cue: "실패 가능성이 확인된 계산도 지우지 않아 같은 문제를 반복하지 않는다."
 beverage_style: flash
 serve_mode: iced
 brew_method: flash
@@ -62,7 +89,7 @@ prep_steps:
     label: "추출 보류"
     instruction: "이 버전은 Research Hold다. 얼음이 남지 않을 가능성이 있으므로 추출 카드로 사용하지 않는다."
     critical: true
-profile_name: "Harfusa Ice 315 v1"
+profile_name: "SBR Harfusa Ice 315 v1"
 profile_temperature_c: 96
 nominal_ratio: 14
 cold_brew_enabled: false
@@ -85,7 +112,7 @@ drop_temp_c: 65
 target_temp_c: 5
 ---
 
-# Harfusa · 315ml Flash brew · v1
+# SBR · Harfusa · 315ml Flash brew · v1
 
 상태: **Candidate · Research Hold — 사용자 채택 전 / 추출 금지**
 

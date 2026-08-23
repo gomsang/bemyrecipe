@@ -11,7 +11,50 @@ process: ""
 roast_level: ""
 roast_date: null
 roaster: ""
+roaster_code: ""
 tasting_notes: []
+story:
+  headline: ""
+  deck: ""
+  sections:
+    - id: place
+      eyebrow: "PLACE · LOT FACT 또는 REGIONAL CONTEXT"
+      title: ""
+      body: ""
+      evidence: exact_lot
+    - id: region
+      eyebrow: "REGION · REGIONAL CONTEXT"
+      title: ""
+      body: ""
+      evidence: regional_context
+    - id: people
+      eyebrow: "PEOPLE · LOT FACT 또는 STATION CONTEXT"
+      title: ""
+      body: ""
+      evidence: station_context
+    - id: variety
+      eyebrow: "VARIETY · VARIETY CONTEXT"
+      title: ""
+      body: ""
+      evidence: variety_context
+    - id: altitude
+      eyebrow: "ALTITUDE · LOT FACT"
+      title: ""
+      body: ""
+      evidence: exact_lot
+    - id: process
+      eyebrow: "PROCESS · LOT FACT + CONTEXT"
+      title: ""
+      body: ""
+      evidence: station_context
+    - id: roast
+      eyebrow: "ROAST · LOT FACT + BREW CONTEXT"
+      title: ""
+      body: ""
+      evidence: brew_context
+  facts: []
+  unknowns: []
+  sources: []
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---

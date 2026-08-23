@@ -32,6 +32,30 @@ control_conditions:
   ice_goal: remain_while_drinking
 rule_exceptions: []
 rule_extension_requests: []
+drink_guide:
+  status: research_hold # ready | research_hold
+  title: ""
+  deck: ""
+  estimated_read_minutes: 4
+  brew_story: ""
+  serving_ritual: ""
+  brew_choices:
+    - label: "DOSE / WATER"
+      value: ""
+      reason: ""
+    - label: "TEMPERATURE"
+      value: ""
+      reason: ""
+    - label: "SERVING"
+      value: ""
+      reason: ""
+  taste_journey:
+    - moment: "향을 맡을 때"
+      cue: ""
+    - moment: "첫 모금"
+      cue: ""
+    - moment: "온도가 변한 뒤"
+      cue: ""
 beverage_style: flash
 serve_mode: iced # hot | iced | cold_brew — docs/RECIPE-SCHEMA.md 참고
 brew_method: flash # standard | flash | cold_drip

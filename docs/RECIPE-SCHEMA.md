@@ -2,16 +2,84 @@
 
 UI와 Aiden 동기화는 레시피 본문을 추측하지 않고 YAML frontmatter만 읽습니다. 사람이 따라 할 설명도 같은 frontmatter의 `prep_steps`로 관리합니다.
 
+## Drink Guide와 원두 story
+
+드링크 가이드는 두 Markdown 원본을 합성합니다.
+
+- `beans/*.md`의 `story`: recipe version에 공통인 장소, 지역, 사람/생산 구조, 품종, 고도, 가공, 로스팅, 미확인 정보와 출처
+- `recipes/*.md`의 `drink_guide`: 해당 version의 추출 의도, 핵심 선택, serving ritual과 시간에 따른 tasting cue
+
+원두 story는 같은 설명을 version마다 복제하지 않게 하고, recipe guide는 설정이 바뀔 때 “왜 이 버전은 이렇게 마시는가”가 함께 바뀌게 합니다. Catalog builder가 둘을 `drinkGuide` projection으로 합칩니다.
+
+Bean 예시:
+
+```yaml
+story:
+  headline: "그늘진 고원에서 건너온, 맑고 향긋한 커피"
+  deck: "한 문단 소개"
+  sections:
+    - id: place
+      eyebrow: "PLACE · LOT FACT"
+      title: "확인된 장소"
+      body: "직접 확인된 사실과 적용 범위를 구분한 본문"
+      evidence: exact_lot
+  facts:
+    - label: "ALTITUDE"
+      value: "1,800–2,100m"
+      note: "봉투 표기"
+  unknowns:
+    - "개별 생산자와 세부 cultivar"
+  sources:
+    - label: "사용자 제공 원두 봉투"
+      url: null
+      scope: "EXACT LOT"
+      note: "지역, 고도, 가공, roast"
+```
+
+`story.sections`에는 `place`, `region`, `people`, `variety`, `altitude`, `process`, `roast`가 모두 필요합니다. `evidence` 허용값은 `exact_lot`, `station_context`, `regional_context`, `variety_context`, `brew_context`입니다. 같은 이름의 과거 crop이나 가까운 지역 자료는 exact-lot 사실을 대신할 수 없습니다.
+
+Recipe 예시:
+
+```yaml
+drink_guide:
+  status: ready # ready | research_hold
+  title: "차가운 잔에서 베르가못이 열리는 순간"
+  deck: "이 version을 설명하는 짧은 소개"
+  estimated_read_minutes: 5
+  brew_story: "dose, water, grind, temperature, ice 설계가 이 원두와 어떻게 연결되는지"
+  serving_ritual: "추출 직후부터 마실 때까지의 실제 행동"
+  brew_choices:
+    - label: "TWO ICE ROLES"
+      value: "110g + 20g"
+      reason: "급랭과 음용 중 보냉을 분리"
+  taste_journey:
+    - moment: "첫 모금"
+      cue: "찾아볼 향미와 질감"
+```
+
+최소 3개의 `brew_choices`와 3개의 `taste_journey`가 필요합니다. `brew_ready: true`는 `drink_guide.status: ready`, 보류 version은 `research_hold`여야 합니다. 확인되지 않은 producer, farm, fermentation, drying, roast machine/development를 서사를 위해 만들어내면 안 됩니다.
+
+## Roaster 식별과 이름
+
+같은 산지·농장·품종이라도 roaster와 roast batch가 다르면 별도 bean과 별도 recipe lineage입니다. Bean frontmatter에는 `roaster`와 2–8자의 대문자 영문·숫자 `roaster_code`를 기록합니다. 로스터가 확인되지 않았을 때만 `roaster: "미기록"`, `roaster_code: "UNK"`를 사용하며 임의로 추정하지 않습니다.
+
+- Bean 파일: `beans/<roaster-code>-<origin>-<producer-or-lot>.md`
+- Lineage: `<roaster-code>-<bean-lot>-<style>-<cup>`처럼 소문자 roaster code로 시작
+- 웹 레시피 제목: `<ROASTER_CODE> · <coffee> · <style> · v<number>`
+- Aiden `profile_name`: `<ROASTER_CODE> <coffee> <style> <cup> v<number>`; 서버가 앞에 `[C]` 또는 `[A]`를 추가
+
+로스터가 뒤늦게 확인되면 `UNK`를 유지한 채 새 version을 만드는 것이 아니라 bean id, lineage, 제목과 profile name을 실제 코드로 정정합니다. 이미 brew log가 존재한다면 링크도 함께 옮겨 계보가 갈라지지 않게 합니다.
+
 ## Lineage와 version
 
 같은 원두·음용 모드·추출 방식·컵·basket·vessel·ice goal에서 추출 설정만 개선되면 새 레시피가 아니라 기존 `lineage`의 다음 version입니다.
 
 ```yaml
-lineage: harfusa-flash-315
+lineage: sbr-harfusa-flash-315
 version: 2
 revision:
   kind: sensory_adjustment
-  parent: harfusa-flash-315-v1
+  parent: sbr-harfusa-flash-315-v1
   primary_variable: grind_setting
   summary: "마르는 끝맛을 줄이기 위해 한 단계 굵게 조정"
   rationale: "v1 brew log에서 느린 drawdown과 astringency가 함께 관찰됨"

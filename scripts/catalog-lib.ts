@@ -12,6 +12,8 @@ import type {
   Catalog,
   CatalogBean,
   CatalogRecipe,
+  BeanStory,
+  DrinkGuide,
   PreparationPlan,
   RecipeRevision,
   RecipeStatus,
@@ -47,7 +49,44 @@ function readBean(recipeFile: string, beanReference: unknown): CatalogBean {
     process: String(bean.process ?? ""),
     roastLevel: String(bean.roast_level ?? ""),
     roastDate: asDate(bean.roast_date),
+    roaster: String(bean.roaster ?? ""),
+    roasterCode: String(bean.roaster_code ?? "").trim().toUpperCase(),
     tastingNotes: Array.isArray(bean.tasting_notes) ? bean.tasting_notes.map(String) : [],
+    story: readBeanStory(bean),
+  };
+}
+
+function cleanStrings(value: unknown): string[] {
+  return Array.isArray(value) ? value.map(String).map((item) => item.trim()).filter(Boolean) : [];
+}
+
+function readBeanStory(data: Record<string, unknown>): BeanStory {
+  const story = record(data.story);
+  const sections = Array.isArray(story.sections) ? story.sections.map(record) : [];
+  const facts = Array.isArray(story.facts) ? story.facts.map(record) : [];
+  const sources = Array.isArray(story.sources) ? story.sources.map(record) : [];
+  return {
+    headline: String(story.headline ?? "").trim(),
+    deck: String(story.deck ?? "").trim(),
+    sections: sections.map((section) => ({
+      id: String(section.id ?? "").trim(),
+      eyebrow: String(section.eyebrow ?? "").trim(),
+      title: String(section.title ?? "").trim(),
+      body: String(section.body ?? "").trim(),
+      evidence: String(section.evidence ?? "regional_context") as BeanStory["sections"][number]["evidence"],
+    })),
+    facts: facts.map((fact) => ({
+      label: String(fact.label ?? "").trim(),
+      value: String(fact.value ?? "").trim(),
+      note: String(fact.note ?? "").trim(),
+    })),
+    unknowns: cleanStrings(story.unknowns),
+    sources: sources.map((source) => ({
+      label: String(source.label ?? "").trim(),
+      url: source.url ? String(source.url).trim() : null,
+      scope: String(source.scope ?? "").trim(),
+      note: String(source.note ?? "").trim(),
+    })),
   };
 }
 
@@ -153,6 +192,30 @@ function readRevision(data: Record<string, unknown>): RecipeRevision {
   };
 }
 
+function readDrinkGuide(data: Record<string, unknown>, coffeeStory: BeanStory): DrinkGuide {
+  const guide = record(data.drink_guide);
+  const brewChoices = Array.isArray(guide.brew_choices) ? guide.brew_choices.map(record) : [];
+  const tasteJourney = Array.isArray(guide.taste_journey) ? guide.taste_journey.map(record) : [];
+  return {
+    status: String(guide.status ?? "research_hold") as DrinkGuide["status"],
+    title: String(guide.title ?? "").trim(),
+    deck: String(guide.deck ?? "").trim(),
+    estimatedReadMinutes: Number(guide.estimated_read_minutes ?? 0),
+    brewStory: String(guide.brew_story ?? "").trim(),
+    servingRitual: String(guide.serving_ritual ?? "").trim(),
+    brewChoices: brewChoices.map((choice) => ({
+      label: String(choice.label ?? "").trim(),
+      value: String(choice.value ?? "").trim(),
+      reason: String(choice.reason ?? "").trim(),
+    })),
+    tasteJourney: tasteJourney.map((item) => ({
+      moment: String(item.moment ?? "").trim(),
+      cue: String(item.cue ?? "").trim(),
+    })),
+    coffeeStory,
+  };
+}
+
 function titleFromMarkdown(content: string, fallback: string): string {
   return content.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? fallback;
 }
@@ -179,6 +242,7 @@ export function buildCatalog(): Catalog {
     const parsed = matter(fs.readFileSync(file, "utf8"));
     const data = parsed.data as Record<string, unknown>;
     const profile = readProfile(data);
+    const bean = readBean(file, data.bean);
     const preparation = readPreparation(data);
     const controlConditions = record(data.control_conditions);
     const ruleExceptions = readRuleExceptions(data);
@@ -214,7 +278,7 @@ export function buildCatalog(): Catalog {
       acceptanceNote: data.acceptance_note ? String(data.acceptance_note) : null,
       serveMode: String(data.serve_mode) as CatalogRecipe["serveMode"],
       brewMethod: String(data.brew_method) as CatalogRecipe["brewMethod"],
-      bean: readBean(file, data.bean),
+      bean,
       profile,
       brew: {
         cupId: String(data.cup_id ?? ""),
@@ -229,6 +293,7 @@ export function buildCatalog(): Catalog {
         targetTempC: Number(data.target_temp_c),
       },
       preparation,
+      drinkGuide: readDrinkGuide(data, bean.story),
       rulesetVersion,
       controlConditions,
       ruleExceptions,
@@ -238,7 +303,7 @@ export function buildCatalog(): Catalog {
       sourcePath: path.relative(REPO_ROOT, file),
       summary: summaryFromMarkdown(parsed.content),
     };
-    recipe.validation.errors.push(...validateRevisionShape(recipe));
+    recipe.validation.errors.push(...validateRevisionShape(recipe), ...validateDrinkGuide(recipe), ...validateRoasterIdentity(recipe));
     recipe.validation.valid = recipe.validation.errors.length === 0;
     return recipe;
   });
@@ -261,6 +326,38 @@ export function buildCatalog(): Catalog {
     schemaVersion: 1,
     recipes,
   };
+}
+
+function validateDrinkGuide(recipe: CatalogRecipe): string[] {
+  const errors: string[] = [];
+  const guide = recipe.drinkGuide;
+  const story = guide.coffeeStory;
+  const requiredStorySections = ["place", "region", "people", "variety", "altitude", "process", "roast"];
+  if (!story.headline || !story.deck) errors.push("drink_guide.bean_story.missing: bean story의 headline과 deck이 필요합니다.");
+  for (const sectionId of requiredStorySections) {
+    const section = story.sections.find((item) => item.id === sectionId);
+    if (!section?.title || !section.body || !section.eyebrow) errors.push(`drink_guide.bean_story.section_missing: ${sectionId} section이 필요합니다.`);
+  }
+  if (story.facts.length < 6 || story.facts.some((fact) => !fact.label || !fact.value)) errors.push("drink_guide.bean_story.facts: 확인 가능한 원두 fact가 6개 이상 필요합니다.");
+  if (story.sources.length < 3 || story.sources.some((source) => !source.label || !source.scope)) errors.push("drink_guide.bean_story.sources: 범위를 표시한 출처가 3개 이상 필요합니다.");
+  if (!guide.title || !guide.deck || !guide.brewStory || !guide.servingRitual) errors.push("drink_guide.recipe_story.missing: title, deck, brew_story, serving_ritual이 필요합니다.");
+  if (!Number.isInteger(guide.estimatedReadMinutes) || guide.estimatedReadMinutes < 1 || guide.estimatedReadMinutes > 15) errors.push("drink_guide.read_time.invalid: estimated_read_minutes는 1–15분 정수여야 합니다.");
+  if (guide.brewChoices.length < 3 || guide.brewChoices.some((choice) => !choice.label || !choice.value || !choice.reason)) errors.push("drink_guide.brew_choices: 값과 이유가 있는 brew choice가 3개 이상 필요합니다.");
+  if (guide.tasteJourney.length < 3 || guide.tasteJourney.some((item) => !item.moment || !item.cue)) errors.push("drink_guide.taste_journey: moment와 cue가 있는 tasting 단계가 3개 이상 필요합니다.");
+  if (recipe.brewReady && guide.status !== "ready") errors.push("drink_guide.status: brew_ready recipe의 drink_guide.status는 ready여야 합니다.");
+  if (!recipe.brewReady && guide.status !== "research_hold") errors.push("drink_guide.status: Research Hold recipe의 drink_guide.status는 research_hold여야 합니다.");
+  return errors;
+}
+
+function validateRoasterIdentity(recipe: CatalogRecipe): string[] {
+  const errors: string[] = [];
+  const code = recipe.bean.roasterCode;
+  if (!/^[A-Z0-9]{2,8}$/.test(code)) errors.push("roaster.code.invalid: roaster_code는 2–8자의 대문자 영문·숫자여야 합니다. 미확인은 UNK를 사용하세요.");
+  if (!recipe.bean.roaster.trim()) errors.push("roaster.name.missing: roaster가 필요합니다. 미확인은 미기록으로 표시하세요.");
+  if (code && !recipe.lineage.startsWith(`${code.toLowerCase()}-`)) errors.push(`roaster.lineage.mismatch: lineage는 roaster code ${code.toLowerCase()}- 로 시작해야 합니다.`);
+  if (code && !recipe.title.startsWith(`${code} · `)) errors.push(`roaster.title.mismatch: 레시피 제목은 ${code} · 로 시작해야 합니다.`);
+  if (code && !recipe.profile.profile_name.startsWith(`${code} `)) errors.push(`roaster.profile_name.mismatch: profile_name은 ${code} 로 시작해야 합니다.`);
+  return errors;
 }
 
 function validateRevisionShape(recipe: CatalogRecipe): string[] {

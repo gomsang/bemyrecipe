@@ -87,6 +87,32 @@ Accepted recipe를 먼저 참고합니다. 다만 같은 나라나 같은 roast�
 
 최고 수준의 판단은 확신을 과장하는 것이 아니라, 어떤 정보가 사실이고 어떤 부분이 한 잔으로 검증할 가설인지 분명히 하는 것입니다.
 
+## 2.2 Drink Guide gate
+
+숫자 레시피와 드링크 가이드는 같은 조사에서 출발하지만 역할이 다릅니다. 원두 파일의 `story`는 recipe version이 바뀌어도 유지되는 장소·사람·품종·고도·가공·로스팅 맥락을 소유하고, recipe의 `drink_guide`는 해당 version의 추출 의도·서빙·맛의 시간축을 소유합니다. Catalog builder가 둘을 합쳐 한 편의 가이드로 만듭니다.
+
+모든 bean story는 다음 장을 포함합니다.
+
+1. `place`: 봉투나 exact-lot 자료에서 확인된 장소
+2. `region`: 지역의 문화·재배 맥락과 흔한 경향의 한계
+3. `people`: 생산자, 농장, cooperative 또는 washing-station 구조. 확인되지 않으면 그 사실을 그대로 기록
+4. `variety`: 품종 또는 landrace 표기의 정확한 의미와 미확인 cultivar
+5. `altitude`: 확인된 고도와 추출 가설 사이의 경계
+6. `process`: 확인된 가공명과, exact crop에 적용할 수 있는 세부 가공 정보의 범위
+7. `roast`: roaster·배전도·roast date와 추출 맥락. 확인되지 않은 열원, development, color는 추측 금지
+
+`story.sections[].evidence`는 `exact_lot`, `station_context`, `regional_context`, `variety_context`, `brew_context` 중 하나입니다. 문장 안에서도 직접 확인된 사실과 넓은 맥락을 구분합니다. 유명 산지의 전형적인 향미를 이번 lot의 맛으로 단정하지 않습니다.
+
+Recipe `drink_guide`는 다음을 포함합니다.
+
+- 이 version만의 제목과 한 문단 소개
+- dose, water, ice, grind, temperature, pulse 중 핵심 선택과 이유
+- brew ice와 serving ice를 포함한 실제 serving ritual
+- 향을 맡을 때, 첫 모금, 온도가 변한 뒤, 마지막 모금의 관찰 포인트
+- `brew_ready: true`이면 `status: ready`, Research Hold이면 `status: research_hold`
+
+가이드가 길어도 출처가 없는 이야기를 보태지 않습니다. `unknowns`는 결함이 아니라 다음 조사와 기록의 경계입니다.
+
 ## 3. Aiden 필수 계산
 
 기호:

@@ -22,6 +22,8 @@ Markdown files are the database. Update them as part of the requested work; do n
 
 Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
 
+Every recipe must also ship with a Drink Guide. Store reusable, sourced coffee context in the linked bean file's `story` frontmatter and version-specific brewing/serving narrative in the recipe's `drink_guide` frontmatter. Cover place, region, people or production structure, variety, altitude, process, roast, uncertainty, why the settings were chosen, and what to notice while drinking. Separate exact-lot facts from station, regional, variety, and brew context. Never invent a farm, producer, cultivar, fermentation detail, or roast method to make the story feel complete.
+
 Every recipe also belongs to a versioned `lineage`. When bean, serve mode, brew method, beverage style, cup, basket, vessel, and ice goal are unchanged, recipe-setting changes must become the next version in the same lineage—not a new recipe card. Record the machine-readable `revision` block from `docs/RECIPE-SCHEMA.md`; the prose `Changed from previous version` section alone is not sufficient.
 
 ## Chat workflow
@@ -31,14 +33,14 @@ Every recipe also belongs to a versioned `lineage`. When bean, serve mode, brew 
 When the user provides a bean and serving goal:
 
 1. Run the clarification gate in `INTAKE.md`. If any decision-critical field is missing, ask the user before generating numeric settings. Group related gaps into at most three concise questions.
-2. Create or refresh a bean-specific Research Dossier from `research/_template.md` according to `research/PROTOCOL.md`. Every new bean baseline requires current web research; do not rely only on stored general knowledge.
+2. Create or refresh a bean-specific Research Dossier from `research/_template.md` according to `research/PROTOCOL.md`. Every new bean baseline requires current web research; do not rely only on stored general knowledge. Research both numeric recipe decisions and the Drink Guide's origin/process/roast story.
 3. Research current Aiden behavior, Ode Gen 2 Stock Burr behavior, relevant coffee science, independent expert/barista guidance, multiple Aiden community reports, and the exact bean/lot or the closest defensible origin/process evidence.
 4. Search existing recipes for similar cases. Prefer accepted recipes, but treat them as evidence only—not templates to copy blindly.
 5. In the dossier, separate verified evidence, inference, and testable hypothesis. Record source conflicts and why one direction is more applicable to this dose, basket, roast, water, cup, and drink style.
 6. Compare the recipe's control conditions with the current ruleset. Record known conditions under `control_conditions`.
 7. If evidence introduces a condition or allowed value that is absent from the ruleset, preserve it in the recipe and add `rule_extension_requests`. Do not weaken the recipe to fit an old rule.
-8. Create or update one bean file from `beans/_template.md`.
-9. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate` and `brew_ready: true`.
+8. Create or update one bean file from `beans/_template.md`, including its sourced `story` and explicit `unknowns`. Treat a different roaster or roast batch as a different bean identity even when farm, variety, and process match. Record a short `roaster_code`; use `UNK` only when the roaster is genuinely unrecorded.
+9. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate`, `brew_ready: true`, and a version-specific `drink_guide`.
 10. Run every calculation and validation in `HARNESS.md`.
 11. Update `INDEX.md`.
 12. Run `npm run rules:test`, `npm run versions:test`, `npm run catalog:validate`, and `npm run catalog:build`.
@@ -149,9 +151,9 @@ Source prestige alone does not make a recipe setting transferable. Always record
 
 ## File naming
 
-- Bean: `beans/<origin>-<producer-or-lot>.md`
+- Bean: `beans/<roaster-code>-<origin>-<producer-or-lot>.md`
 - Candidate recipe: `recipes/candidates/<bean-slug>-<style>-<cup-ml>-v<number>.md`
 - Accepted recipe: `recipes/accepted/<bean-slug>-<style>-<cup-ml>-v<number>.md`
 - Brew log: `logs/YYYY-MM-DD-<recipe-slug>-brew-<number>.md`
 
-Use lowercase ASCII slugs. Keep all displayed content in Korean unless the original coffee name or technical term is clearer in English.
+Use lowercase ASCII slugs and begin every bean-derived recipe lineage with the lowercase roaster code. Recipe headings and Aiden `profile_name` must include the uppercase roaster code; the device status prefix remains `[C]` or `[A]`. Keep all displayed content in Korean unless the original coffee name or technical term is clearer in English.

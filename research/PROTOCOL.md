@@ -13,7 +13,7 @@
 
 ## 2. 필수 조사 축
 
-새 baseline의 Dossier는 아래 일곱 축을 다룹니다.
+새 baseline의 Dossier는 아래 여덟 축을 다룹니다.
 
 ### A. Aiden 공식·기계
 
@@ -89,6 +89,20 @@ Roaster/barista의 공개 Aiden profile을 참고하면 소개 페이지와 실�
 
 개인 반복 측정은 후속 revision에서 일반 커뮤니티보다 높은 가중치를 가집니다.
 
+### H. Drink Guide 근거
+
+숫자 설정과 별개로, 사용자가 한 잔을 이해하며 마실 수 있는 서사 근거를 조사합니다.
+
+- exact bag/lot에서 확인되는 장소, 생산자 또는 station, 고도, 품종, 가공, roast level/date
+- 지역의 지리·문화·agroforestry 맥락은 UNESCO, 공공기관, 연구기관처럼 적용 범위가 명확한 자료 우선
+- `Heirloom`, `Landrace`처럼 넓은 품종 표기의 정확한 의미
+- exact crop의 fermentation/drying/roasting 세부가 없으면 같은 station·지역 자료를 context로만 사용
+- 가공 방식이 cup에 미칠 수 있는 방향과, 실제 lot에서 보장할 수 없는 부분
+- roast level/date와 추출 선택의 관계. roaster·roaster type·development가 없으면 추측 금지
+- 생산자 이름이나 농장 서사를 확인할 수 없을 때 이를 감추거나 만들어내지 않기
+
+Dossier와 bean story에는 source scope를 `exact lot`, `station context`, `regional context`, `variety context`, `brew context`로 남깁니다. 드링크 가이드의 목적은 길게 쓰는 것이 아니라, 사실과 맥락을 구분한 채 장소에서 잔까지 이어지는 이해 가능한 흐름을 만드는 것입니다.
+
 ## 3. 출처 기록 형식
 
 각 핵심 항목을 아래 표로 남깁니다.
@@ -117,7 +131,7 @@ Dossier에는 반드시 `충돌`, `선택`, `선택 이유`, `틀렸을 때 나�
 
 웹 전체를 완전히 조사할 수는 없습니다. 다음 조건을 만족하면 조사 포화로 봅니다.
 
-- 필수 일곱 축을 확인했거나 자료 부재를 명시함
+- 필수 여덟 축을 확인했거나 자료 부재를 명시함
 - 최근 추가 출처가 새로운 recipe-changing 정보를 주지 않음
 - 핵심 충돌과 적용 조건이 설명됨
 - 각 주요 setting에 근거 또는 명시적 가설이 연결됨
@@ -142,6 +156,8 @@ Dossier에는 반드시 `충돌`, `선택`, `선택 이유`, `틀렸을 때 나�
 - 첫 brew에서 무엇을 측정하면 다음 결정이 가능한가
 
 레시피를 `최적`, `정답`, `보장`이라고 부르지 않습니다. 사용자 장비에서 검증되기 전에는 **가장 근거가 탄탄한 baseline Candidate**입니다.
+
+같은 작업에서 bean `story`와 recipe `drink_guide`를 완성합니다. 숫자 brew card만 만들고 서사를 다음 작업으로 미루지 않습니다. UI용 글도 Markdown frontmatter가 source of truth이며 웹에서 직접 작성한 문구로 원본을 우회하지 않습니다.
 
 ## 7. Revision 조사
 

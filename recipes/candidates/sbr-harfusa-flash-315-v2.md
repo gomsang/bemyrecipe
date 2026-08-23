@@ -2,15 +2,15 @@
 type: recipe
 status: candidate
 storage: candidate
-bean: ../../beans/ethiopia-harfusa.md
+bean: ../../beans/sbr-ethiopia-harfusa.md
 research_dossier: ../../research/2026-08-23-harfusa.md
 research_status: sufficient-with-gaps
 brew_ready: true
-lineage: harfusa-flash-315
+lineage: sbr-harfusa-flash-315
 version: 2
 revision:
   kind: gate_completion
-  parent: harfusa-flash-315-v1
+  parent: sbr-harfusa-flash-315-v1
   primary_variable: serving_geometry
   summary: "Research Hold를 해제하고 315ml split-ice 실행 기준 확정"
   rationale: "확정된 삼다수·split ice 조건에서 headspace와 잔존 얼음을 동시에 확보하도록 serving geometry를 다시 계산했다."
@@ -26,8 +26,8 @@ revision:
 accepted_at: null
 acceptance_note: null
 similar_recipes:
-  - harfusa-flash-315-v1.md
-  - harfusa-flash-500-v1.md
+  - sbr-harfusa-flash-315-v1.md
+  - sbr-harfusa-flash-500-v1.md
 created: 2026-08-23
 ruleset_version: 2
 control_conditions:
@@ -40,6 +40,38 @@ control_conditions:
   ice_goal: remain_while_drinking
 rule_exceptions: []
 rule_extension_requests: []
+drink_guide:
+  status: ready
+  title: "차가운 잔에서, 베르가못이 먼저 열리는 순간"
+  deck: >-
+    Gedeo 고원의 washed coffee를 315ml 한 잔에 또렷하게 담는다. 급랭은 carafe에서 끝내고, 새 얼음은 잔에 남겨 첫 향과 마지막 온도를 함께 지키는 레시피다.
+  estimated_read_minutes: 5
+  brew_story: >-
+    17g의 coffee에 Aiden water 190ml를 써 진한 hot concentrate를 만들고, carafe의 brew ice 110g으로 바로 식힌다. 315ml 잔에는 fresh serving ice 20g만 따로 둔다. 두 얼음을 나누는 이유는 단순하다. 하나는 추출 직후의 열을 받고, 다른 하나는 마시는 동안의 시간을 맡는다. 95°C bloom에서 시작해 94→92°C로 완만하게 낮춘 것은 Harfusa의 향을 충분히 열되, 오렌지 껍질 같은 마르는 끝맛은 첫 baseline에서 경계하기 위해서다.
+  serving_ritual: >-
+    Drip finish 뒤 carafe를 10–15초 부드럽게 돌려 농도와 온도를 맞춘다. fresh serving ice를 담은 315ml 잔으로 곧바로 옮기고 두세 번만 가볍게 섞는다. 첫 모금을 서두르지 말고 향을 먼저 맡은 뒤, 5분 후 같은 노트를 다시 찾아본다.
+  brew_choices:
+    - label: "CONCENTRATE"
+      value: "17g · 190ml"
+      reason: "실제 hot ratio 1:11.18로 향의 밀도를 만들면서 315ml 잔에 필요한 얼음 공간을 남긴다."
+    - label: "TWO ICE ROLES"
+      value: "110g + 20g"
+      reason: "brew ice는 급랭, serving ice는 음용 중 냉각을 맡아 역할과 투입 시점을 분리한다."
+    - label: "TEMPERATURE"
+      value: "95 → 92°C"
+      reason: "Aiden의 열 유지 속에서 추출력을 남기되 거칠고 마르는 finish를 경계하는 baseline이다."
+    - label: "GRIND"
+      value: "ODE 5⅓"
+      reason: "개인 drawdown 기록이 없으므로 현재 Fellow Single Brew 공식 출발점을 calibration anchor로 쓴다."
+  taste_journey:
+    - moment: "잔을 들기 전"
+      cue: "차가운 표면 위로 올라오는 베르가못과 가벼운 꽃 향을 먼저 확인한다."
+    - moment: "첫 모금"
+      cue: "감귤의 선명함 뒤에 백도 같은 둥근 단맛과 차처럼 가벼운 질감이 이어지는지 본다."
+    - moment: "5분 뒤"
+      cue: "얼음이 조금 더 녹은 뒤에도 백도와 오렌지필이 흐려지지 않고 서로 구분되는지 비교한다."
+    - moment: "마지막"
+      cue: "얼음이 남아 있는지, 오렌지필이 향긋한 여운인지 혀를 마르게 하는 쓴맛인지 기록한다."
 beverage_style: flash
 serve_mode: iced
 brew_method: flash
@@ -99,7 +131,7 @@ prep_steps:
     label: "즉시 이송"
     instruction: "Swirl한 커피를 serving ice 위로 전부 붓고 2–3회만 가볍게 섞는다. 처음과 5분 뒤, 다 마신 뒤를 기록한다."
     critical: false
-profile_name: "Harfusa Ice 315 v2"
+profile_name: "SBR Harfusa Ice 315 v2"
 profile_temperature_c: 94
 nominal_ratio: 14
 cold_brew_enabled: false
@@ -122,7 +154,7 @@ drop_temp_c: 65
 target_temp_c: 5
 ---
 
-# Harfusa · 315ml Split-ice Flash brew · v2
+# SBR · Harfusa · 315ml Split-ice Flash brew · v2
 
 상태: **Candidate — 사용자 채택 전 / brew ready**
 
@@ -158,8 +190,8 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 
 | 참고 recipe | 유사한 점 | 참고한 원칙 | 그대로 복사하지 않은 이유 |
 |---|---|---|---|
-| [Harfusa · 315ml Flash v1 Research Hold](harfusa-flash-315-v1.md) | 같은 원두·컵·lineage | 실제 1:11대 hot concentrate와 split-ice 구조 | 20g/225ml는 컵 안에서 필요한 얼음량을 확보할 수 없고, 4⅓은 공식 anchor나 개인 log로 방어되지 않음 |
-| [Harfusa · 500ml Tumbler Flash v1](harfusa-flash-500-v1.md) | 같은 원두·장비·물·iced 목표 | Ode 5⅓, actual bloom 약 1:2.4, 95→92°C의 보수적 baseline | 컵 크기와 dose가 달라 25g/280ml/230g ice를 축소 복사하지 않고 315ml 열수지와 headspace를 다시 계산 |
+| [SBR · Harfusa · 315ml Flash v1 Research Hold](sbr-harfusa-flash-315-v1.md) | 같은 원두·컵·lineage | 실제 1:11대 hot concentrate와 split-ice 구조 | 20g/225ml는 컵 안에서 필요한 얼음량을 확보할 수 없고, 4⅓은 공식 anchor나 개인 log로 방어되지 않음 |
+| [SBR · Harfusa · 500ml Tumbler Flash v1](sbr-harfusa-flash-500-v1.md) | 같은 원두·장비·물·iced 목표 | Ode 5⅓, actual bloom 약 1:2.4, 95→92°C의 보수적 baseline | 컵 크기와 dose가 달라 25g/280ml/230g ice를 축소 복사하지 않고 315ml 열수지와 headspace를 다시 계산 |
 | 직접적으로 유사한 Accepted Recipe 없음 | — | 공식·내부 Candidate·개인 측정을 순서대로 적용 | 아직 Accepted Recipe와 brew log가 없음 |
 
 ## 목표
@@ -200,7 +232,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 
 | 단계 | 설정 |
 |---|---|
-| Profile name | `Harfusa Ice 315 v2` |
+| Profile name | `SBR Harfusa Ice 315 v2` |
 | Nominal ratio | **1:14** |
 | Bloom | **1:3 · 45초 · 95°C** |
 | Single Serve pulses | **3회 · 23초 간격** |

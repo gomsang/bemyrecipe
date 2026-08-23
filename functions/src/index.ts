@@ -286,6 +286,46 @@ async function authenticateToken(authorization: string | undefined) {
   return { uid: String(data.ownerId), tokenId: snapshot.id };
 }
 
+function catalogRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function validateCatalogDrinkGuide(recipe: Record<string, unknown>) {
+  const localId = String(recipe.id ?? "unknown");
+  const guide = catalogRecord(recipe.drinkGuide);
+  const story = catalogRecord(guide?.coffeeStory);
+  const bean = catalogRecord(recipe.bean);
+  if (!guide || !story) throw new Error(`Drink Guide가 없습니다: ${localId}`);
+  if (!bean) throw new Error(`원두 정보가 없습니다: ${localId}`);
+  const roasterCode = String(bean.roasterCode ?? "").trim().toUpperCase();
+  if (!/^[A-Z0-9]{2,8}$/.test(roasterCode) || !String(bean.roaster ?? "").trim()) throw new Error(`Roaster 식별자가 올바르지 않습니다: ${localId}`);
+  if (!String(recipe.lineage ?? "").startsWith(`${roasterCode.toLowerCase()}-`)) throw new Error(`Lineage에 roaster code가 없습니다: ${localId}`);
+  if (!String(recipe.title ?? "").startsWith(`${roasterCode} · `)) throw new Error(`Recipe title에 roaster code가 없습니다: ${localId}`);
+  const profile = catalogRecord(recipe.profile);
+  if (!String(profile?.profile_name ?? "").startsWith(`${roasterCode} `)) throw new Error(`Aiden profile name에 roaster code가 없습니다: ${localId}`);
+  for (const field of ["title", "deck", "brewStory", "servingRitual"] as const) {
+    if (!String(guide[field] ?? "").trim()) throw new Error(`Drink Guide ${field}가 없습니다: ${localId}`);
+  }
+  const expectedStatus = recipe.brewReady === true ? "ready" : "research_hold";
+  if (guide.status !== expectedStatus) throw new Error(`Drink Guide status가 brewReady와 일치하지 않습니다: ${localId}`);
+  const readMinutes = Number(guide.estimatedReadMinutes);
+  if (!Number.isInteger(readMinutes) || readMinutes < 1 || readMinutes > 15) throw new Error(`Drink Guide 읽기 시간이 올바르지 않습니다: ${localId}`);
+  const choices = Array.isArray(guide.brewChoices) ? guide.brewChoices : [];
+  const journey = Array.isArray(guide.tasteJourney) ? guide.tasteJourney : [];
+  if (choices.length < 3 || journey.length < 3) throw new Error(`Drink Guide의 추출 선택과 맛의 흐름이 부족합니다: ${localId}`);
+  if (!String(story.headline ?? "").trim() || !String(story.deck ?? "").trim()) throw new Error(`원두 Story의 headline/deck이 없습니다: ${localId}`);
+  const sections = Array.isArray(story.sections) ? story.sections.map(catalogRecord).filter((item): item is Record<string, unknown> => item !== null) : [];
+  const sectionIds = new Set(sections.filter((section) => String(section.title ?? "").trim() && String(section.body ?? "").trim()).map((section) => String(section.id ?? "")));
+  for (const sectionId of ["place", "region", "people", "variety", "altitude", "process", "roast"]) {
+    if (!sectionIds.has(sectionId)) throw new Error(`원두 Story ${sectionId} section이 없습니다: ${localId}`);
+  }
+  if (!Array.isArray(story.facts) || story.facts.length < 6 || !Array.isArray(story.sources) || story.sources.length < 3) {
+    throw new Error(`원두 Story의 fact/source가 부족합니다: ${localId}`);
+  }
+}
+
 function validateCatalogVersionGraph(recipes: Record<string, unknown>[]) {
   const byLineage = new Map<string, Record<string, unknown>[]>();
   for (const recipe of recipes) {
@@ -356,6 +396,7 @@ export const syncCatalog = onRequest(
         if (ruleEvaluation?.status === "blocked" || !Array.isArray(ruleEvaluation?.errors) || ruleEvaluation.errors.length > 0) {
           throw new Error(`Recipe hard rule validation을 통과하지 못했습니다: ${localId}`);
         }
+        validateCatalogDrinkGuide(recipe);
         const documentId = `${publicOwnerKey(principal.uid)}__${localId}`;
         incomingIds.add(documentId);
         validated.push({ documentId, recipe, profile: recipe.profile });

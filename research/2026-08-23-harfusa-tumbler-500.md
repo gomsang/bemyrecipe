@@ -1,7 +1,7 @@
 ---
 type: research-dossier
-bean: ../beans/ethiopia-harfusa.md
-recipe_lineage: harfusa-flash-500
+bean: ../beans/sbr-ethiopia-harfusa.md
+recipe_lineage: sbr-harfusa-flash-500
 status: sufficient-with-gaps
 searched_at: 2026-08-23
 latest_official_check: 2026-08-23
@@ -14,9 +14,10 @@ coverage:
   aiden_community: true
   bean_specific: partial
   internal_recipes: true
+  drink_guide_story: true
 ---
 
-# Harfusa · 500ml Tumbler Flash brew · Research Dossier
+# SBR · Harfusa · 500ml Tumbler Flash brew · Research Dossier
 
 ## 조사 질문
 
@@ -59,7 +60,7 @@ coverage:
 | Ethiopia Drops profile의 Ode 3.2·7 pulses는 해당 사용자에게 astringent했고, 다른 사용자는 Medium profile을 선호했다. | Community negative report | [Ethiopia Danche Aiden discussion](https://www.reddit.com/r/FellowProducts/comments/1gubnfo/strange_aiden_recipe_from_drops/) | 다른 Ethiopia/lot, water 불명 | 매우 고운 grind·많은 pulse를 피하는 반대 근거 | Low |
 | Washed Ethiopia 사용자 사이에도 Ode 7에서 bitter, 낮은 온도·fine grind 성공, 공식 Light 성공 등 상반된 보고가 공존한다. | Community conflict | [Washed Ethiopia Aiden discussion](https://www.reddit.com/r/FellowProducts/comments/1hnlr10/new_aiden_user_looking_for_guidance/) | Sidama 등 다른 lot; 조건 불완전 | community 수치를 평균내지 않아야 함을 보여줌 | Low |
 | Harfusa/Hafursa 자료는 Yirgacheffe G1, heirloom, smallholder 맥락을 지지하지만 2024 crop이며 사용자의 exact roaster/lot는 아니다. | Evidence with limitation | [Project Origin · Yirgacheffe G1 Hafursa](https://projectorigin.coffee/wp-content/uploads/2024/08/ETH_Yirgacheffe_2024.pdf) | 다른 crop/seller | station 맥락만 부분 적용; bag facts 대체 금지 | Medium-Low |
-| 내부 315ml v1은 4⅓과 얼음 110g의 근거가 약하고 자체 열수지에서도 얼음 잔존에 실패해 Research Hold다. | Internal evidence | [315ml v1 Research Hold](../recipes/candidates/harfusa-flash-315-v1.md) | 같은 bean, 다른 cup; 미추출 | 실패한 serving geometry를 반복하지 않는 데 직접 | Medium |
+| 내부 315ml v1은 4⅓과 얼음 110g의 근거가 약하고 자체 열수지에서도 얼음 잔존에 실패해 Research Hold다. | Internal evidence | [315ml v1 Research Hold](../recipes/candidates/sbr-harfusa-flash-315-v1.md) | 같은 bean, 다른 cup; 미추출 | 실패한 serving geometry를 반복하지 않는 데 직접 | Medium |
 
 ## 분야별 합성
 
@@ -87,7 +88,7 @@ Hoffmann과 Coffee Chronicler의 공통 적용점은 Aiden의 열 유지와 추�
 
 ### 원두·로스터·생산지
 
-원두 사실은 사용자 bag 정보가 최우선입니다. 정확한 roaster가 미기록이고 외부의 exact lot 일치를 확인하지 못했으므로 Project Origin의 Hafursa 자료는 지역 맥락만 제공합니다. Fellow의 Sidamo Bensa는 exact bean이 아니라 process·roast·고도·rest가 가까운 비교 사례입니다. 8월 14일 roast는 오늘 9일차여서 그 자료의 7–20일 window에는 들어갑니다.
+원두 사실은 사용자 bag 정보가 최우선이며 로스터는 서부로스터스(`SBR`)로 확인됐습니다. 외부의 exact lot·roaster 일치를 확인하지 못했으므로 Project Origin의 Hafursa 자료는 지역 맥락만 제공합니다. Fellow의 Sidamo Bensa는 exact bean이 아니라 process·roast·고도·rest가 가까운 비교 사례입니다. 8월 14일 roast는 조사일 기준 9일차여서 그 자료의 7–20일 window에는 들어갑니다.
 
 ### 개인 유사 recipe와 log
 
@@ -116,12 +117,20 @@ Accepted Recipe와 brew log는 아직 없습니다. 315ml v1은 미추출 Resear
 
 ## Coverage gaps와 가정
 
-- 정확한 roaster와 외부 exact lot/crop 일치는 확인하지 못했습니다. Bag facts를 우선합니다.
+- 로스터는 서부로스터스로 확인했지만 외부 exact lot/crop 일치와 실제 roast development는 확인하지 못했습니다. Bag facts를 우선합니다.
 - 삼다수 alkalinity/KH와 실제 bottle TDS는 미기록입니다.
 - Ode Gen 2 zero point, seasoning, 최근 청소 상태는 미기록입니다.
 - RF 2.0g/g, drop temperature 65°C, target 5°C, ice start 0°C는 개인 미교정 가정입니다.
 - 텀블러 자체의 열용량과 마시는 시간·주변 온도는 열수지에 포함하지 않았습니다.
 - 사용자의 실제 Aiden UI에서 1:14, 28초, 각 온도가 저장되는지 시작 전 확인해야 하며 UI가 최종 기준입니다.
+
+## Drink Guide 적용
+
+- 원두 공통 서사는 사용자 bag 정보와 `2026-08-23-harfusa.md`의 출처 범위를 따릅니다. Gedeo의 agroforestry·지역 맥락은 원산지 이야기로만 사용하고, 사용자의 정확한 lot나 생산자 운영 방식으로 단정하지 않습니다.
+- 가공 챕터에는 **Washed라는 확인 사실**과 그 방식이 일반적으로 지향하는 깨끗한 향미 표현을 분리해 씁니다. 이 lot의 발효 시간, 세척 횟수, 건조 방식은 미확인으로 표시합니다.
+- 로스팅 챕터에는 **서부로스터스, Medium–Light와 2026-08-14 roast date라는 확인 사실**을 반영합니다. 열원, batch size, development time, 색도는 확인되지 않았으므로 향미의 원인으로 단정하지 않습니다.
+- 500ml 전용 추출 서사는 150g brew ice로 급랭한 뒤 80g fresh serving ice로 긴 음용 시간의 냉각을 맡기는 두 단계 구조, 40ml headspace, 보수적 열수지에서 약 67g의 잔존 얼음을 설명합니다.
+- 첫 추출 뒤 실제 output, transfer temperature, 남은 얼음과 맛의 흐름이 기록되면 일반적 지역 설명보다 개인 brew log를 우선해 다음 버전의 Guide를 고칩니다.
 
 ## Gate 판정
 

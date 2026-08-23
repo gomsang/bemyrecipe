@@ -2,11 +2,11 @@
 type: recipe
 status: candidate
 storage: candidate
-bean: ../../beans/ethiopia-harfusa.md
+bean: ../../beans/sbr-ethiopia-harfusa.md
 research_dossier: ../../research/2026-08-23-harfusa-tumbler-500.md
 research_status: sufficient-with-gaps
 brew_ready: true
-lineage: harfusa-flash-500
+lineage: sbr-harfusa-flash-500
 version: 1
 revision:
   kind: baseline
@@ -22,7 +22,7 @@ revision:
 accepted_at: null
 acceptance_note: null
 similar_recipes:
-  - harfusa-flash-315-v1.md
+  - sbr-harfusa-flash-315-v1.md
 created: 2026-08-23
 ruleset_version: 2
 control_conditions:
@@ -35,6 +35,38 @@ control_conditions:
   ice_goal: remain_while_drinking
 rule_exceptions: []
 rule_extension_requests: []
+drink_guide:
+  status: ready
+  title: "긴 한 잔을 위한 두 번의 냉각"
+  deck: >-
+    500ml 텀블러를 채우되 넘치지 않고, 마지막 모금까지 얼음이 남도록 설계했다. Harfusa의 밝은 향을 처음에만 번쩍이는 인상으로 끝내지 않고 오래 이어 가는 버전이다.
+  estimated_read_minutes: 5
+  brew_story: >-
+    25g coffee와 Aiden water 280ml로 충분한 양의 hot concentrate를 만들고, carafe의 brew ice 150g이 첫 번째 냉각을 맡는다. 텀블러에는 fresh serving ice 80g을 따로 둬 두 번째 냉각과 장시간 보냉을 맡긴다. 예상 적재량은 460g으로 40ml headspace를 남기고, 보수적인 열수지에서도 약 67g의 얼음이 남을 수 있는 구성이다. 25g bed의 흐름을 고려해 pulse 간격은 공식 23초보다 5초 늘렸다.
+  serving_ritual: >-
+    완료 차임 뒤 drip finish까지 기다리고 carafe를 10–15초 부드럽게 돌린다. 텀블러에 fresh serving ice 80g을 넣은 직후 전부 옮기고 두세 번만 섞는다. 첫 모금과 5분 뒤를 비교하고, 마지막에는 온도뿐 아니라 남은 얼음의 양과 희석된 뒤의 단맛을 함께 본다.
+  brew_choices:
+    - label: "CONCENTRATE"
+      value: "25g · 280ml"
+      reason: "실제 hot ratio 1:11.20으로 500ml 안에서 향의 밀도와 충분한 음료량을 함께 만든다."
+    - label: "TWO ICE ROLES"
+      value: "150g + 80g"
+      reason: "carafe에서 급랭한 뒤 fresh ice 80g을 텀블러에 남겨 음용 시간을 확보한다."
+    - label: "HEADSPACE"
+      value: "약 40ml"
+      reason: "이송과 얼음 움직임을 고려해 텀블러를 끝까지 채우지 않는다."
+    - label: "PULSE"
+      value: "3회 · 28초"
+      reason: "25g의 비교적 큰 single-serve bed에서 overflow와 과도한 교반 위험을 낮추는 baseline이다."
+  taste_journey:
+    - moment: "뚜껑을 닫기 전"
+      cue: "베르가못과 오렌지 껍질의 향이 차가운 잔 위에서도 분명한지 확인한다."
+    - moment: "첫 모금"
+      cue: "선명한 감귤 뒤로 백도 단맛이 따라오고, 질감이 물처럼 비지 않는지 본다."
+    - moment: "5분 뒤"
+      cue: "온도가 안정된 뒤에도 베르가못과 백도가 따로 읽히는지, 쓴맛이 자라지 않는지 비교한다."
+    - moment: "마지막"
+      cue: "얼음이 실제로 남았는지와 모든 얼음이 더 녹은 뒤 농도가 지나치게 옅어졌는지 기록한다."
 beverage_style: flash
 serve_mode: iced
 brew_method: flash
@@ -94,7 +126,7 @@ prep_steps:
     label: "즉시 이송"
     instruction: "Swirl한 커피를 serving ice 위로 전부 붓고 2–3회만 가볍게 섞는다. 처음과 5분 뒤, 다 마신 뒤를 기록한다."
     critical: false
-profile_name: "Harfusa Ice 500 v1"
+profile_name: "SBR Harfusa Ice 500 v1"
 profile_temperature_c: 94
 nominal_ratio: 14
 cold_brew_enabled: false
@@ -117,7 +149,7 @@ drop_temp_c: 65
 target_temp_c: 5
 ---
 
-# Harfusa · 500ml Tumbler Flash brew · v1
+# SBR · Harfusa · 500ml Tumbler Flash brew · v1
 
 상태: **Candidate — 사용자 채택 전 / brew ready**
 
@@ -146,13 +178,13 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 - Research status: `sufficient-with-gaps`
 - 조사 시점: 2026-08-23
 - 핵심 충돌: 공식 Light 99°C와 더 낮은 declining profile, Ode 3–7대의 상충 보고, hot-water extraction과 ice remaining의 충돌
-- Gate 판정: intake complete이며 모든 조사 축을 다뤘고, exact roaster·water alkalinity·개인 열 보정값의 gap을 첫 brew 측정으로 넘길 수 있어 numeric Candidate 허용
+- Gate 판정: intake complete이며 모든 조사 축을 다뤘고, 서부로스터스의 상세 roast development·water alkalinity·개인 열 보정값의 gap을 첫 brew 측정으로 넘길 수 있어 numeric Candidate 허용
 
 ## 참고한 유사 recipe
 
 | 참고 recipe | 유사한 점 | 참고한 원칙 | 그대로 복사하지 않은 이유 |
 |---|---|---|---|
-| [Harfusa · 315ml Flash v1 Research Hold](harfusa-flash-315-v1.md) | 같은 원두·장비·iced 목표 | Brew ice와 serving ice를 분리하고 열수지·headspace를 먼저 검증 | 315ml용 20g/225ml/110g ice는 자체 계산에서 얼음 잔존에 실패했고 4⅓도 개인 근거가 없음 |
+| [SBR · Harfusa · 315ml Flash v1 Research Hold](sbr-harfusa-flash-315-v1.md) | 같은 원두·장비·iced 목표 | Brew ice와 serving ice를 분리하고 열수지·headspace를 먼저 검증 | 315ml용 20g/225ml/110g ice는 자체 계산에서 얼음 잔존에 실패했고 4⅓도 개인 근거가 없음 |
 | 직접적으로 유사한 Accepted Recipe 없음 | — | 공식·유사 원두·개인 측정을 순서대로 적용 | 아직 Accepted Recipe와 brew log가 없음 |
 
 ## 목표
@@ -194,7 +226,7 @@ Paper filter는 이 version의 재현성 통제조건으로 뜨거운 물에 린
 
 | 단계 | 설정 |
 |---|---|
-| Profile name | `Harfusa Ice 500 v1` |
+| Profile name | `SBR Harfusa Ice 500 v1` |
 | Nominal ratio | **1:14** |
 | Bloom | **1:3 · 45초 · 95°C** |
 | Single Serve pulses | **3회 · 28초 간격** |

@@ -2,6 +2,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import {
   ArrowDownRight,
   ArrowUpRight,
+  BookOpenText,
   Check,
   ChevronRight,
   CircleAlert,
@@ -10,6 +11,7 @@ import {
   Cloud,
   Coffee,
   Copy,
+  ExternalLink,
   KeyRound,
   LoaderCircle,
   LogOut,
@@ -139,6 +141,9 @@ function App() {
           && recipe.ruleEvaluation?.recipeRulesetVersion === RECIPE_RULES.version
           && Object.keys(recipe.controlConditions ?? {}).length > 0
           && Boolean(recipe.revision?.summary)
+          && Boolean(recipe.drinkGuide?.title)
+          && Boolean(recipe.bean?.story?.headline)
+          && Boolean(recipe.bean?.roasterCode)
           && Number.isInteger(recipe.versionCount)
         ))) return;
         setRecipes(liveRecipes);
@@ -180,7 +185,7 @@ function App() {
   const latestRecipes = useMemo(() => recipeHeads(recipes), [recipes]);
   const filtered = useMemo(() => latestRecipes.filter((recipe) => {
     const statusMatches = status === "all" || recipe.status === status;
-    const haystack = `${recipe.title} ${recipe.bean.name} ${recipe.bean.origin} ${recipe.bean.tastingNotes.join(" ")}`.toLowerCase();
+    const haystack = `${recipe.title} ${recipe.bean.name} ${recipe.bean.roaster} ${recipe.bean.roasterCode} ${recipe.bean.origin} ${recipe.bean.tastingNotes.join(" ")}`.toLowerCase();
     return statusMatches && haystack.includes(query.trim().toLowerCase());
   }), [latestRecipes, status, query]);
 
@@ -315,7 +320,7 @@ function PublicRecipes(props: PublicRecipesProps) {
               <button className={props.selected?.lineage === recipe.lineage ? "recipe-row selected" : "recipe-row"} onClick={() => props.onSelect(recipe.id)} key={recipe.lineage}>
                 <span className="recipe-index">{String(index + 1).padStart(2, "0")}</span>
                 <div className="recipe-copy">
-                  <div className="recipe-meta"><StatusBadge status={recipe.status} /><ServeModeBadge mode={recipe.serveMode} /><span className="version-badge">V{recipe.version} · {recipe.versionCount} {recipe.versionCount === 1 ? "VERSION" : "VERSIONS"}</span><span>{recipe.bean.origin}</span><span>{recipe.bean.process}</span></div>
+                  <div className="recipe-meta"><StatusBadge status={recipe.status} /><ServeModeBadge mode={recipe.serveMode} /><span className="roaster-badge">{recipe.bean.roasterCode}</span><span className="version-badge">V{recipe.version} · {recipe.versionCount} {recipe.versionCount === 1 ? "VERSION" : "VERSIONS"}</span><span>{recipe.bean.origin}</span><span>{recipe.bean.process}</span></div>
                   <h2>{recipeDisplayTitle(recipe)}</h2>
                   <p>{recipe.bean.tastingNotes.join(" · ")}</p>
                 </div>
@@ -359,6 +364,7 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
 }) {
   const [aidenSaving, setAidenSaving] = useState(false);
   const [aidenMessage, setAidenMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [detailView, setDetailView] = useState<"brew" | "guide">("brew");
   const serveModeRule = getServeModeRule(recipe.serveMode);
   const brewMethodRule = getBrewMethodRule(recipe.brewMethod);
   const iceStrategyRule = getIceStrategyRule(recipe.preparation.icePlan.strategy);
@@ -432,25 +438,37 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
         </section>
       ) : null}
 
-      <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
-
-      <div className="metric-grid">
-        <Metric icon={<Coffee />} label="DOSE" value={`${recipe.brew.doseG}g`} />
-        <Metric icon={<Waves />} label="BREW WATER" value={`${recipe.brew.brewWaterG}ml`} />
-        <Metric icon={<Thermometer />} label="BASE TEMP" value={`${recipe.profile.profile_temperature_c}°C`} />
-        <Metric icon={<Settings2 />} label="GRIND" value={recipe.brew.grindSetting} />
+      <div className="detail-mode-tabs" role="tablist" aria-label="레시피 상세 보기">
+        <button className={detailView === "brew" ? "active" : ""} role="tab" aria-selected={detailView === "brew"} onClick={() => setDetailView("brew")}>
+          <Settings2 size={16} />
+          <span><small>EXECUTION</small>추출 레시피</span>
+        </button>
+        <button className={detailView === "guide" ? "active" : ""} role="tab" aria-selected={detailView === "guide"} onClick={() => setDetailView("guide")}>
+          <BookOpenText size={16} />
+          <span><small>EDITORIAL</small>드링크 가이드</span>
+        </button>
       </div>
 
-      <section className="brew-program">
+      {detailView === "brew" ? <>
+        <VersionHistory recipe={recipe} versions={versions} onSelect={onSelectVersion} />
+
+        <div className="metric-grid">
+          <Metric icon={<Coffee />} label="DOSE" value={`${recipe.brew.doseG}g`} />
+          <Metric icon={<Waves />} label="BREW WATER" value={`${recipe.brew.brewWaterG}ml`} />
+          <Metric icon={<Thermometer />} label="BASE TEMP" value={`${recipe.profile.profile_temperature_c}°C`} />
+          <Metric icon={<Settings2 />} label="GRIND" value={recipe.brew.grindSetting} />
+        </div>
+
+        <section className="brew-program">
         <div className="detail-section-title"><span>BREW PROGRAM</span><span>{recipe.profile.pulse_count + 1} PHASES</span></div>
         <PhaseRow number="B" name="Bloom" detail={`1:${recipe.profile.bloom_ratio} / ${recipe.profile.bloom_seconds}s`} temp={recipe.profile.bloom_temp_c} />
         {recipe.profile.pulse_temps_c.map((temperature, index) => (
           <PhaseRow number={String(index + 1).padStart(2, "0")} name={`Pulse ${index + 1}`} detail={`${recipe.profile.pulse_interval_seconds}s interval`} temp={temperature} key={index} />
         ))}
-      </section>
+        </section>
 
-      {recipe.serveMode === "iced" ? (
-        <section className="ice-program">
+        {recipe.serveMode === "iced" ? (
+          <section className="ice-program">
           <div className="detail-section-title"><span>ICE PLAN</span><span>{iceStrategyRule?.label ?? recipe.preparation.icePlan.strategy.toUpperCase()}</span></div>
           <div className="ice-cards">
             <div>
@@ -466,10 +484,10 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
               <p>{servingIceRule.description}</p>
             </div>
           </div>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
 
-      <section className="prep-program">
+        <section className="prep-program">
         <div className="detail-section-title"><span>PREPARATION</span><span>{recipe.preparation.steps.length} STEPS</span></div>
         {showerSelectorRule ? (
           <div className="rinse-note">
@@ -492,14 +510,14 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
             {step.critical ? <i>KEY</i> : null}
           </div>
         ))}
-      </section>
+        </section>
 
-      <section className="brew-balance">
+        <section className="brew-balance">
         <div><span>BREW ICE</span><strong>{recipe.brew.brewIceG}g</strong></div>
         <div><span>SERVING ICE</span><strong>{recipe.brew.servingIceG}g</strong></div>
         <div><span>CUP</span><strong>{recipe.brew.cupCapacityMl}ml</strong></div>
-      </section>
-      <section className={`rule-program ${ruleEvaluation.status}`}>
+        </section>
+        <section className={`rule-program ${ruleEvaluation.status}`}>
         <div className="detail-section-title"><span>CONTROL RULES</span><span>RULESET V{ruleEvaluation.rulesetVersion}</span></div>
         <div className="rule-summary">
           <span>{ruleEvaluation.status === "pass" ? <CircleCheckBig size={16} /> : <CircleAlert size={16} />}</span>
@@ -519,9 +537,98 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
             <div><small>SYSTEM CHANGE PROPOSAL</small><strong>{proposal.title}</strong><p>{proposal.rationale}</p></div>
           </div>
         ))}
-      </section>
+        </section>
+      </> : <DrinkGuideReader recipe={recipe} />}
       <div className="source-line"><ShieldCheck size={15} /><span>{recipe.validation.valid ? "Aiden 입력값 검증 완료" : "입력값 확인 필요"}</span><span>{recipe.created}</span></div>
     </aside>
+  );
+}
+
+const STORY_EVIDENCE_LABELS: Record<string, string> = {
+  exact_lot: "LOT FACT",
+  station_context: "STATION CONTEXT",
+  regional_context: "REGIONAL CONTEXT",
+  variety_context: "VARIETY CONTEXT",
+  brew_context: "BREW CONTEXT",
+};
+
+function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
+  const guide = recipe.drinkGuide;
+  const story = guide.coffeeStory;
+  return (
+    <section className="drink-guide">
+      <header className="guide-hero">
+        <div className="guide-kicker"><BookOpenText size={15} /><span>DRINK GUIDE · {guide.estimatedReadMinutes} MIN READ</span></div>
+        {guide.status === "research_hold" ? <div className="guide-hold"><CircleAlert size={15} />RESEARCH HOLD · 실행용 가이드가 아닙니다</div> : null}
+        <h3>{guide.title}</h3>
+        <p>{guide.deck}</p>
+      </header>
+
+      <div className="guide-facts" aria-label="원두 핵심 정보">
+        {story.facts.map((fact) => (
+          <div key={`${fact.label}-${fact.value}`}><span>{fact.label}</span><strong>{fact.value}</strong><small>{fact.note}</small></div>
+        ))}
+      </div>
+
+      <div className="guide-intro">
+        <span>01 · THE COFFEE</span>
+        <h3>{story.headline}</h3>
+        <p>{story.deck}</p>
+      </div>
+
+      <div className="guide-chapters">
+        {story.sections.map((section, index) => (
+          <article className="guide-chapter" key={section.id}>
+            <div className="guide-chapter-index">{String(index + 1).padStart(2, "0")}</div>
+            <div>
+              <div className="guide-chapter-meta"><span>{section.eyebrow}</span><i>{STORY_EVIDENCE_LABELS[section.evidence] ?? section.evidence}</i></div>
+              <h4>{section.title}</h4>
+              <p>{section.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="guide-intro guide-brew-intro">
+        <span>02 · WHY THIS BREW</span>
+        <h3>이 한 잔을 이렇게 설계한 이유</h3>
+        <p>{guide.brewStory}</p>
+      </div>
+      <div className="guide-choices">
+        {guide.brewChoices.map((choice) => (
+          <div key={`${choice.label}-${choice.value}`}><span>{choice.label}</span><strong>{choice.value}</strong><p>{choice.reason}</p></div>
+        ))}
+      </div>
+
+      <div className="guide-intro guide-taste-intro">
+        <span>03 · HOW TO DRINK</span>
+        <h3>온도가 움직이는 동안 찾아볼 것</h3>
+        <p>{guide.servingRitual}</p>
+      </div>
+      <div className="taste-journey">
+        {guide.tasteJourney.map((item, index) => (
+          <div key={`${item.moment}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item.moment}</strong><p>{item.cue}</p></div>
+        ))}
+      </div>
+
+      <div className="guide-disclosure">
+        <span>확인되지 않은 정보</span>
+        <p>정확한 정보가 없는 곳에는 그럴듯한 이야기를 채워 넣지 않습니다.</p>
+        <ul>{story.unknowns.map((item) => <li key={item}>{item}</li>)}</ul>
+      </div>
+      <div className="guide-sources">
+        <div className="detail-section-title"><span>SOURCES & SCOPE</span><span>{story.sources.length} REFERENCES</span></div>
+        {story.sources.map((source) => (
+          source.url ? (
+            <a href={source.url} target="_blank" rel="noreferrer" key={source.label}>
+              <span><small>{source.scope}</small><strong>{source.label}</strong><i>{source.note}</i></span><ExternalLink size={14} />
+            </a>
+          ) : (
+            <div key={source.label}><span><small>{source.scope}</small><strong>{source.label}</strong><i>{source.note}</i></span></div>
+          )
+        ))}
+      </div>
+    </section>
   );
 }
 

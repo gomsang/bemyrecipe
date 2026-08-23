@@ -2,7 +2,7 @@
 
 Fellow Aiden 레시피를 Codex 대화로 만들고, Markdown 원본·공개 웹 카탈로그·개인 Aiden 프로필을 한 흐름으로 관리합니다.
 
-사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `[C]`, `[A]` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
+사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `[C]`, `[A]` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
 
 > Fellow는 공개 Aiden API를 제공하지 않습니다. 이 프로젝트의 기기 연결은 앱이 사용하는 비공식 엔드포인트를 직접 호출하며, Fellow의 변경으로 동작이 중단될 수 있습니다. 다른 Fellow 라이브러리를 런타임 의존성으로 설치하지 않습니다.
 
@@ -31,6 +31,8 @@ Firebase 값이 없어도 `public/catalog.json`으로 만든 로컬 카탈로그
 
 Codex는 `AGENTS.md`의 intake와 research gate를 거친 뒤 Candidate를 만듭니다. 추출 뒤 맛과 시간을 알려주면 log를 남기고, 한 번에 하나의 primary variable만 바꿉니다.
 
+새 Candidate를 만들 때에는 드링크 가이드도 함께 작성합니다. `beans/*.md`에는 지역·생산 구조·품종·고도·가공·로스팅처럼 version에 공통인 사실과 출처를, `recipes/*.md`에는 해당 추출의 의도와 마시는 순서를 저장합니다. 같은 이름의 다른 crop이나 지역 설명은 context로 표시하고, 확인되지 않은 농장·품종·가공·로스팅 세부를 지어내지 않습니다.
+
 채택은 명시적으로 말해야 합니다.
 
 > 이 레시피를 채택할게.
@@ -46,7 +48,7 @@ npm run catalog:sync
 
 사이트는 Markdown 파일 수만큼 카드를 만들지 않습니다. 같은 `lineage`의 파일은 하나의 레시피로 묶고 최신 version만 목록에 표시합니다. 상세 화면의 **VERSION HISTORY**에서 v1, v2 등 이전 설정과 변경 이유·실제 변경값·성공 기준을 선택해 비교할 수 있습니다.
 
-같은 원두, HOT/ICED mode, brew method, cup, basket, vessel, ice goal에서 설정만 바뀌면 새 이름을 만들지 않고 `<lineage>-v<number>.md`로 올립니다. 각 파일의 `revision` frontmatter가 parent와 변경 내용을 기계가 읽을 수 있게 보존합니다. 전체 convention과 허용되는 revision 종류는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md#lineage와-version)에 있습니다.
+같은 원두, HOT/ICED mode, brew method, cup, basket, vessel, ice goal에서 설정만 바뀌면 새 이름을 만들지 않고 `<lineage>-v<number>.md`로 올립니다. 단, 같은 농장·품종이라도 로스터가 다르면 별도 bean과 lineage입니다. 짧은 `roaster_code`를 파일·웹 제목·Aiden profile name에 넣어 구분하고, 확인되지 않았을 때만 `UNK`를 씁니다. 각 파일의 `revision` frontmatter가 parent와 변경 내용을 기계가 읽을 수 있게 보존합니다. 전체 convention은 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md#lineage와-version)에 있습니다.
 
 ```bash
 npm run versions:test
@@ -158,6 +160,8 @@ npm --prefix functions audit --omit=dev
 - HOT 레시피의 얼음 0g 규칙
 - ICED 레시피의 ice plan과 preparation step
 - `brew_ready: true` 레시피의 실행 순서 존재 여부
+- bean story의 장소·지역·사람·품종·고도·가공·로스팅 장과 출처 범위
+- recipe Drink Guide의 추출 의도·핵심 선택·serving ritual·taste journey
 - 등록되지 않은 새 통제조건의 review와 system-change proposal
 
 ## 라이선스
