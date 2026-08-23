@@ -23,7 +23,7 @@ HTTP Function:
 
 - `syncCatalog`: `Authorization: Bearer bmr_live_...`가 필요합니다.
 
-`syncCatalog`는 현재 recipe ruleset version과 hard-rule 결과를 다시 확인합니다. Flash recipe의 잔존 얼음과 headspace도 서버에서 다시 계산하므로, 로컬 catalog 값을 고쳐 검사를 건너뛸 수 없습니다. `review` recipe는 hard error가 없으면 동기화할 수 있지만, `blocked` 또는 다른 ruleset version은 서버가 거부합니다.
+`syncCatalog`는 현재 recipe ruleset version과 hard-rule 결과를 다시 확인합니다. Flash recipe는 카라페와 음용 컵을 나눈 2단계 열수지로 Serving ice의 최소 투입량·잔존량과 headspace를 서버에서 다시 계산하므로, 로컬 catalog 값을 고쳐 검사를 건너뛸 수 없습니다. `review` recipe는 hard error가 없으면 동기화할 수 있지만, `blocked` 또는 다른 evaluator ruleset version은 서버가 거부합니다.
 
 ## 비공식 Fellow 연결
 

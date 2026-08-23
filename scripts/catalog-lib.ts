@@ -264,6 +264,21 @@ export function buildCatalog(): Catalog {
     const bean = readBean(file, data.bean);
     const preparation = readPreparation(data);
     const controlConditions = record(data.control_conditions);
+    const flashThermalInput = {
+      selectedWaterG: Number(data.brew_water_g),
+      doseG: Number(data.dose_g),
+      retentionFactor: Number(data.retention_factor),
+      brewIceG: preparation.icePlan.brewIce.grams,
+      servingIceG: preparation.icePlan.servingIce.grams,
+      dropTempC: Number(data.drop_temp_c),
+      cupCapacityMl: Number(data.cup_capacity_ml),
+    };
+    const flashThermal = String(data.serve_mode) === "iced" && String(data.brew_method) === "flash"
+      ? {
+          base: estimateFlashThermalBalance(flashThermalInput),
+          stress: estimateFlashThermalBalance({ ...flashThermalInput, dropTempC: flashThermalInput.dropTempC + 5 }),
+        }
+      : null;
     const ruleExceptions = readRuleExceptions(data);
     const ruleExtensionRequests = readRuleExtensionRequests(data);
     const parsedRulesetVersion = Number(data.ruleset_version);
@@ -314,6 +329,21 @@ export function buildCatalog(): Catalog {
         retentionFactor: Number(data.retention_factor),
         dropTempC: Number(data.drop_temp_c),
         minHeadspaceMl: Number(data.minimum_headspace_ml),
+        minServingIceG: Number(data.minimum_serving_ice_g ?? 0),
+        flashThermal: flashThermal ? {
+          base: {
+            transferLiquidTempC: flashThermal.base.transferLiquidTempC,
+            brewIceRemainingInCarafeG: flashThermal.base.brewIceRemainingInCarafeG,
+            servingIceRemainingG: flashThermal.base.servingIceRemainingG,
+            estimatedHeadspaceMl: flashThermal.base.estimatedHeadspaceMl,
+          },
+          stress: {
+            transferLiquidTempC: flashThermal.stress.transferLiquidTempC,
+            brewIceRemainingInCarafeG: flashThermal.stress.brewIceRemainingInCarafeG,
+            servingIceRemainingG: flashThermal.stress.servingIceRemainingG,
+            estimatedHeadspaceMl: flashThermal.stress.estimatedHeadspaceMl,
+          },
+        } : null,
       },
       preparation,
       drinkGuide: readDrinkGuide(data, bean.story),
@@ -375,10 +405,10 @@ function validateDrinkGuide(recipe: CatalogRecipe): string[] {
   return errors;
 }
 
-function validateFlashThermalBalance(recipe: CatalogRecipe): string[] {
+export function validateFlashThermalBalance(recipe: CatalogRecipe): string[] {
   if (!recipe.brewReady || recipe.serveMode !== "iced" || recipe.brewMethod !== "flash") return [];
   const errors: string[] = [];
-  const { retentionFactor, dropTempC, minHeadspaceMl } = recipe.brew;
+  const { retentionFactor, dropTempC, minHeadspaceMl, minServingIceG } = recipe.brew;
   if (![retentionFactor, dropTempC, minHeadspaceMl].every(Number.isFinite) || retentionFactor <= 0 || dropTempC <= 0 || minHeadspaceMl < 0) {
     return ["thermal.input.invalid: flash recipe에는 유효한 retention_factor, drop_temp_c, minimum_headspace_ml이 필요합니다."];
   }
@@ -393,8 +423,15 @@ function validateFlashThermalBalance(recipe: CatalogRecipe): string[] {
   };
   const base = estimateFlashThermalBalance(input);
   const stress = estimateFlashThermalBalance({ ...input, dropTempC: dropTempC + 5 });
-  if (recipe.controlConditions.ice_goal === "remain_while_drinking" && (base.remainingIceG < 10 || stress.remainingIceG < 10)) {
-    errors.push(`thermal.ice_remaining: 0°C ice model에서 base/stress 잔존 얼음이 각각 ${base.remainingIceG.toFixed(1)}g/${stress.remainingIceG.toFixed(1)}g입니다. 두 조건 모두 10g 이상이어야 합니다.`);
+  if (recipe.controlConditions.ice_goal === "remain_while_drinking" && (base.servingIceRemainingG < 10 || stress.servingIceRemainingG < 10)) {
+    errors.push(`thermal.serving_ice_remaining: 2단계 0°C ice model에서 음용 컵의 base/stress 잔존 얼음이 각각 ${base.servingIceRemainingG.toFixed(1)}g/${stress.servingIceRemainingG.toFixed(1)}g입니다. 두 조건 모두 10g 이상이어야 합니다.`);
+  }
+  if ((recipe.rulesetVersion ?? 0) >= 5) {
+    if (!Number.isFinite(minServingIceG) || minServingIceG <= 0) {
+      errors.push("thermal.serving_ice_floor.missing: ruleset v5 Flash recipe에는 minimum_serving_ice_g가 필요합니다.");
+    } else if (recipe.brew.servingIceG < minServingIceG) {
+      errors.push(`thermal.serving_ice_floor: Serving ice ${recipe.brew.servingIceG}g은 minimum_serving_ice_g ${minServingIceG}g보다 작습니다.`);
+    }
   }
   if (base.estimatedHeadspaceMl < minHeadspaceMl || stress.estimatedHeadspaceMl < minHeadspaceMl) {
     errors.push(`thermal.headspace: 고체 얼음 부피를 포함한 base/stress headspace가 각각 ${base.estimatedHeadspaceMl.toFixed(1)}ml/${stress.estimatedHeadspaceMl.toFixed(1)}ml입니다. minimum_headspace_ml ${minHeadspaceMl}ml 이상이어야 합니다.`);

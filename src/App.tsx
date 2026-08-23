@@ -33,6 +33,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { profileNameForRecipe, type AidenProfile } from "../shared/aiden-profile";
 import { AIDEN_QUANTITY_MODES } from "../shared/aiden-water";
+import { buildCatalogRoute, parseCatalogRoute, type RecipeDetailView } from "../shared/catalog-route";
 import {
   evaluateRecipeRules,
   getBrewMethodRule,
@@ -112,7 +113,8 @@ function revisionFor(recipe: CatalogRecipe): RecipeRevision {
 
 function App() {
   const [recipes, setRecipes] = useState<CatalogRecipe[]>([]);
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState(() => parseCatalogRoute(window.location.pathname)?.recipeId ?? "");
+  const [detailView, setDetailView] = useState<RecipeDetailView>(() => parseCatalogRoute(window.location.pathname)?.detailView ?? "brew");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
   const [view, setView] = useState<View>("recipes");
@@ -129,8 +131,15 @@ function App() {
       .then((response) => response.json() as Promise<Catalog>)
       .then((catalog) => {
         if (!active) return;
+        const route = parseCatalogRoute(window.location.pathname);
+        const requested = route ? catalog.recipes.find((recipe) => recipe.id === route.recipeId) : undefined;
+        const initial = requested ?? recipeHeads(catalog.recipes)[0];
         setRecipes(catalog.recipes);
-        setSelectedId(recipeHeads(catalog.recipes)[0]?.id ?? "");
+        setSelectedId(initial?.id ?? "");
+        setDetailView(route?.detailView ?? "brew");
+        if (initial && route && !requested) {
+          window.history.replaceState({}, "", buildCatalogRoute(initial.id, route?.detailView ?? "brew"));
+        }
       })
       .catch(() => undefined);
     loadPublicRecipes()
@@ -139,8 +148,8 @@ function App() {
         // Markdown is the source of truth. A stale Firestore projection must not
         // replace the catalog bundled from the current repository ruleset.
         if (!liveRecipes.every((recipe) => (
-          recipe.rulesetVersion === RECIPE_RULES.version
-          && recipe.ruleEvaluation?.recipeRulesetVersion === RECIPE_RULES.version
+          Number(recipe.rulesetVersion) <= RECIPE_RULES.version
+          && recipe.ruleEvaluation?.rulesetVersion === RECIPE_RULES.version
           && Object.keys(recipe.controlConditions ?? {}).length > 0
           && Boolean(recipe.revision?.summary)
           && Boolean(recipe.drinkGuide?.title)
@@ -157,6 +166,18 @@ function App() {
       })
       .catch(() => undefined);
     return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseCatalogRoute(window.location.pathname);
+      if (!route) return;
+      setView("recipes");
+      setSelectedId(route.recipeId);
+      setDetailView(route.detailView);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   useEffect(() => {
@@ -201,9 +222,40 @@ function App() {
   const acceptedCount = latestRecipes.filter((recipe) => recipe.status === "accepted").length;
   const candidateCount = latestRecipes.filter((recipe) => recipe.status === "candidate").length;
 
+  useEffect(() => {
+    if (view !== "recipes" || !selected || selected.id === selectedId) return;
+    setSelectedId(selected.id);
+    window.history.replaceState({}, "", buildCatalogRoute(selected.id, detailView));
+  }, [detailView, selected, selectedId, view]);
+
+  useEffect(() => {
+    const route = parseCatalogRoute(window.location.pathname);
+    if (!route || route.recipeId !== selected?.id || route.detailView !== detailView) return;
+    window.requestAnimationFrame(() => {
+      document.querySelector(".recipe-detail")?.scrollIntoView({ block: "start" });
+    });
+  }, [detailView, selected?.id]);
+
   function navigate(next: View) {
     setView(next);
     setMobileNav(false);
+  }
+
+  function selectRecipe(id: string) {
+    setSelectedId(id);
+    setDetailView("brew");
+    window.history.pushState({}, "", buildCatalogRoute(id, "brew"));
+  }
+
+  function selectVersion(id: string) {
+    setSelectedId(id);
+    window.history.pushState({}, "", buildCatalogRoute(id, detailView));
+  }
+
+  function selectDetailView(next: RecipeDetailView) {
+    if (!selected) return;
+    setDetailView(next);
+    window.history.pushState({}, "", buildCatalogRoute(selected.id, next));
   }
 
   async function saveRecipeToAiden(recipe: CatalogRecipe) {
@@ -241,7 +293,10 @@ function App() {
           selected={selected}
           versions={selectedVersions}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={selectRecipe}
+          onSelectVersion={selectVersion}
+          detailView={detailView}
+          onDetailView={selectDetailView}
           status={status}
           onStatus={setStatus}
           query={query}
@@ -281,6 +336,9 @@ type PublicRecipesProps = {
   versions: CatalogRecipe[];
   selectedId: string;
   onSelect: (id: string) => void;
+  onSelectVersion: (id: string) => void;
+  detailView: RecipeDetailView;
+  onDetailView: (view: RecipeDetailView) => void;
   status: StatusFilter;
   onStatus: (status: StatusFilter) => void;
   query: string;
@@ -340,7 +398,7 @@ function PublicRecipes(props: PublicRecipesProps) {
             ))}
             {!props.filtered.length ? <div className="empty-list">조건에 맞는 레시피가 없습니다.</div> : null}
           </div>
-          {props.selected ? <RecipeDetail key={props.selected.id} recipe={props.selected} versions={props.versions} onSelectVersion={props.onSelect} onSaveToAiden={props.onSaveToAiden} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
+          {props.selected ? <RecipeDetail recipe={props.selected} versions={props.versions} onSelectVersion={props.onSelectVersion} detailView={props.detailView} onDetailView={props.onDetailView} onSaveToAiden={props.onSaveToAiden} /> : <div className="detail-empty">레시피를 불러오는 중입니다.</div>}
         </div>
       </section>
     </main>
@@ -362,15 +420,16 @@ function vesselLabel(value: string) {
   return value.replaceAll("-", " ").toUpperCase();
 }
 
-function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
+function RecipeDetail({ recipe, versions, onSelectVersion, detailView, onDetailView, onSaveToAiden }: {
   recipe: CatalogRecipe;
   versions: CatalogRecipe[];
   onSelectVersion: (id: string) => void;
+  detailView: RecipeDetailView;
+  onDetailView: (view: RecipeDetailView) => void;
   onSaveToAiden?: (recipe: CatalogRecipe) => Promise<{ profileName: string }>;
 }) {
   const [aidenSaving, setAidenSaving] = useState(false);
   const [aidenMessage, setAidenMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
-  const [detailView, setDetailView] = useState<"brew" | "guide">("brew");
   const serveModeRule = getServeModeRule(recipe.serveMode);
   const brewMethodRule = getBrewMethodRule(recipe.brewMethod);
   const iceStrategyRule = getIceStrategyRule(recipe.preparation.icePlan.strategy);
@@ -448,11 +507,11 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
       ) : null}
 
       <div className="detail-mode-tabs" role="tablist" aria-label="레시피 상세 보기">
-        <button className={detailView === "brew" ? "active" : ""} role="tab" aria-selected={detailView === "brew"} onClick={() => setDetailView("brew")}>
+        <button className={detailView === "brew" ? "active" : ""} role="tab" aria-selected={detailView === "brew"} onClick={() => onDetailView("brew")}>
           <Settings2 size={16} />
           <span><small>EXECUTION</small>추출 레시피</span>
         </button>
-        <button className={detailView === "guide" ? "active" : ""} role="tab" aria-selected={detailView === "guide"} onClick={() => setDetailView("guide")}>
+        <button className={detailView === "guide" ? "active" : ""} role="tab" aria-selected={detailView === "guide"} onClick={() => onDetailView("guide")}>
           <BookOpenText size={16} />
           <span><small>EDITORIAL</small>드링크 가이드</span>
         </button>
@@ -491,13 +550,17 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
               <span className="ice-icon"><Snowflake size={15} /></span>
               <small>{brewIceRule.label} · {vesselLabel(recipe.preparation.icePlan.brewIce.vessel)} · {brewIceRule.timingLabel}</small>
               <strong>{recipe.preparation.icePlan.brewIce.grams}g</strong>
-              <p>{brewIceRule.description}</p>
+              <p>{brewIceRule.description}{recipe.brew.flashThermal
+                ? ` 기준 낙하 온도에서 이송 직전 액체는 약 ${recipe.brew.flashThermal.base.transferLiquidTempC.toFixed(1)}°C, 카라페 잔존 얼음은 ${recipe.brew.flashThermal.base.brewIceRemainingInCarafeG.toFixed(1)}g으로 계산됩니다.`
+                : ""}</p>
             </div>
             <div>
               <span className="ice-icon"><Snowflake size={15} /></span>
               <small>{servingIceRule.label} · {vesselLabel(recipe.preparation.icePlan.servingIce.vessel)} · {servingIceRule.timingLabel}</small>
               <strong>{recipe.preparation.icePlan.servingIce.grams}g</strong>
-              <p>{servingIceRule.description}</p>
+              <p>{servingIceRule.description}{recipe.brew.flashThermal
+                ? ` 처음 ${recipe.brew.servingIceG}g을 넣고, base/stress 조건에서 약 ${recipe.brew.flashThermal.base.servingIceRemainingG.toFixed(1)}g/${recipe.brew.flashThermal.stress.servingIceRemainingG.toFixed(1)}g이 이 잔에 남는 계산입니다${recipe.brew.minServingIceG > 0 ? `. 최소 투입 기준은 ${recipe.brew.minServingIceG}g입니다` : ""}.`
+                : ""}</p>
             </div>
           </div>
           </section>
@@ -562,12 +625,28 @@ function RecipeDetail({ recipe, versions, onSelectVersion, onSaveToAiden }: {
 }
 
 const STORY_EVIDENCE_LABELS: Record<string, string> = {
-  exact_lot: "LOT FACT",
-  station_context: "STATION CONTEXT",
-  regional_context: "REGIONAL CONTEXT",
-  variety_context: "VARIETY CONTEXT",
-  brew_context: "BREW CONTEXT",
+  exact_lot: "이 커피의 정보",
+  station_context: "하르푸사 이야기",
+  regional_context: "지역 이야기",
+  variety_context: "품종 이야기",
+  brew_context: "로스팅과 추출",
 };
+
+const STORY_SCOPE_LABELS: Record<string, string> = {
+  "EXACT LOT": "이 커피",
+  "THIS COFFEE": "이 커피",
+  "STATION CONTEXT": "하르푸사 이야기",
+  "REGIONAL CONTEXT": "지역 이야기",
+  "VARIETY CONTEXT": "품종 이야기",
+  "PROCESS CONTEXT": "가공 이야기",
+  "ROAST CONTEXT": "로스팅 이야기",
+  "GENERAL WASHED CONTEXT": "워시드 가공",
+  "SAME-NAME 2024 CONTEXT": "하르푸사 자료",
+};
+
+function readerScopeLabel(scope: string) {
+  return STORY_SCOPE_LABELS[scope] ?? scope;
+}
 
 function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
   const guide = recipe.drinkGuide;
@@ -609,21 +688,21 @@ function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
       <div className="guide-intro">
         <span>02 · FROM CHERRY TO GREEN</span>
         <h3>Washed라는 한 단어 안에서 일어나는 일</h3>
-        <p>가공명은 맛의 별명이 아니라 체리를 생두로 바꾸는 작업의 묶음입니다. 이번 로트에서 확인된 사실과 일반 공정, 같은 이름의 다른 crop 자료를 구분해 읽습니다.</p>
+        <p>가공명은 맛의 별명이 아니라 체리를 생두로 바꾸는 여러 작업을 묶은 말이다. 붉은 체리가 로스팅 전의 단단한 생두가 되기까지 어떤 손길을 거치는지 차례로 따라가 본다.</p>
       </div>
       <div className="process-journey">
         {story.processJourney.map((item) => (
           <article key={`${item.step}-${item.title}`}>
             <span>{item.step}</span>
-            <div><small>{item.scope}</small><h4>{item.title}</h4><p>{item.body}</p></div>
+            <div><small>{readerScopeLabel(item.scope)}</small><h4>{item.title}</h4><p>{item.body}</p></div>
           </article>
         ))}
       </div>
 
       <div className="guide-intro">
         <span>03 · TASTING LANGUAGE</span>
-        <h3>봉투의 세 단어를 마시는 법</h3>
-        <p>컵노트는 첨가물이나 정답이 아니라 향과 맛을 함께 찾기 위한 비유입니다. 비슷해 보이는 감각과 무엇이 다른지도 같이 살펴봅니다.</p>
+        <h3>세 가지 향을 마시는 법</h3>
+        <p>컵노트는 첨가물이나 정답이 아니라 향과 맛을 함께 찾기 위한 비유다. 비슷해 보이는 감각과 무엇이 다른지도 함께 살펴본다.</p>
       </div>
       <div className="tasting-lexicon">
         {story.tastingLexicon.map((item) => (
@@ -659,19 +738,19 @@ function DrinkGuideReader({ recipe }: { recipe: CatalogRecipe }) {
       </div>
 
       <div className="guide-disclosure">
-        <span>확인되지 않은 정보</span>
-        <p>정확한 정보가 없는 곳에는 그럴듯한 이야기를 채워 넣지 않습니다.</p>
+        <span>편집 노트</span>
+        <p>이 커피에 공개되지 않은 세부 정보는 상상으로 채우지 않았다.</p>
         <ul>{story.unknowns.map((item) => <li key={item}>{item}</li>)}</ul>
       </div>
       <div className="guide-sources">
-        <div className="detail-section-title"><span>SOURCES & SCOPE</span><span>{story.sources.length} REFERENCES</span></div>
+        <div className="detail-section-title"><span>더 읽어보기</span><span>{story.sources.length} REFERENCES</span></div>
         {story.sources.map((source) => (
           source.url ? (
             <a href={source.url} target="_blank" rel="noreferrer" key={source.label}>
-              <span><small>{source.scope}</small><strong>{source.label}</strong><i>{source.note}</i></span><ExternalLink size={14} />
+              <span><small>{readerScopeLabel(source.scope)}</small><strong>{source.label}</strong><i>{source.note}</i></span><ExternalLink size={14} />
             </a>
           ) : (
-            <div key={source.label}><span><small>{source.scope}</small><strong>{source.label}</strong><i>{source.note}</i></span></div>
+            <div key={source.label}><span><small>{readerScopeLabel(source.scope)}</small><strong>{source.label}</strong><i>{source.note}</i></span></div>
           )
         ))}
       </div>

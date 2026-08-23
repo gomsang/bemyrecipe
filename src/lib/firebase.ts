@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInW
 import { collection, getDocs, getFirestore, orderBy, query } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import type { User } from "firebase/auth";
+import { canonicalRecipeId } from "../../shared/catalog-route";
 import type { CatalogRecipe } from "./types";
 
 const config = {
@@ -45,7 +46,10 @@ export async function callServer<TInput, TResult>(name: string, data?: TInput): 
 export async function loadPublicRecipes(): Promise<CatalogRecipe[]> {
   if (!db) return [];
   const snapshot = await getDocs(query(collection(db, "recipes"), orderBy("created", "desc")));
-  return snapshot.docs.map((document) => document.data() as CatalogRecipe);
+  return snapshot.docs.map((document) => {
+    const recipe = document.data() as CatalogRecipe & { localId?: string };
+    return { ...recipe, id: canonicalRecipeId(recipe) };
+  });
 }
 
 export type AuthUser = User;

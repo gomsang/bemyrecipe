@@ -19,8 +19,9 @@
 - 린스 물을 버리지 않아 계산하지 않은 물이 남는 구조
 - pulse count와 온도 배열 길이 불일치
 - `brew_ready: true`인데 필수 실행 단계가 없는 상태
-- 얼음이 남아야 하는 Flash recipe가 기본 또는 +5°C 조건에서 잔존 얼음 10g을 확보하지 못한 상태
-- 고체 얼음 부피를 포함한 headspace가 recipe의 `minimum_headspace_ml`보다 작은 상태
+- 얼음이 남아야 하는 Flash recipe가 기본 또는 +5°C 조건에서 음용 컵의 Serving ice 10g을 확보하지 못한 상태
+- Ruleset v5 Flash recipe의 Serving ice가 `minimum_serving_ice_g`보다 작은 상태
+- 음용 컵의 고체 Serving ice 부피를 포함한 headspace가 recipe의 `minimum_headspace_ml`보다 작은 상태
 
 Hard constraint는 `rule_exceptions`로 우회할 수 없다.
 

@@ -16,54 +16,54 @@ tasting_notes: ["베르가못", "백도", "오렌지필"]
 story:
   headline: "숲과 밭의 경계에서 자란, 향으로 읽는 예가체프"
   deck: >-
-    Harfusa는 에티오피아 남부 Gedeo의 높은 경사면에서 온 washed coffee다. 이곳의 커피는 거대한 단일 농장보다 집과 밭, 그늘나무와 생활 작물이 맞물린 풍경에서 이해하는 편이 가깝다. 봉투에 적힌 베르가못·백도·오렌지필은 예가체프의 정답이 아니라, 이 로트 한 잔을 천천히 읽기 위한 세 개의 감각 표지다.
+    Harfusa는 에티오피아 남부 Gedeo의 높은 경사면에서 온 washed coffee다. 이곳의 커피는 거대한 단일 농장보다 집과 밭, 그늘나무와 생활 작물이 맞물린 풍경에서 이해하는 편이 가깝다. 베르가못·백도·오렌지필은 예가체프의 정답이 아니라, 이 한 잔을 천천히 읽기 위한 세 개의 감각 표지다.
   sections:
     - id: place
-      eyebrow: "PLACE · REGIONAL CONTEXT"
-      title: "리프트 밸리 동쪽, Gedeo의 가파른 고원"
+      eyebrow: "PLACE · GEDEO HIGHLANDS"
+      title: "하르푸사에서 시작해 게데오의 고원으로"
       body: >-
-        Gedeo는 에티오피아 리프트 밸리 동쪽 사면에 이어지는 농업 문화 경관이다. UNESCO가 기록한 이곳의 밭은 한 작물만 줄지어 심은 평면이 아니다. 위에는 큰 나무, 그 아래에는 커피나무, 다시 그 아래에는 enset와 여러 식량 작물이 층을 이룬다. 집과 밭, 생계와 숲이 따로 떨어지지 않는 agroforestry가 오랜 세월 이어져 왔다. 이번 원두의 정확한 농장 풍경을 확인한 자료는 아니지만, Yirgacheffe 커피가 자라 온 더 넓은 생활 환경을 이해하는 배경이 된다.
+        이 커피는 에티오피아 남부 Gedeo Zone, Yirgacheffe의 Harfusa Kebele에서 왔다. 그보다 넓게 펼쳐진 Gedeo의 고원은 리프트 밸리 동쪽 사면을 따라 이어진다. 이곳의 밭에는 큰 나무와 커피나무, enset와 여러 식량 작물이 높낮이를 달리해 함께 자란다. 집과 밭, 생계와 숲이 따로 떨어지지 않는 오래된 agroforestry의 풍경이다.
       evidence: regional_context
     - id: region
-      eyebrow: "YIRGACHEFFE · REGIONAL CONTEXT"
+      eyebrow: "YIRGACHEFFE · MANY EXPRESSIONS"
       title: "지역 이름이 곧 한 가지 맛을 뜻하지는 않는다"
       body: >-
-        Yirgacheffe라는 이름 아래에는 여러 kebele와 생산자, 수확 시기와 가공소가 공존한다. 커피 시장에서는 꽃, 감귤, 차처럼 가벼운 질감이 이 지역의 인상으로 자주 소개되지만, 행정 지명은 향미 성분표가 아니다. 유전적 다양성, 밭의 미세기후, 익은 체리를 고르는 방식, 발효와 건조, 로스팅이 한꺼번에 잔을 바꾼다. 이 봉투에서는 그 넓은 가능성 가운데 로스터가 적은 베르가못과 백도, 오렌지필을 실제로 찾아본다.
+        Yirgacheffe라는 이름 아래에는 여러 kebele와 생산자, 수확 시기와 가공소가 공존한다. 꽃과 감귤, 차처럼 가벼운 질감이 이 지역의 인상으로 자주 소개되지만, 지명 하나로 모든 잔의 맛을 설명할 수는 없다. 나무의 유전적 다양성, 밭의 미세기후, 익은 체리를 고르는 방식, 발효와 건조, 로스팅이 차례로 커피의 표정을 바꾼다. 이 잔에서는 그 넓은 가능성 가운데 베르가못과 백도, 오렌지필을 찾아본다.
       evidence: regional_context
     - id: people
-      eyebrow: "HARFUSA · STATION CONTEXT"
+      eyebrow: "HARFUSA · PEOPLE & LOT"
       title: "한 농장의 이름보다, 모여 만들어지는 lot"
       body: >-
-        봉투에서 직접 확인되는 생산지 표기는 Harfusa Kebele까지다. Kebele는 에티오피아의 작은 행정 단위다. 같은 이름의 과거 자료에서는 소규모 garden coffee 재배자들이 익은 체리를 washing station으로 가져와 하나의 lot를 만든다고 설명한다. 수많은 손의 수확물이 한 가공소에서 만나므로 station의 선별과 발효, 건조 관리가 중요해진다. 다만 이번 로트의 생산자 수와 cooperative, station 운영 주체는 확인되지 않았다. 한 사람의 농장 이야기로 꾸미지 않고, 확인된 지명과 생산 구조의 맥락까지만 전한다.
+        Harfusa Kebele는 한 사람의 농장 이름이라기보다 작은 지역을 가리키는 이름이다. 예가체프에서는 소규모 garden coffee 재배자들이 익은 체리를 washing station으로 가져와 하나의 lot를 이루는 경우가 많다. 여러 밭에서 온 체리가 한곳에 모이는 만큼, 가공소의 선별과 발효, 건조가 커피의 완성도에 큰 몫을 한다. 이 Harfusa의 개별 생산자 수와 cooperative, station 운영 주체는 별도로 공개되지 않았다.
       evidence: station_context
     - id: variety
-      eyebrow: "VARIETY · VARIETY CONTEXT"
+      eyebrow: "VARIETY · HEIRLOOM"
       title: "Heirloom은 하나의 품종명이 아니다"
       body: >-
-        아라비카의 기원지인 에티오피아에는 다른 생산국보다 훨씬 넓은 유전적 다양성이 남아 있다. 이 봉투의 ‘Heirloom’은 하나의 고정된 품종명이 아니라, 지역 환경과 재배 문화 속에서 오래 적응한 여러 landrace와 아직 세분되지 않은 계통을 넓게 묶은 유통 표현에 가깝다. 그래서 Heirloom 자체를 ‘꽃 향이 나는 품종’이라고 읽을 수는 없다. 이번 잔의 향은 유전형 하나가 아니라 재배·가공·로스팅까지 만난 결과이며, 세부 cultivar는 미확인으로 남긴다.
+        아라비카의 기원지인 에티오피아에는 다른 생산국보다 훨씬 넓은 유전적 다양성이 남아 있다. 이 커피의 ‘Heirloom’은 하나의 고정된 품종명이 아니라, 지역 환경과 재배 문화 속에서 오래 적응한 여러 landrace와 아직 세분되지 않은 계통을 넓게 묶은 표현에 가깝다. 따라서 Heirloom 자체를 ‘꽃 향이 나는 품종’이라고 읽을 수는 없다. 잔의 향은 나무의 유전형뿐 아니라 재배와 가공, 로스팅이 함께 만든 결과다.
       evidence: variety_context
     - id: altitude
-      eyebrow: "ALTITUDE · LOT FACT"
-      title: "1,800–2,100m, 봉투에서 확인된 높이"
+      eyebrow: "ALTITUDE · 1,800–2,100M"
+      title: "1,800–2,100m, 천천히 익어 가는 높이"
       body: >-
-        재배 고도 1,800–2,100m는 이번 원두에서 직접 확인된 정보다. 고도가 높아지면 대체로 기온이 낮아져 체리의 생육과 성숙 속도가 달라질 수 있다. 그렇다고 숫자가 높을수록 무조건 더 향긋하거나 단단한 것은 아니다. 경사 방향, 그늘, 토양, 강수와 가공이 함께 작용하고, 여러 연구에서도 산지와 고도의 효과는 서로 얽혀 나타난다. 여기서는 높은 숫자를 품질 등급처럼 소비하기보다, 이 커피가 놓였던 서늘한 환경의 한 단서로 읽는다.
+        이 커피는 해발 1,800–2,100m에서 자랐다. 높은 곳은 대체로 기온이 낮아 체리가 익는 속도와 나무의 생육에 영향을 준다. 다만 고도가 높다고 무조건 더 향긋하거나 좋은 커피가 되는 것은 아니다. 경사 방향과 그늘, 토양, 강수, 가공이 함께 작용하기 때문이다. 이 숫자는 품질의 점수라기보다 Harfusa의 서늘한 재배 환경을 그려 보는 단서에 가깝다.
       evidence: exact_lot
     - id: process
-      eyebrow: "PROCESS · LOT FACT + CONTEXT"
+      eyebrow: "PROCESS · WASHED"
       title: "과육을 걷어내고 선명도를 남기는 Washed"
       body: >-
-        Washed는 수확한 커피 체리에서 껍질과 과육을 벗긴 뒤, 씨앗을 감싼 끈끈한 점액질을 발효로 분해하고 물로 씻어 말리는 계열의 가공법이다. 발효는 향을 덧칠하는 한 번의 비법이 아니라 점액질을 제거하기 위한 미생물·효소 작용이며, 물속 발효인지 건식 발효인지, 시간과 온도, 세척 뒤 침지 여부에 따라 결과가 달라진다. 같은 Harfusa 이름의 2024 자료는 depulping, 12–24시간 수중 발효, 수로 세척, raised-bed 건조를 소개하지만 이번 crop의 시간표로 단정하지 않는다. Washed라는 이름만으로 ‘깨끗한 맛’을 보장하지 않고, 이 잔에서 향이 얼마나 또렷이 분리되는지 확인한다.
+        Washed는 수확한 커피 체리에서 껍질과 과육을 벗긴 뒤, 씨앗을 감싼 끈끈한 점액질을 발효로 느슨하게 만들고 물로 씻어 말리는 가공 방식이다. 이때 발효는 향을 덧칠하는 한 번의 비법이 아니라 미생물과 효소가 점액질을 분해하는 과정이다. 물속에서 발효하는지, 시간을 얼마나 두는지, 세척 뒤 다시 물에 담그는지에 따라 결과는 달라진다. Harfusa의 다른 수확 자료에는 12–24시간 수중 발효와 수로 세척, raised bed 건조가 소개되어 있다. 이번 잔에서는 Washed라는 이름을 맛의 보증서로 보기보다 향이 얼마나 맑게 나뉘는지 느껴본다.
       evidence: station_context
     - id: roast
-      eyebrow: "ROAST · LOT FACT + BREW CONTEXT"
+      eyebrow: "ROAST · MEDIUM–LIGHT"
       title: "Medium–Light, 향을 열되 추출력을 잃지 않는 지점"
       body: >-
-        서부로스터스와 Medium–Light, 2026-08-14 roast date는 사용자가 확인한 정보다. 로스팅은 생두의 당과 아미노산, 산과 향 전구체를 열로 바꾸는 마지막 큰 변환이다. 연구에서는 같은 생두도 최종 배전도와 시간·온도 경로에 따라 휘발성 향의 구성이 크게 달라질 수 있음을 보여준다. Medium–Light라는 표기는 밝은 산지 향을 남기려는 방향을 짐작하게 하지만, 열원·batch size·development·색도는 기록되지 않았다. 같은 Harfusa라도 다른 로스터의 봉투라면 별개의 커피로 다루는 이유다.
+        서부로스터스는 이 Harfusa를 Medium–Light로 볶았고, 로스팅 날짜는 2026년 8월 14일이다. 로스팅은 생두의 당과 아미노산, 산과 향의 전구체가 열을 만나 새로운 향과 맛으로 바뀌는 마지막 큰 변환이다. 같은 생두도 어느 온도에 얼마나 오래 머물렀는지에 따라 향의 구성이 달라진다. Medium–Light라는 표기에서는 산지의 밝은 향을 남기려는 방향을 읽을 수 있지만, 실제 맛은 로스터의 세부 열 운용까지 더해져 완성된다. 그래서 같은 Harfusa라도 로스터가 달라지면 다른 커피처럼 바라보는 편이 자연스럽다.
       evidence: brew_context
   process_journey:
     - step: "01"
       title: "익은 체리를 모으고 고른다"
-      body: "Washed의 출발점은 커피 체리다. 덜 익거나 손상된 체리가 섞이면 뒤 단계만으로 되돌리기 어렵다. 이번 로트의 구체적인 수확·선별 기준은 확인되지 않았다."
+      body: "Washed의 출발점은 잘 익은 커피 체리다. 덜 익거나 손상된 체리가 섞이면 뒤 단계만으로 되돌리기 어렵다. 이 Harfusa의 구체적인 수확·선별 기준은 별도로 공개되지 않았다."
       scope: "GENERAL WASHED CONTEXT"
     - step: "02"
       title: "과육을 벗긴다"
@@ -75,11 +75,11 @@ story:
       scope: "GENERAL WASHED CONTEXT"
     - step: "04"
       title: "물로 씻고 밀도로 나눈다"
-      body: "느슨해진 점액질을 씻어내고 수로에서 상태나 밀도에 따라 다시 선별할 수 있다. 같은 이름의 2024 Hafursa 자료에는 이 수로 세척이 기록돼 있다."
+      body: "느슨해진 점액질을 씻어내고 수로에서 상태나 밀도에 따라 다시 선별할 수 있다. Harfusa의 2024년 자료에서도 이 수로 세척 과정을 볼 수 있다."
       scope: "SAME-NAME 2024 CONTEXT"
     - step: "05"
       title: "파치먼트 상태로 천천히 말린다"
-      body: "씻은 씨앗은 파치먼트 껍질을 두른 채 목표 수분까지 건조한다. 동명 2024 자료는 raised bed에서 10–15일을 적지만, 이번 로트의 건조 방식과 기간은 확인되지 않았다."
+      body: "씻은 씨앗은 파치먼트 껍질을 두른 채 목표 수분까지 건조한다. Harfusa의 2024년 자료에는 raised bed에서 10–15일 동안 말리는 과정이 소개되어 있다. 이 커피의 건조 기간은 별도로 공개되지 않았다."
       scope: "SAME-NAME 2024 CONTEXT"
   tasting_lexicon:
     - term: "베르가못"
@@ -93,7 +93,7 @@ story:
       distinction: "기분 좋은 zest의 여운과 혀를 말리는 거친 쓴맛은 다르다. 마지막 모금에서 둘을 구분한다."
   glossary:
     - term: "Kebele"
-      definition: "에티오피아의 작은 지역 행정 단위. Harfusa는 이번 봉투가 가리키는 세부 지명이다."
+      definition: "에티오피아의 작은 지역 행정 단위. Harfusa는 이 커피가 가리키는 세부 지명이다."
     - term: "Agroforestry"
       definition: "나무와 작물을 같은 땅에서 여러 층으로 기르는 농업 방식. Gedeo의 생활 경관을 이해하는 핵심 단어다."
     - term: "Enset"
@@ -107,41 +107,41 @@ story:
   facts:
     - label: "ROASTER"
       value: "서부로스터스"
-      note: "사용자 확인 · code SBR"
+      note: "SBR"
     - label: "ORIGIN"
       value: "Ethiopia"
-      note: "봉투 표기"
+      note: "SNNPR · Gedeo Zone"
     - label: "REGION"
       value: "Gedeo · Yirgacheffe"
-      note: "봉투 표기"
+      note: "에티오피아 남부 고원"
     - label: "PLACE"
       value: "Harfusa Kebele"
-      note: "봉투 표기 · 개별 농장 미확인"
+      note: "Yirgacheffe의 작은 지역 단위"
     - label: "ALTITUDE"
       value: "1,800–2,100m"
-      note: "봉투 표기"
+      note: "고지대 재배"
     - label: "VARIETY"
       value: "Heirloom"
-      note: "세부 cultivar 미확인"
+      note: "에티오피아의 다양한 재래 계통"
     - label: "PROCESS"
       value: "Washed"
-      note: "세부 발효·건조 조건 미확인"
+      note: "과육 제거 · 발효 · 세척"
     - label: "ROAST"
       value: "Medium–Light"
-      note: "사용자 제공"
+      note: "밝은 향을 살린 배전"
     - label: "ROAST DATE"
       value: "2026-08-14"
-      note: "사용자 제공"
+      note: "로스팅 날짜"
   unknowns:
-    - "이번 crop의 개별 생산자·cooperative·washing station 운영 주체"
-    - "세부 cultivar 이름과 구성 비율"
-    - "수확 시기, 발효 시간, 건조 일수와 방식"
-    - "서부로스터스의 실제 roast machine, batch size와 roast development"
+    - "이 Harfusa를 만든 개별 생산자와 washing station 운영 주체"
+    - "Heirloom 안에 포함된 세부 품종과 구성 비율"
+    - "수확 시기와 발효 시간, 건조 일수"
+    - "서부로스터스의 로스터와 세부 로스팅 프로파일"
   sources:
-    - label: "사용자 제공 원두 봉투 정보"
+    - label: "서부로스터스 · Harfusa 원두 정보"
       url: null
-      scope: "EXACT LOT"
-      note: "서부로스터스, 이름, 지역, 고도, Heirloom, Washed, tasting notes, roast level/date"
+      scope: "THIS COFFEE"
+      note: "이름, 지역, 고도, Heirloom, Washed, 컵노트, 배전도와 로스팅 날짜"
     - label: "UNESCO · The Gedeo Cultural Landscape"
       url: "https://whc.unesco.org/en/list/1641/"
       scope: "REGIONAL CONTEXT"
@@ -149,7 +149,7 @@ story:
     - label: "Project Origin · Yirgacheffe G1 Hafursa 2024"
       url: "https://projectorigin.coffee/wp-content/uploads/2024/08/ETH_Yirgacheffe_2024.pdf"
       scope: "STATION CONTEXT"
-      note: "같은 이름의 다른 crop; garden coffee와 washed process 맥락만 참고"
+      note: "Harfusa의 garden coffee와 washed process를 더 이해하기 위한 자료"
     - label: "World Coffee Research · History of Arabica"
       url: "https://varieties.worldcoffeeresearch.org/arabica-2/history-of-arabica"
       scope: "VARIETY CONTEXT"
@@ -165,7 +165,7 @@ story:
     - label: "Royal Coffee · Ethiopia Hafursa archive"
       url: "https://royalcoffee.com/product/3427097000040033217/"
       scope: "STATION CONTEXT"
-      note: "같은 이름의 과거 coffee; 이번 lot의 생산자 사실로 사용하지 않음"
+      note: "Harfusa의 생산과 유통 배경을 더 이해하기 위한 자료"
 created: 2026-08-23
 updated: 2026-08-24
 ---
@@ -214,5 +214,7 @@ updated: 2026-08-24
 
 - [315ml Flash brew v1 Candidate](../recipes/candidates/sbr-harfusa-flash-315-v1.md) — Research Hold / brew_ready false
 - [315ml Split-ice Flash brew v2 Candidate](../recipes/candidates/sbr-harfusa-flash-315-v2.md) — 상변화 계산 교정으로 Research Hold
-- [315ml Split-ice Flash brew v3 Candidate](../recipes/candidates/sbr-harfusa-flash-315-v3.md) — 열수지 교정 / brew_ready true / 최신
+- [315ml Split-ice Flash brew v3 Candidate](../recipes/candidates/sbr-harfusa-flash-315-v3.md) — 열수지 교정 / brew_ready true
+- [315ml Split-ice Flash brew v4 Candidate](../recipes/candidates/sbr-harfusa-flash-315-v4.md) — Serving ice 52g / 2단계 열수지 / brew_ready true / 최신
 - [500ml Tumbler Flash brew v1 Candidate](../recipes/candidates/sbr-harfusa-flash-500-v1.md) — brew_ready true / 사용자 채택 전
+- [500ml Tumbler Flash brew v2 Candidate](../recipes/candidates/sbr-harfusa-flash-500-v2.md) — Serving ice 150g / 2단계 열수지 / brew_ready true / 최신

@@ -179,7 +179,7 @@ Headspace 판정:
 
 ## 4. Flash brew 열수지 근사
 
-아래 계산은 얼음이 0°C이고, 용기·공기·추출 중 열손실을 무시한 보수 근사입니다. 고체 얼음과 액체 물이 함께 남아 있는 평형은 약 0°C입니다. 얼음이 남으면서 액체가 5°C라는 상태를 계산하지 않습니다.
+아래 계산은 얼음이 0°C이고, 용기·공기·추출 중 열손실을 무시한 보수 근사입니다. 실제 실행 순서대로 **카라페의 Brew ice → 액체 이송 → 음용 컵의 Serving ice**를 따로 계산합니다. 고체 Brew ice가 카라페에 남으면 자동으로 손님 잔의 얼음이 되지 않습니다.
 
 기호:
 
@@ -189,23 +189,35 @@ Headspace 판정:
 - 얼음 융해열 `Lf = 333.55 J/g`
 - 고체 얼음 밀도 `ρice = 0.917g/ml`
 
+### 1단계 · 카라페
+
 ```text
-iceMeltAtZeroG = B × c × Td / Lf
-estimatedMeltedIceG = min(BI + SI, iceMeltAtZeroG)
-estimatedIceRemainingG = max(0, BI + SI - estimatedMeltedIceG)
-estimatedOccupiedVolumeMl = B + estimatedMeltedIceG + estimatedIceRemainingG / ρice
+initialHeatJ = B × c × Td
+brewIceMeltedG = min(BI, initialHeatJ / Lf)
+brewIceRemainingInCarafeG = BI - brewIceMeltedG
+transferLiquidG = B + brewIceMeltedG
+heatAfterBrewIceJ = max(0, initialHeatJ - brewIceMeltedG × Lf)
+transferLiquidTempC =
+  brewIceRemainingInCarafeG > 0 ? 0 : heatAfterBrewIceJ / (c × transferLiquidG)
+```
+
+### 2단계 · 음용 컵
+
+```text
+servingIceMeltCapacityG = transferLiquidG × c × transferLiquidTempC / Lf
+servingIceMeltedG = min(SI, servingIceMeltCapacityG)
+servingIceRemainingG = SI - servingIceMeltedG
+finalLiquidG = transferLiquidG + servingIceMeltedG
+estimatedOccupiedVolumeMl = finalLiquidG + servingIceRemainingG / ρice
 estimatedHeadspaceMl = Cup - estimatedOccupiedVolumeMl
 ```
 
-얼음이 전부 녹을 때만 남은 에너지로 최종 액체 온도를 계산합니다.
-
-```text
-finalLiquidTempC = (B × c × Td - (BI + SI) × Lf) / (c × (B + BI + SI))
-```
+Serving ice가 전부 녹을 때만 남은 에너지로 최종 액체 온도를 계산합니다. Brew ice가 카라페에 고체로 남으면 음용 컵의 점유 부피와 잔존 얼음에서 제외합니다. 실제로 조각이 함께 따라 들어갔다면 brew log에 별도로 기록합니다.
 
 판정:
 
-- `ice_goal: remain_while_drinking`인 brew-ready Flash recipe는 `drop_temp_c`와 `drop_temp_c + 5°C`에서 모두 10g 이상 남아야 합니다.
+- `ice_goal: remain_while_drinking`인 brew-ready Flash recipe는 `drop_temp_c`와 `drop_temp_c + 5°C`에서 **음용 컵의 Serving ice**가 모두 10g 이상 남아야 합니다.
+- Ruleset v5 recipe는 컵별 서비스 경험을 나타내는 `minimum_serving_ice_g`를 기록하고, 실제 Serving ice 투입량이 이 값 이상이어야 합니다. 이 값은 보편적 과학 상수가 아니라 `PROFILE.md`의 개인 컵 기준입니다.
 - 두 조건에서 고체 얼음 부피를 포함한 headspace가 `minimum_headspace_ml` 이상이어야 합니다.
 - 얼음이 남는 계산 결과의 온도는 약 0°C이며, 실제 서빙 온도는 비평형 이송·용기·공기·냉동고 온도 때문에 달라질 수 있습니다.
 
@@ -226,6 +238,7 @@ finalLiquidTempC = (B × c × Td - (BI + SI) × Lf) / (c × (B + BI + SI))
 - 실제 dose와 machine-assumed dose가 10% 이상 다르면 눈에 띄게 표시했는가
 - 컵 headspace가 목표 이상인가
 - 아이스 목표인데 열수지상 얼음이 남을 가능성이 있는가
+- 총 얼음이 아니라 음용 컵의 Serving ice 투입량과 잔존량이 개인 컵 기준을 만족하는가
 - nominal ratio나 interval의 현재 UI 한계를 오래된 게시물만으로 단정하지 않았는가
 
 ### 5.0 Aiden 물양 선택 간격

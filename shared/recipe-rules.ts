@@ -1,7 +1,7 @@
 import { AIDEN_QUANTITY_MODES, validateAidenWaterSelection } from "./aiden-water";
 
 export const RECIPE_RULES = {
-  version: 4,
+  version: 5,
   ui: {
     quantityModes: AIDEN_QUANTITY_MODES,
     serveModes: {

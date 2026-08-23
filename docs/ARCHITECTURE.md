@@ -26,6 +26,8 @@ Browser
 
 원두에 공통인 `story`는 bean Markdown에, version마다 달라지는 `drink_guide`는 recipe Markdown에 씁니다. Catalog builder가 둘을 `drinkGuide` 하나로 합칩니다. 브라우저의 **추출 레시피 / 드링크 가이드**는 같은 원본을 두 방식으로 읽는 화면이며 별도의 글을 저장하지 않습니다.
 
+공개 상세 화면은 `/recipes/<recipe-id>/brew`와 `/recipes/<recipe-id>/guide`를 canonical route로 사용합니다. 주소에는 선택한 정확한 version id가 들어가므로 이전 version 링크도 같은 화면을 복원합니다. Firestore document id에는 owner prefix가 붙지만 브라우저는 projection의 `localId`를 Markdown recipe id로 정규화해 정적 catalog와 같은 URL을 유지합니다. React가 History API의 `pushState`와 `popstate`를 처리하고, Firebase Hosting의 SPA rewrite가 새로고침과 외부 공유 deep link를 `index.html`로 연결합니다.
+
 화면의 타이포그래피·breakpoint·상세 정보 순서·Drink Guide reader 규칙은 [UI-GUIDELINES.md](UI-GUIDELINES.md)에 둡니다.
 
 각 Markdown version은 별도 문서로 보존하지만 UI 목록은 `lineage`로 그룹화합니다. 가장 높은 version이 lineage head가 되어 한 카드만 표시되고, `revision` projection으로 이전 version의 parent·변경 이유·변경값·성공 기준을 펼쳐봅니다. Firestore projection이 현재 version schema보다 오래되면 정적 Markdown catalog가 우선합니다.

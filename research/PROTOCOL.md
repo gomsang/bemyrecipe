@@ -104,6 +104,7 @@ Roaster/barista의 공개 Aiden profile을 참고하면 소개 페이지와 실�
 - 품종명의 기원과 역사, `Heirloom`처럼 넓은 유통 표기가 실제로 뜻하는 범위
 - 봉투의 tasting note를 향·맛·질감으로 번역하고, 닮았지만 불쾌할 수 있는 감각과 구분하는 독자용 언어
 - kebele, agroforestry, parchment처럼 본문 이해를 막는 낯선 용어의 짧은 설명
+- 검증 과정은 Dossier에 남기되 손님용 본문에는 `사용자가 확인`, `봉투에서 직접 확인`, `exact-lot 사실로 사용하지 않음` 같은 제작 문구를 노출하지 않기. 사실은 자연스럽게 서술하고 범위의 경계는 편집 노트와 출처에 정리
 
 Dossier와 bean story에는 source scope를 `exact lot`, `station context`, `regional context`, `variety context`, `brew context`로 남깁니다. 길이만 늘리지 않습니다. 실제로 새로 알게 되는 지식이 있고, 사실과 넓은 맥락의 경계가 보이며, 장소에서 잔까지 흐름이 이어져야 합니다.
 

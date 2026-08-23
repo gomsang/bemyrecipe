@@ -21,12 +21,12 @@ story:
     - id: place
       eyebrow: "PLACE · LOT FACT"
       title: "확인된 장소"
-      body: "직접 확인된 사실과 적용 범위를 구분한 본문"
+      body: "손님이 자연스럽게 읽을 수 있는 사실과 이야기"
       evidence: exact_lot
   facts:
     - label: "ALTITUDE"
       value: "1,800–2,100m"
-      note: "봉투 표기"
+      note: "고지대 재배"
   process_journey:
     - step: "01"
       title: "체리 선별"
@@ -42,7 +42,7 @@ story:
   unknowns:
     - "개별 생산자와 세부 cultivar"
   sources:
-    - label: "사용자 제공 원두 봉투"
+    - label: "로스터 원두 정보"
       url: null
       scope: "EXACT LOT"
       note: "지역, 고도, 가공, roast"
@@ -119,7 +119,7 @@ revision:
 ## Ruleset과 통제조건
 
 ```yaml
-ruleset_version: 4
+ruleset_version: 5
 control_conditions:
   aiden_quantity_mode: metric_precise
   basket: single_serve
@@ -164,7 +164,14 @@ brew_method: flash     # standard | flash | cold_drip
 
 `iced`는 Aiden의 Cold Brew 스위치를 뜻하지 않습니다. Flash brew는 `serve_mode: iced`, `brew_method: flash`, `cold_brew_enabled: false`입니다.
 
-Flash recipe는 `retention_factor`, `drop_temp_c`, `target_temp_c`와 함께 컵별 최소 여유인 `minimum_headspace_ml`을 기록합니다. Validator는 0°C 상변화 모델로 `drop_temp_c`와 5°C 높은 stress 조건을 계산합니다. `ice_goal: remain_while_drinking`이면 두 조건 모두 잔존 얼음 10g 이상이어야 하고, 고체 얼음의 부피까지 포함한 headspace가 `minimum_headspace_ml` 이상이어야 합니다.
+Flash recipe는 `retention_factor`, `drop_temp_c`, `target_temp_c`와 함께 컵별 최소 여유인 `minimum_headspace_ml`을 기록합니다. Ruleset v5부터는 음용 컵에 처음 넣을 얼음의 개인 기준인 `minimum_serving_ice_g`도 필수입니다.
+
+```yaml
+minimum_headspace_ml: 30
+minimum_serving_ice_g: 150
+```
+
+Validator는 카라페의 Brew ice를 먼저 계산하고, 그 결과로 나온 액체만 음용 컵의 Serving ice 위에 옮기는 2단계 0°C 상변화 모델을 사용합니다. 카라페에 고체로 남은 Brew ice는 음용 컵의 얼음으로 세지 않습니다. `ice_goal: remain_while_drinking`이면 `drop_temp_c`와 5°C 높은 stress 조건에서 음용 컵의 Serving ice가 각각 10g 이상 남아야 합니다. Serving ice 투입량은 `minimum_serving_ice_g` 이상, 고체 Serving ice 부피를 포함한 headspace는 `minimum_headspace_ml` 이상이어야 합니다.
 
 ## Aiden 물양 선택 모드
 
@@ -234,6 +241,8 @@ ice_plan:
 ### Serving ice
 
 추출이 끝난 뒤 음용 컵에 새로 넣는 얼음입니다. 카라페의 음료를 옮기기 직전에 넣습니다. 마시는 동안 낮은 온도를 유지하고 얼음이 남게 하는 역할입니다.
+
+총 얼음량만으로 Serving ice의 충분함을 판단하지 않습니다. 같은 230g이라도 `Brew 150g + Serving 80g`과 `Brew 80g + Serving 150g`은 장시간 희석 상한은 같을 수 있지만, 이송 온도와 손님이 처음 받는 얼음 채움은 다릅니다. `minimum_serving_ice_g`는 이 서비스 차이를 보존합니다.
 
 `split`은 두 얼음을 모두 쓰는 방식입니다. 500ml 텀블러처럼 오래 차갑게 마실 때 기본 후보가 됩니다. HOT 레시피는 `strategy: none`이고 두 `grams`가 모두 0이어야 합니다.
 

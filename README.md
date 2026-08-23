@@ -2,7 +2,7 @@
 
 대화로 만든 Fellow Aiden 레시피를 Markdown에 남기고, 웹에서 읽고, 내 Aiden으로 보내는 작은 개인 도구입니다.
 
-사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `C.`, `A.` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
+사이트는 로그인 없이 Accepted와 Candidates 레시피를 열람할 수 있습니다. 각 상세 화면은 실행용 **추출 레시피**와 산지에서 잔까지 이어지는 **드링크 가이드**를 나눠 보여 줍니다. 선택한 version과 화면은 `/recipes/<id>/brew`, `/recipes/<id>/guide` 주소에 남아 링크를 받은 사람도 같은 내용을 바로 열 수 있습니다. 로그인하면 자신의 Fellow 계정을 연결하고 Aiden 프로필을 조회·수정하며, 로컬 Codex 동기화용 토큰을 발급할 수 있습니다. 레시피 상세 화면에서는 검증된 Candidate와 Accepted를 바로 Aiden에 저장할 수 있고, 각각 `C.`, `A.` 접두사로 구분합니다. 로컬에서 레시피를 `Accepted`로 바꾼 뒤 동기화하면 해당 프로필을 Aiden에 자동 등록합니다.
 
 > Fellow는 공개 Aiden API를 제공하지 않습니다. 이 프로젝트의 기기 연결은 앱이 사용하는 비공식 엔드포인트를 직접 호출하며, Fellow의 변경으로 동작이 중단될 수 있습니다. 다른 Fellow 라이브러리를 런타임 의존성으로 설치하지 않습니다.
 
@@ -33,7 +33,7 @@ Codex는 `AGENTS.md`의 intake와 research gate를 거친 뒤 Candidate를 만�
 
 독자에게 보이는 한국어를 다듬을 때는 선택적으로 [`humanize-korean`](https://github.com/epoko77-ai/im-not-ai) Codex skill을 쓸 수 있습니다. Codex CLI 0.121.0 이상에서 설치한 뒤 `$humanize-korean`으로 실행합니다. 이 저장소의 `AGENTS.md`는 skill이 있을 때 레시피와 드링크 가이드의 문체 점검에 사용하되, 수치·인용·출처 범위는 건드리지 않도록 정해 둡니다.
 
-새 Candidate에는 드링크 가이드가 함께 붙습니다. 단순한 레시피 해설이 아니라, 커피를 마시는 사람이 산지와 품종의 역사, 가공 과정, 로스팅, 봉투의 향미 표현을 읽을 수 있는 짧은 매거진에 가깝습니다. 추출자를 위한 내용은 `WHY THIS BREW`에만 둡니다. `beans/*.md`가 공통 사실과 출처를, `recipes/*.md`가 이 버전의 추출 의도와 마시는 흐름을 맡습니다. 같은 이름의 다른 crop은 참고 맥락으로만 쓰며, 확인되지 않은 농장이나 발효 이야기를 채워 넣지 않습니다.
+새 Candidate에는 드링크 가이드가 함께 붙습니다. 단순한 레시피 해설이 아니라, 커피를 마시는 사람이 산지와 품종의 역사, 가공 과정, 로스팅, 향미 표현을 읽을 수 있는 짧은 매거진에 가깝습니다. 카페에서 커피와 함께 건네도 자연스럽도록 조사 과정이나 내부 검증 문구는 본문에서 빼고, 공개되지 않은 정보는 끝의 편집 노트에 정직하게 남깁니다. 추출자를 위한 내용은 `WHY THIS BREW`에만 둡니다. `beans/*.md`가 공통 사실과 출처를, `recipes/*.md`가 이 버전의 추출 의도와 마시는 흐름을 맡습니다. 같은 이름의 다른 crop은 참고 맥락으로만 쓰며, 확인되지 않은 농장이나 발효 이야기를 채워 넣지 않습니다.
 
 채택은 명시적으로 말해야 합니다.
 
@@ -80,7 +80,7 @@ Validator는 빠진 version, 중복 version, 잘못된 parent, 같은 lineage의
 
 Aiden 물양은 단위 모드에 따라 간격이 달라집니다. 기본 cup/half-cup 모드는 75ml씩 움직이고, `Settings → Units → Precise Units`를 켜면 Single Serve에서 10ml 단위 선택이 가능합니다. 레시피는 `aiden_quantity_mode`를 기록하고, 사이트의 **AIDEN WATER SELECTOR**에서 필요한 모드와 정확한 물양을 함께 보여 줍니다. Validator와 서버가 이 조합을 둘 다 검사합니다.
 
-Flash recipe는 낙하 온도를 5°C 높인 조건도 함께 검사합니다. 얼음이 남아 있는 평형은 약 0°C라는 상변화 원칙을 적용하고, 고체 얼음의 부피까지 headspace에 포함합니다. `remain_while_drinking` 목표라면 두 조건 모두 얼음 10g 이상과 컵별 최소 여유를 통과해야 합니다.
+Flash recipe는 낙하 온도를 5°C 높인 조건도 함께 검사합니다. 카라페의 Brew ice와 음용 컵의 Serving ice를 실행 순서대로 계산하고, 카라페에 고체로 남은 얼음을 손님 잔의 얼음으로 세지 않습니다. `remain_while_drinking` 목표라면 두 조건 모두 음용 컵의 Serving ice 10g 이상, 컵별 최소 Serving ice 투입량과 headspace를 통과해야 합니다.
 
 ## Ruleset
 
@@ -154,6 +154,7 @@ npm run deploy:public
 npm run catalog:validate
 npm run rules:test
 npm run thermal:test
+npm run routes:test
 npm run profiles:test
 npm run build
 npm audit --omit=dev
@@ -166,7 +167,8 @@ npm --prefix functions audit --omit=dev
 - pulse 개수와 온도 배열 길이
 - HOT 레시피의 얼음 0g 규칙
 - ICED 레시피의 ice plan과 preparation step
-- Flash 레시피의 0°C 상변화 열수지, +5°C stress와 고체 얼음 부피 headspace
+- Flash 레시피의 2단계 0°C 상변화 열수지, 컵별 Serving ice 투입·잔존량, +5°C stress와 고체 얼음 부피 headspace
+- Recipe/Drink Guide 공유 URL의 생성·해석
 - `brew_ready: true` 레시피의 실행 순서 존재 여부
 - bean story의 장소·지역·사람·품종·고도·가공·로스팅, 가공 단계, 감각어, 작은 사전과 출처 범위
 - recipe Drink Guide의 추출 의도·핵심 선택·serving ritual·taste journey

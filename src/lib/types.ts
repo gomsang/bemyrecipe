@@ -100,6 +100,18 @@ export type BrewSettings = {
   retentionFactor: number;
   dropTempC: number;
   minHeadspaceMl: number;
+  minServingIceG: number;
+  flashThermal: {
+    base: FlashThermalProjection;
+    stress: FlashThermalProjection;
+  } | null;
+};
+
+export type FlashThermalProjection = {
+  transferLiquidTempC: number;
+  brewIceRemainingInCarafeG: number;
+  servingIceRemainingG: number;
+  estimatedHeadspaceMl: number;
 };
 
 export type PrepStep = {

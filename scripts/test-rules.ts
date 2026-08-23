@@ -3,7 +3,7 @@ import { validateAidenWaterSelection as validateServerWater } from "../functions
 import { evaluateRecipeRules, type RecipeRuleInput } from "../shared/recipe-rules";
 
 const base: RecipeRuleInput = {
-  recipeRulesetVersion: 4,
+  recipeRulesetVersion: 5,
   serveMode: "iced",
   brewMethod: "flash",
   brewReady: true,
@@ -95,7 +95,7 @@ const requestedExtension = evaluateRecipeRules({
 assert.equal(requestedExtension.proposals[0]?.rationale, "표면적이 희석 속도를 반복적으로 설명함");
 assert.deepEqual(requestedExtension.proposals[0]?.suggestedChanges, ["ICE PLAN UI에 형태 표시"]);
 
-const futureRuleset = evaluateRecipeRules({ ...base, recipeRulesetVersion: 5 });
+const futureRuleset = evaluateRecipeRules({ ...base, recipeRulesetVersion: 6 });
 assert.equal(futureRuleset.status, "review");
 assert(futureRuleset.proposals.some((item) => item.condition === "ruleset_version"));
 

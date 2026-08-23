@@ -12,7 +12,7 @@ import { FellowClient } from "./fellow-client.js";
 initializeApp();
 const db = getFirestore();
 const REGION = "asia-northeast3";
-const SUPPORTED_RECIPE_RULESET_VERSION = 4;
+const SUPPORTED_RECIPE_RULESET_VERSION = 5;
 const credentialKey = defineSecret("CREDENTIAL_ENCRYPTION_KEY");
 const tokenPepper = defineSecret("TOKEN_PEPPER");
 
@@ -358,26 +358,39 @@ function validateCatalogFlashThermal(recipe: Record<string, unknown>) {
   const selectedWaterG = Number(brew.brewWaterG);
   const doseG = Number(brew.doseG);
   const retentionFactor = Number(brew.retentionFactor);
-  const totalIceG = Number(brew.brewIceG) + Number(brew.servingIceG);
+  const brewIceG = Number(brew.brewIceG);
+  const servingIceG = Number(brew.servingIceG);
+  const totalIceG = brewIceG + servingIceG;
   const dropTempC = Number(brew.dropTempC);
   const cupCapacityMl = Number(brew.cupCapacityMl);
   const minHeadspaceMl = Number(brew.minHeadspaceMl);
+  const minServingIceG = Number(brew.minServingIceG ?? 0);
   if (![selectedWaterG, doseG, retentionFactor, totalIceG, dropTempC, cupCapacityMl, minHeadspaceMl].every(Number.isFinite)
     || selectedWaterG <= 0 || doseG <= 0 || retentionFactor <= 0 || totalIceG < 0 || dropTempC <= 0 || cupCapacityMl <= 0 || minHeadspaceMl < 0) {
     throw new Error(`Flash 열수지 입력이 올바르지 않습니다: ${localId}`);
   }
   const evaluate = (temperatureC: number) => {
     const hotBeverageG = Math.max(0, selectedWaterG - doseG * retentionFactor);
-    const meltCapacityG = hotBeverageG * 4.186 * temperatureC / 333.55;
-    const meltedIceG = Math.min(totalIceG, meltCapacityG);
-    const remainingIceG = Math.max(0, totalIceG - meltedIceG);
-    const occupiedVolumeMl = hotBeverageG + meltedIceG + remainingIceG / 0.917;
-    return { remainingIceG, headspaceMl: cupCapacityMl - occupiedVolumeMl };
+    const initialHeatJ = hotBeverageG * 4.186 * temperatureC;
+    const meltedBrewIceG = Math.min(brewIceG, initialHeatJ / 333.55);
+    const transferLiquidG = hotBeverageG + meltedBrewIceG;
+    const heatAfterBrewIceJ = Math.max(0, initialHeatJ - meltedBrewIceG * 333.55);
+    const transferTempC = brewIceG - meltedBrewIceG > 0 || transferLiquidG <= 0
+      ? 0
+      : heatAfterBrewIceJ / (4.186 * transferLiquidG);
+    const servingMeltCapacityG = transferLiquidG * 4.186 * transferTempC / 333.55;
+    const meltedServingIceG = Math.min(servingIceG, servingMeltCapacityG);
+    const servingIceRemainingG = Math.max(0, servingIceG - meltedServingIceG);
+    const occupiedVolumeMl = transferLiquidG + meltedServingIceG + servingIceRemainingG / 0.917;
+    return { servingIceRemainingG, headspaceMl: cupCapacityMl - occupiedVolumeMl };
   };
   const base = evaluate(dropTempC);
   const stress = evaluate(dropTempC + 5);
-  if (conditions?.ice_goal === "remain_while_drinking" && (base.remainingIceG < 10 || stress.remainingIceG < 10)) {
-    throw new Error(`Flash 잔존 얼음이 보수 기준을 통과하지 못했습니다: ${localId}`);
+  if (conditions?.ice_goal === "remain_while_drinking" && (base.servingIceRemainingG < 10 || stress.servingIceRemainingG < 10)) {
+    throw new Error(`Flash serving ice 잔존량이 보수 기준을 통과하지 못했습니다: ${localId}`);
+  }
+  if (Number(recipe.rulesetVersion) >= 5 && (!Number.isFinite(minServingIceG) || minServingIceG <= 0 || servingIceG < minServingIceG)) {
+    throw new Error(`Flash serving ice 최소 투입량을 통과하지 못했습니다: ${localId}`);
   }
   if (base.headspaceMl < minHeadspaceMl || stress.headspaceMl < minHeadspaceMl) {
     throw new Error(`Flash headspace가 minimum_headspace_ml을 통과하지 못했습니다: ${localId}`);
