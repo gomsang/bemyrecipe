@@ -1,5 +1,9 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { buildCatalog } from "./catalog-lib";
+
+// Keep explicit shell/CI variables authoritative, then fill missing local values
+// from the ignored developer file documented in README.md.
+config({ path: ".env.local", override: false, quiet: true });
 
 const endpoint = process.env.CATALOG_SYNC_URL;
 const token = process.env.CATALOG_SYNC_TOKEN;

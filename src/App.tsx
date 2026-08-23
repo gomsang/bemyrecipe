@@ -192,7 +192,13 @@ function App() {
         />
       ) : null}
       {authReady && user && view === "aiden" ? (
-        <AidenView dashboard={dashboard} loading={dashboardLoading} onRefresh={refreshDashboard} recipes={recipes} />
+        <AidenView
+          dashboard={dashboard}
+          loading={dashboardLoading}
+          onRefresh={refreshDashboard}
+          onConnected={(aiden) => setDashboard((current) => ({ ...current, aiden, profiles: [] }))}
+          recipes={recipes}
+        />
       ) : null}
       {authReady && user && view === "manage" ? (
         <ConsoleView user={user} dashboard={dashboard} loading={dashboardLoading} onRefresh={refreshDashboard} />
@@ -420,7 +426,13 @@ function PhaseRow({ number, name, detail, temp }: { number: string; name: string
   return <div className="phase-row"><span className="phase-number">{number}</span><div><strong>{name}</strong><small>{detail}</small></div><span className="phase-temp">{temp}°</span></div>;
 }
 
-function AidenView({ dashboard, loading, onRefresh, recipes }: { dashboard: Dashboard; loading: boolean; onRefresh: () => void; recipes: CatalogRecipe[] }) {
+function AidenView({ dashboard, loading, onRefresh, onConnected, recipes }: {
+  dashboard: Dashboard;
+  loading: boolean;
+  onRefresh: () => void;
+  onConnected: (aiden: Dashboard["aiden"]) => void;
+  recipes: CatalogRecipe[];
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -432,11 +444,14 @@ function AidenView({ dashboard, loading, onRefresh, recipes }: { dashboard: Dash
     setSaving(true);
     setMessage("");
     try {
-      await callServer("saveAidenCredentials", { email: email.trim(), password });
+      const result = await callServer<
+        { email: string; password: string },
+        { connected: true; aiden: Dashboard["aiden"] }
+      >("saveAidenCredentials", { email: email.trim(), password });
       setPassword("");
       setMessage("Aiden 연결을 확인하고 암호화해 저장했습니다.");
       setReconnecting(false);
-      onRefresh();
+      onConnected(result.aiden);
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "저장할 수 없습니다.");
     } finally {

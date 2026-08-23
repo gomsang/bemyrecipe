@@ -1,7 +1,9 @@
 import type { FellowProfilePayload } from "./aiden-profile.js";
 
 const API_ROOT = "https://l8qtmnc692.execute-api.us-west-2.amazonaws.com/v1";
-const CLIENT_AGENT = "BeMyRecipe/1.0";
+// Fellow's private Aiden API currently expects the mobile-client request shape.
+// Keep this in our own client rather than depending on a third-party package.
+const CLIENT_AGENT = "Fellow/5 CFNetwork/1568.300.101 Darwin/24.2.0";
 const TASTABLE_KEYS: (keyof FellowProfilePayload)[] = [
   "title", "ratio", "bloomEnabled", "bloomRatio", "bloomDuration", "bloomTemperature",
   "ssPulsesEnabled", "ssPulsesNumber", "ssPulsesInterval", "ssPulseTemperatures",
@@ -77,6 +79,7 @@ export class FellowClient {
 
   private async request<T = unknown>(pathname: string, init: RequestInit = {}, authenticated = true): Promise<T> {
     const headers = new Headers(init.headers);
+    headers.set("accept", "application/json");
     headers.set("content-type", "application/json");
     headers.set("user-agent", CLIENT_AGENT);
     if (authenticated) headers.set("authorization", `Bearer ${this.accessToken}`);

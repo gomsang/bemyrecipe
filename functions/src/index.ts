@@ -76,7 +76,19 @@ export const saveAidenCredentials = onCall(
         maskedEmail: maskEmail(email),
         updatedAt: FieldValue.serverTimestamp(),
       });
-      return { connected: true, devices: devices.length };
+      return {
+        connected: true,
+        aiden: {
+          configured: true,
+          maskedEmail: maskEmail(email),
+          devices: devices.map((device) => ({
+            id: String(device.id ?? ""),
+            name: String(device.displayName ?? "Aiden"),
+            firmware: device.firmwareVersion ? String(device.firmwareVersion) : undefined,
+          })),
+          connectionError: null,
+        },
+      };
     } catch (reason) {
       throw new HttpsError("failed-precondition", safeMessage(reason));
     }
