@@ -11,6 +11,7 @@ import { FellowClient } from "./fellow-client.js";
 initializeApp();
 const db = getFirestore();
 const REGION = "asia-northeast3";
+const SUPPORTED_RECIPE_RULESET_VERSION = 1;
 const credentialKey = defineSecret("CREDENTIAL_ENCRYPTION_KEY");
 const tokenPepper = defineSecret("TOKEN_PEPPER");
 
@@ -245,6 +246,13 @@ export const syncCatalog = onRequest(
         const localId = String(recipe.id ?? "");
         if (!/^[a-z0-9][a-z0-9-]{0,119}$/.test(localId)) throw new Error(`Recipe id가 올바르지 않습니다: ${localId}`);
         validateProfile(recipe.profile);
+        const ruleEvaluation = recipe.ruleEvaluation as { rulesetVersion?: unknown; status?: unknown; errors?: unknown } | undefined;
+        if (Number(ruleEvaluation?.rulesetVersion) !== SUPPORTED_RECIPE_RULESET_VERSION) {
+          throw new Error(`지원하지 않는 recipe ruleset입니다: ${String(ruleEvaluation?.rulesetVersion ?? "missing")}`);
+        }
+        if (ruleEvaluation?.status === "blocked" || !Array.isArray(ruleEvaluation?.errors) || ruleEvaluation.errors.length > 0) {
+          throw new Error(`Recipe hard rule validation을 통과하지 못했습니다: ${localId}`);
+        }
         const documentId = `${publicOwnerKey(principal.uid)}__${localId}`;
         incomingIds.add(documentId);
         validated.push({ documentId, recipe, profile: recipe.profile });

@@ -12,14 +12,15 @@ Read these files before recipe work:
 2. `HARNESS.md` — calculations, validation, tasting logic, and revision rules
 3. `INTAKE.md` — required questions and the clarification gate
 4. `research/PROTOCOL.md` — mandatory web-research coverage and synthesis rules
-5. `INDEX.md` — active beans, recipes, and brew status
-6. The relevant file under `beans/` and its bean-specific Research Dossier
-7. Similar recipes, searching `recipes/accepted/` first and `recipes/candidates/` second
-8. The latest relevant recipe and its linked files under `logs/`
+5. `shared/recipe-rules.ts` and `docs/RULE-GOVERNANCE.md` — current ruleset, UI copy, hard/advisory boundaries, and extension policy
+6. `INDEX.md` — active beans, recipes, and brew status
+7. The relevant file under `beans/` and its bean-specific Research Dossier
+8. Similar recipes, searching `recipes/accepted/` first and `recipes/candidates/` second
+9. The latest relevant recipe and its linked files under `logs/`
 
 Markdown files are the database. Update them as part of the requested work; do not merely print a recipe in chat and leave the repository stale.
 
-Every recipe must declare `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
+Every recipe must declare `ruleset_version`, `control_conditions`, `rule_exceptions`, `rule_extension_requests`, `serve_mode`, `brew_method`, `filter_rinse`, `ice_plan`, and ordered `prep_steps`. Follow `docs/RECIPE-SCHEMA.md`. HOT and ICED are execution modes, not display-only tags.
 
 ## Chat workflow
 
@@ -32,13 +33,15 @@ When the user provides a bean and serving goal:
 3. Research current Aiden behavior, Ode Gen 2 Stock Burr behavior, relevant coffee science, independent expert/barista guidance, multiple Aiden community reports, and the exact bean/lot or the closest defensible origin/process evidence.
 4. Search existing recipes for similar cases. Prefer accepted recipes, but treat them as evidence only—not templates to copy blindly.
 5. In the dossier, separate verified evidence, inference, and testable hypothesis. Record source conflicts and why one direction is more applicable to this dose, basket, roast, water, cup, and drink style.
-6. Create or update one bean file from `beans/_template.md`.
-7. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate` and `brew_ready: true`.
-8. Run every calculation and validation in `HARNESS.md`.
-9. Update `INDEX.md`.
-10. Run `npm run catalog:validate` and `npm run catalog:build`.
-11. If `CATALOG_SYNC_URL` and `CATALOG_SYNC_TOKEN` are available locally, run `npm run catalog:sync`.
-12. Reply with a compact Markdown brew card: preparation, exact Aiden inputs, Harness calculations, evidence-to-setting rationale, uncertainty, and what to observe.
+6. Compare the recipe's control conditions with the current ruleset. Record known conditions under `control_conditions`.
+7. If evidence introduces a condition or allowed value that is absent from the ruleset, preserve it in the recipe and add `rule_extension_requests`. Do not weaken the recipe to fit an old rule.
+8. Create or update one bean file from `beans/_template.md`.
+9. Only when both the intake gate and research gate pass, create recipe version 1 from `recipes/_template.md` under `recipes/candidates/` with `status: candidate` and `brew_ready: true`.
+10. Run every calculation and validation in `HARNESS.md`.
+11. Update `INDEX.md`.
+12. Run `npm run rules:test`, `npm run catalog:validate`, and `npm run catalog:build`.
+13. If `CATALOG_SYNC_URL` and `CATALOG_SYNC_TOKEN` are available locally, run `npm run catalog:sync`.
+14. Reply with a compact Markdown brew card: preparation, exact Aiden inputs, Harness calculations, evidence-to-setting rationale, uncertainty, what to observe, and any ruleset expansion proposal.
 
 If the user explicitly asks for a quick draft before research is sufficient, store it as `brew_ready: false` and label every number provisional. Otherwise, do not generate numeric settings before both gates pass.
 
@@ -102,6 +105,16 @@ Source prestige alone does not make a recipe setting transferable. Always record
 - Use `Evidence`, `Inference`, and `Hypothesis` labels. Never present inference as a machine fact.
 - The target is the most defensible personalized baseline, not a claim of guaranteed global optimum. Actual brew logs outrank generic advice for later revisions.
 
+## Rule governance
+
+- Treat machine input limits, contradictory water/ice balance, and impossible execution order as hard constraints. Hard constraints block `brew_ready` and cannot be bypassed by `rule_exceptions`.
+- Treat new sensory hypotheses, accessories, environmental measurements, and previously unmodeled control conditions as adaptive constraints. They produce `review` and a system-change proposal, not automatic rejection.
+- Never delete or normalize away an unknown control condition merely to make validation pass.
+- Use `rule_exceptions` only for an identified advisory rule. Record the reason, evidence, and the condition that ends the exception.
+- Use `rule_extension_requests` when the better recipe needs a new condition, allowed value, UI element, or evaluator behavior.
+- During ordinary recipe work, propose the system change but do not silently broaden hard machine limits. When the user authorizes the extension, update the central registry, UI behavior, schema documentation, migration notes, and rule tests together; increment `RECIPE_RULES.version` for a material behavior change.
+- A recipe may remain `brew_ready: true` with `review` status when all hard constraints pass and the uncertainty is explicitly recorded. Explain what must be observed before promoting the proposed rule.
+
 ## Non-negotiable reasoning
 
 - Aiden selected water is water delivered to the bed, not beverage yield.
@@ -121,6 +134,7 @@ Source prestige alone does not make a recipe setting transferable. Always record
 - If data is missing, state the assumption instead of inventing precision.
 - Do not commit Firebase, Fellow, or API-token secrets. Do not write them into Markdown, logs, screenshots, or chat responses.
 - Do not guess unsupported Cold Brew private-API mappings. Leave automatic device sync disabled until verified against the current app and echoed device state.
+- Do not let an incomplete ruleset suppress a better evidence-backed recipe. Preserve the recipe, mark the gap, and propose how the system should evolve.
 
 ## Site sync
 

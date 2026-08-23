@@ -22,6 +22,8 @@ HTTP Function:
 
 - `syncCatalog`: `Authorization: Bearer bmr_live_...`가 필요합니다.
 
+`syncCatalog`는 현재 recipe ruleset version과 hard-rule 결과를 다시 확인합니다. `review` recipe는 hard error가 없으면 동기화할 수 있지만, `blocked` 또는 다른 ruleset version은 서버가 거부합니다.
+
 ## 비공식 Fellow 연결
 
 런타임에는 외부 Fellow/Aiden library가 없습니다. `src/fellow-client.ts`가 로그인, device/profile 조회와 profile CRUD에 필요한 호출만 구현합니다. API 변경·rate limit·계정 잠금 위험을 줄이기 위해 짧은 timeout, 제한된 요청 수, 오류문구의 이메일 제거, 저장 뒤 echo 검증을 적용합니다.

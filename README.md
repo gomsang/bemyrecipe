@@ -59,13 +59,24 @@ npm run catalog:sync
 
 필터 린싱, 린스 물 폐기, 얼음 투입, 분쇄·도징, 추출 후 swirl, 이송 순서는 `prep_steps`에 저장됩니다. UI의 **PREPARATION**은 이 값을 그대로 표시합니다. 상세 필드와 HOT/ICED 예시는 [docs/RECIPE-SCHEMA.md](docs/RECIPE-SCHEMA.md)를 참고하십시오.
 
+## Ruleset
+
+`shared/recipe-rules.ts`가 사이트 표시와 Markdown 검증에서 함께 쓰는 중앙 ruleset입니다. HOT/ICED label, brew method 조합, ice role, 린싱 설명, 통제조건과 validation 등급을 한곳에서 관리합니다.
+
+규칙은 두 종류로 나눕니다.
+
+- **Hard constraint**: Aiden 입력 범위, 모순된 얼음 수지, 실행할 수 없는 순서. 빌드를 중단합니다.
+- **Adaptive constraint**: 새 accessory, 환경값, 향미 가설처럼 아직 schema에 없는 조건. 레시피는 보존하고 UI에 Review와 system-change proposal을 표시합니다.
+
+더 나은 레시피가 기존 규칙에 없다는 이유로 버려지지 않습니다. `control_conditions`에 실제 조건을 기록하고 `rule_extension_requests`에 schema·UI·validator·migration·test 변경안을 남깁니다. 운영 방식은 [docs/RULE-GOVERNANCE.md](docs/RULE-GOVERNANCE.md)에 있습니다.
+
 ## 저장소 구조
 
 ```text
 .
 ├── src/                    공개 카탈로그와 로그인 후 관리 UI
 ├── functions/              Firebase Functions와 자체 Fellow HTTP client
-├── shared/                 UI·검증기가 함께 쓰는 Aiden profile 규칙
+├── shared/                 UI·검증기가 함께 쓰는 Aiden profile/recipe ruleset
 ├── scripts/                Markdown 검증, catalog 생성, 원격 동기화
 ├── local/                  Codex 로컬 사용 안내
 ├── recipes/                Candidate / Accepted Markdown 원본
@@ -118,6 +129,7 @@ npm run deploy:public
 
 ```bash
 npm run catalog:validate
+npm run rules:test
 npm run build
 npm audit --omit=dev
 npm --prefix functions audit --omit=dev
@@ -130,6 +142,7 @@ npm --prefix functions audit --omit=dev
 - HOT 레시피의 얼음 0g 규칙
 - ICED 레시피의 ice plan과 preparation step
 - `brew_ready: true` 레시피의 실행 순서 존재 여부
+- 등록되지 않은 새 통제조건의 review와 system-change proposal
 
 ## 라이선스
 

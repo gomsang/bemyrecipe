@@ -1,4 +1,13 @@
 import type { AidenProfile } from "../../shared/aiden-profile";
+import type {
+  BrewMethod,
+  IceStrategy,
+  PrepPhase,
+  RuleEvaluation,
+  RuleException,
+  RuleExtensionRequest,
+  ServeMode,
+} from "../../shared/recipe-rules";
 
 export type RecipeStatus = "accepted" | "candidate" | "rejected" | "superseded";
 
@@ -30,7 +39,7 @@ export type BrewSettings = {
 
 export type PrepStep = {
   id: string;
-  phase: "before_brew" | "after_brew" | "serve" | "hold";
+  phase: PrepPhase;
   label: string;
   instruction: string;
   critical: boolean;
@@ -50,7 +59,7 @@ export type PreparationPlan = {
     discardRinseWater: boolean;
   };
   icePlan: {
-    strategy: "none" | "brew_only" | "serving_only" | "split";
+    strategy: IceStrategy;
     brewIce: IceItem;
     servingIce: IceItem;
   };
@@ -67,13 +76,18 @@ export type CatalogRecipe = {
   created: string;
   acceptedAt: string | null;
   acceptanceNote: string | null;
-  serveMode: "hot" | "iced" | "cold_brew";
-  brewMethod: "standard" | "flash" | "cold_drip";
+  serveMode: ServeMode;
+  brewMethod: BrewMethod;
   bean: CatalogBean;
   profile: AidenProfile;
   brew: BrewSettings;
   preparation: PreparationPlan;
-  validation: { valid: boolean; errors: string[] };
+  rulesetVersion: number | null;
+  controlConditions: Record<string, unknown>;
+  ruleExceptions: RuleException[];
+  ruleExtensionRequests: RuleExtensionRequest[];
+  ruleEvaluation: RuleEvaluation;
+  validation: { valid: boolean; errors: string[]; warnings: string[] };
   sourcePath: string;
   summary: string;
 };

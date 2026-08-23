@@ -14,6 +14,15 @@ acceptance_note: null
 similar_recipes:
   - harfusa-flash-315-v1.md
 created: 2026-08-23
+ruleset_version: 1
+control_conditions:
+  basket: single_serve
+  grinder_burr: ode-gen2-stock
+  water: samdasoo
+  vessel: tumbler-500
+  ice_goal: remain_while_drinking
+rule_exceptions: []
+rule_extension_requests: []
 beverage_style: flash
 serve_mode: iced
 brew_method: flash
@@ -104,6 +113,14 @@ Research/Brew gate: **sufficient-with-gaps / brew_ready: true**
 - 서빙: 500ml tumbler · carafe ice와 fresh serving ice 모두 사용 · 30ml 이상 headspace · 마시는 동안 얼음 잔존
 - 맛: 사용자가 clarity/sweetness 우선순위를 아직 정하지 않았으므로 베르가못의 선명도와 백도의 단맛을 균형 있게 보는 baseline
 - 물: 제주삼다수
+
+## 규칙 평가
+
+- Ruleset: **v1**
+- Hard constraints: **pass** — ICED/FLASH, split ice, rinse-water 폐기, ordered prep가 일치함
+- Advisory review: **없음**
+- Rule exception: **없음**
+- System change proposal: **없음**. 향후 얼음 형태·냉동고 온도처럼 결과를 설명하는 새 통제조건이 생기면 recipe에 보존하고 ruleset/UI 확장을 제안함
 
 ## Research Dossier
 

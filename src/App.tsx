@@ -4,6 +4,8 @@ import {
   ArrowUpRight,
   Check,
   ChevronRight,
+  CircleAlert,
+  CircleCheckBig,
   CircleUserRound,
   Cloud,
   Coffee,
@@ -21,11 +23,18 @@ import {
   SlidersHorizontal,
   Thermometer,
   Trash2,
+  Waypoints,
   Waves,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { AidenProfile } from "../shared/aiden-profile";
+import {
+  getBrewMethodRule,
+  getIceStrategyRule,
+  getServeModeRule,
+  RECIPE_RULES,
+} from "../shared/recipe-rules";
 import { ProfileEditor } from "./components/ProfileEditor";
 import { LoginDialog } from "./components/LoginDialog";
 import { auth, callServer, firebaseConfigured, loadPublicRecipes, logout, type AuthUser } from "./lib/firebase";
@@ -267,7 +276,9 @@ function StatusBadge({ status }: { status: CatalogRecipe["status"] }) {
 }
 
 function ServeModeBadge({ mode }: { mode: CatalogRecipe["serveMode"] }) {
-  return <span className={`serve-mode-badge ${mode}`}>{mode === "iced" ? <Snowflake size={10} /> : <Thermometer size={10} />}{mode.replace("_", " ").toUpperCase()}</span>;
+  const rule = getServeModeRule(mode);
+  const icon = rule?.icon === "snowflake" ? <Snowflake size={10} /> : <Thermometer size={10} />;
+  return <span className={`serve-mode-badge ${mode}`}>{icon}{rule?.label ?? mode.replace("_", " ").toUpperCase()}</span>;
 }
 
 function vesselLabel(value: string) {
@@ -276,9 +287,16 @@ function vesselLabel(value: string) {
 }
 
 function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
+  const serveModeRule = getServeModeRule(recipe.serveMode);
+  const brewMethodRule = getBrewMethodRule(recipe.brewMethod);
+  const iceStrategyRule = getIceStrategyRule(recipe.preparation.icePlan.strategy);
+  const brewIceRule = RECIPE_RULES.ui.iceRoles.brewIce;
+  const servingIceRule = RECIPE_RULES.ui.iceRoles.servingIce;
+  const rinseRule = RECIPE_RULES.ui.filterRinse;
+  const ruleStatus = RECIPE_RULES.ui.ruleStatus[recipe.ruleEvaluation.status];
   return (
     <aside className="recipe-detail">
-      <div className="detail-topline"><span>{recipe.serveMode.toUpperCase()} / {recipe.brewMethod.toUpperCase()}</span><span>V{recipe.version}.0</span></div>
+      <div className="detail-topline"><span>{serveModeRule?.label ?? recipe.serveMode.toUpperCase()} / {brewMethodRule?.label ?? recipe.brewMethod.toUpperCase()}</span><span>V{recipe.version}.0</span></div>
       <div className="detail-badges"><StatusBadge status={recipe.status} /><ServeModeBadge mode={recipe.serveMode} /></div>
       <h2>{recipe.bean.name}</h2>
       <p className="detail-summary">{recipe.summary}</p>
@@ -301,19 +319,19 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
 
       {recipe.serveMode === "iced" ? (
         <section className="ice-program">
-          <div className="detail-section-title"><span>ICE PLAN</span><span>{recipe.preparation.icePlan.strategy.toUpperCase()}</span></div>
+          <div className="detail-section-title"><span>ICE PLAN</span><span>{iceStrategyRule?.label ?? recipe.preparation.icePlan.strategy.toUpperCase()}</span></div>
           <div className="ice-cards">
             <div>
               <span className="ice-icon"><Snowflake size={15} /></span>
-              <small>BREW ICE · {vesselLabel(recipe.preparation.icePlan.brewIce.vessel)} · 추출 전</small>
+              <small>{brewIceRule.label} · {vesselLabel(recipe.preparation.icePlan.brewIce.vessel)} · {brewIceRule.timingLabel}</small>
               <strong>{recipe.preparation.icePlan.brewIce.grams}g</strong>
-              <p>카라페에서 뜨거운 추출액을 즉시 식히고 최종 농도를 만듭니다. 녹는 것이 정상입니다.</p>
+              <p>{brewIceRule.description}</p>
             </div>
             <div>
               <span className="ice-icon"><Snowflake size={15} /></span>
-              <small>SERVING ICE · {vesselLabel(recipe.preparation.icePlan.servingIce.vessel)} · 이송 직전</small>
+              <small>{servingIceRule.label} · {vesselLabel(recipe.preparation.icePlan.servingIce.vessel)} · {servingIceRule.timingLabel}</small>
               <strong>{recipe.preparation.icePlan.servingIce.grams}g</strong>
-              <p>음용 컵에 새로 넣어 마시는 동안 차가움과 남은 얼음을 유지합니다.</p>
+              <p>{servingIceRule.description}</p>
             </div>
           </div>
         </section>
@@ -323,10 +341,10 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
         <div className="detail-section-title"><span>PREPARATION</span><span>{recipe.preparation.steps.length} STEPS</span></div>
         <div className="rinse-note">
           <span>FILTER RINSE</span>
-          <strong>{recipe.preparation.filterRinse.enabled ? "HOT WATER / DISCARD" : "NO RINSE"}</strong>
+          <strong>{recipe.preparation.filterRinse.enabled ? rinseRule.enabledLabel : rinseRule.disabledLabel}</strong>
           <p>{recipe.preparation.filterRinse.enabled
-            ? "Paper filter를 적신 뒤 카라페의 린스 물을 완전히 버립니다. 그 다음 Brew ice를 넣어야 계산한 농도가 유지됩니다."
-            : "이 레시피는 필터 린싱을 하지 않습니다. 준비 과정에서 별도의 물을 더하지 않습니다."}</p>
+            ? rinseRule.enabledDescription
+            : rinseRule.disabledDescription}</p>
         </div>
         {recipe.preparation.steps.map((step, index) => (
           <div className="prep-row" key={step.id}>
@@ -342,9 +360,35 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
         <div><span>SERVING ICE</span><strong>{recipe.brew.servingIceG}g</strong></div>
         <div><span>CUP</span><strong>{recipe.brew.cupCapacityMl}ml</strong></div>
       </section>
+      <section className={`rule-program ${recipe.ruleEvaluation.status}`}>
+        <div className="detail-section-title"><span>CONTROL RULES</span><span>RULESET V{recipe.ruleEvaluation.rulesetVersion}</span></div>
+        <div className="rule-summary">
+          <span>{recipe.ruleEvaluation.status === "pass" ? <CircleCheckBig size={16} /> : <CircleAlert size={16} />}</span>
+          <div><strong>{ruleStatus.label}</strong><p>{ruleStatus.description}</p></div>
+        </div>
+        <div className="condition-grid">
+          {Object.entries(recipe.controlConditions).map(([key, value]) => (
+            <div key={key}><span>{controlConditionLabel(key)}</span><strong>{String(value)}</strong></div>
+          ))}
+        </div>
+        {recipe.ruleEvaluation.warnings.map((warning) => (
+          <div className="rule-message" key={`${warning.ruleId}-${warning.message}`}><CircleAlert size={13} /><span><strong>{warning.ruleId}</strong>{warning.message}</span></div>
+        ))}
+        {recipe.ruleEvaluation.proposals.map((proposal) => (
+          <div className="rule-proposal" key={proposal.id}>
+            <Waypoints size={15} />
+            <div><small>SYSTEM CHANGE PROPOSAL</small><strong>{proposal.title}</strong><p>{proposal.rationale}</p></div>
+          </div>
+        ))}
+      </section>
       <div className="source-line"><ShieldCheck size={15} /><span>{recipe.validation.valid ? "Aiden 입력값 검증 완료" : "입력값 확인 필요"}</span><span>{recipe.created}</span></div>
     </aside>
   );
+}
+
+function controlConditionLabel(key: string) {
+  const definitions = RECIPE_RULES.controlConditions as Record<string, { label: string }>;
+  return definitions[key]?.label ?? key.replaceAll("_", " ").toUpperCase();
 }
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

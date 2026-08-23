@@ -2,6 +2,36 @@
 
 UI와 Aiden 동기화는 레시피 본문을 추측하지 않고 YAML frontmatter만 읽습니다. 사람이 따라 할 설명도 같은 frontmatter의 `prep_steps`로 관리합니다.
 
+## Ruleset과 통제조건
+
+```yaml
+ruleset_version: 1
+control_conditions:
+  basket: single_serve
+  grinder_burr: ode-gen2-stock
+  water: samdasoo
+  vessel: tumbler-500
+  ice_goal: remain_while_drinking
+rule_exceptions: []
+rule_extension_requests: []
+```
+
+`control_conditions`는 계산과 재현성에 영향을 주는 recipe별 조건입니다. 현재 ruleset에 없는 key나 허용값도 삭제하지 않습니다. Validator는 이를 hard error 대신 review로 분류하고 system-change proposal을 만듭니다.
+
+새 조건이 더 나은 레시피에 필요하면 다음처럼 기록합니다.
+
+```yaml
+rule_extension_requests:
+  - condition: ice_shape
+    reason: "표면적 차이가 희석 속도와 잔존 얼음을 설명함"
+    proposed_changes:
+      - "schema에 ice_shape 추가"
+      - "ICE PLAN UI에 형태 표시"
+      - "rule test와 기존 recipe migration 검토"
+```
+
+Hard constraint는 exception으로 우회할 수 없습니다. Advisory를 의도적으로 벗어나는 경우에만 `rule_exceptions`에 `rule_id`, `reason`, `evidence`, `expires_when`을 모두 기록합니다. 자세한 정책은 [RULE-GOVERNANCE.md](RULE-GOVERNANCE.md)를 따릅니다.
+
 ## 음용 방식
 
 ```yaml

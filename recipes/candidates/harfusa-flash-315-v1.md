@@ -13,6 +13,15 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: 2026-08-23
+ruleset_version: 1
+control_conditions:
+  basket: single_serve
+  grinder_burr: ode-gen2-stock
+  water: not-recorded
+  vessel: glass-315
+  ice_goal: remain_while_drinking
+rule_exceptions: []
+rule_extension_requests: []
 beverage_style: flash
 serve_mode: iced
 brew_method: flash
@@ -81,6 +90,14 @@ target_temp_c: 5
   - 사용 물과 roast date는 선택정보지만 첫 log에 기록 권장
 
 이 파일은 기존 예시를 보존한 Candidate입니다. 위 두 decision-critical 질문에 답하기 전에는 추출하거나 Accepted로 승격하지 않습니다. 답변 후 이 파일을 덮어쓰지 않고 v2를 만듭니다.
+
+## 규칙 평가
+
+- Ruleset: **v1**
+- Hard constraints: **pass** — 기록 보존용 profile 값과 ice plan 구조는 유효함
+- Advisory review: **Research Hold** — `brew_ready: false`이므로 실행 레시피로 사용하지 않음
+- Rule exception: **없음**
+- System change proposal: **없음**
 
 ## Research Dossier
 

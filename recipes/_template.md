@@ -13,6 +13,15 @@ accepted_at: null
 acceptance_note: null
 similar_recipes: []
 created: YYYY-MM-DD
+ruleset_version: 1
+control_conditions:
+  basket: single_serve
+  grinder_burr: "grinder-and-burr-id"
+  water: "water-id"
+  vessel: "serving-vessel-id"
+  ice_goal: remain_while_drinking
+rule_exceptions: []
+rule_extension_requests: []
 beverage_style: flash
 serve_mode: iced # hot | iced | cold_brew — docs/RECIPE-SCHEMA.md 참고
 brew_method: flash # standard | flash | cold_drip
@@ -85,6 +94,14 @@ Research/Brew gate: **blocked / brew_ready: false**
 
 - Decision-critical 정보: complete / incomplete
 - 아직 필요한 답:
+
+## 규칙 평가
+
+- Ruleset: v1
+- Hard constraints: pass / blocked
+- Advisory review:
+- 새 통제조건 또는 허용값:
+- System change proposal: 없음 / `rule_extension_requests` 참고
 
 ## Research Dossier
 

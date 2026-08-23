@@ -10,6 +10,7 @@
     "catalog:build": "node --import tsx scripts/build-catalog.ts",
     "catalog:validate": "node --import tsx scripts/validate-recipes.ts",
     "catalog:sync": "node --import tsx scripts/sync-catalog.ts",
+    "rules:test": "node --import tsx scripts/test-rules.ts",
     "deploy": "npm run build && firebase deploy",
     "deploy:public": "npm run build && firebase deploy --only hosting,firestore",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",

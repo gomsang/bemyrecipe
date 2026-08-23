@@ -3,6 +3,11 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { AidenProfile } from "../shared/aiden-profile";
 import { validateAidenProfile } from "../shared/aiden-profile";
+import {
+  evaluateRecipeRules,
+  type RuleException,
+  type RuleExtensionRequest,
+} from "../shared/recipe-rules";
 import type { Catalog, CatalogBean, CatalogRecipe, PreparationPlan, RecipeStatus } from "../src/lib/types";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..");
@@ -92,61 +97,23 @@ function readPreparation(data: Record<string, unknown>): PreparationPlan {
   };
 }
 
-function validatePreparation(data: Record<string, unknown>, plan: PreparationPlan) {
-  const errors: string[] = [];
-  const serveMode = String(data.serve_mode);
-  const brewMethod = String(data.brew_method);
-  if (!["hot", "iced", "cold_brew"].includes(serveMode)) errors.push("serve_mode는 hot, iced, cold_brew 중 하나여야 합니다.");
-  if (!["standard", "flash", "cold_drip"].includes(brewMethod)) errors.push("brew_method는 standard, flash, cold_drip 중 하나여야 합니다.");
-  if (!["hot", "none"].includes(plan.filterRinse.water)) errors.push("filter_rinse.water는 hot 또는 none이어야 합니다.");
-  if (!["none", "brew_only", "serving_only", "split"].includes(plan.icePlan.strategy)) errors.push("ice_plan.strategy 값이 올바르지 않습니다.");
-  if (plan.filterRinse.enabled && (plan.filterRinse.water !== "hot" || !plan.filterRinse.discardRinseWater)) {
-    errors.push("필터를 린싱하면 hot water를 사용하고 rinse water 폐기를 명시해야 합니다.");
-  }
-  if (!plan.filterRinse.enabled && (plan.filterRinse.water !== "none" || plan.filterRinse.discardRinseWater)) {
-    errors.push("필터를 린싱하지 않으면 water는 none, discard_rinse_water는 false여야 합니다.");
-  }
-  const { brewIce, servingIce, strategy } = plan.icePlan;
-  if (!Number.isFinite(brewIce.grams) || !Number.isFinite(servingIce.grams) || brewIce.grams < 0 || servingIce.grams < 0) {
-    errors.push("Ice grams는 0 이상의 유한한 수여야 합니다.");
-  }
-  if (brewIce.timing !== "before_brew" || brewIce.purpose !== "flash_chill") {
-    errors.push("Brew ice는 timing: before_brew, purpose: flash_chill이어야 합니다.");
-  }
-  if (servingIce.timing !== "before_transfer" || servingIce.purpose !== "keep_cold") {
-    errors.push("Serving ice는 timing: before_transfer, purpose: keep_cold이어야 합니다.");
-  }
-  if (!brewIce.vessel.trim() || !servingIce.vessel.trim()) errors.push("각 ice 항목에는 vessel을 명시해야 합니다.");
-  if (strategy === "none" && (brewIce.grams !== 0 || servingIce.grams !== 0)) errors.push("Ice strategy none이면 두 ice grams는 0이어야 합니다.");
-  if (strategy === "brew_only" && !(brewIce.grams > 0 && servingIce.grams === 0)) errors.push("brew_only는 Brew ice만 0g보다 커야 합니다.");
-  if (strategy === "serving_only" && !(brewIce.grams === 0 && servingIce.grams > 0)) errors.push("serving_only는 Serving ice만 0g보다 커야 합니다.");
-  if (strategy === "split" && !(brewIce.grams > 0 && servingIce.grams > 0)) errors.push("split은 Brew ice와 Serving ice가 모두 0g보다 커야 합니다.");
-  if (serveMode === "iced") {
-    if (strategy === "none") errors.push("ICED recipe에는 ice strategy가 필요합니다.");
-  }
-  if (serveMode === "hot" && (strategy !== "none" || brewIce.grams !== 0 || servingIce.grams !== 0)) {
-    errors.push("HOT recipe는 ice strategy none, 두 ice grams 0이어야 합니다.");
-  }
-  if (serveMode === "cold_brew" && brewMethod !== "cold_drip") errors.push("COLD BREW recipe의 brew_method는 cold_drip이어야 합니다.");
-  if (serveMode !== "cold_brew" && brewMethod === "cold_drip") errors.push("cold_drip은 serve_mode: cold_brew에서만 사용할 수 있습니다.");
+function readRuleExceptions(data: Record<string, unknown>): RuleException[] {
+  if (!Array.isArray(data.rule_exceptions)) return [];
+  return data.rule_exceptions.map(record).map((item) => ({
+    ruleId: String(item.rule_id ?? ""),
+    reason: String(item.reason ?? ""),
+    evidence: String(item.evidence ?? ""),
+    expiresWhen: String(item.expires_when ?? ""),
+  }));
+}
 
-  const allowedPhases = new Set(["before_brew", "after_brew", "serve", "hold"]);
-  const seenStepIds = new Set<string>();
-  for (const step of plan.steps) {
-    if (!/^[a-z0-9][a-z0-9_]{1,49}$/.test(step.id)) errors.push(`prep_steps id가 올바르지 않습니다: ${step.id || "(empty)"}`);
-    if (seenStepIds.has(step.id)) errors.push(`prep_steps id가 중복됩니다: ${step.id}`);
-    seenStepIds.add(step.id);
-    if (!allowedPhases.has(step.phase)) errors.push(`prep_steps phase가 올바르지 않습니다: ${step.phase}`);
-    if (!step.label.trim() || !step.instruction.trim()) errors.push(`prep_steps ${step.id || "항목"}의 label과 instruction이 필요합니다.`);
-  }
-  if (Boolean(data.brew_ready)) {
-    if (!plan.steps.length) errors.push("brew_ready recipe에는 prep_steps가 필요합니다.");
-    if (plan.filterRinse.enabled && !seenStepIds.has("rinse_filter")) errors.push("린싱하는 brew-ready recipe에는 rinse_filter step이 필요합니다.");
-    if (brewIce.grams > 0 && !seenStepIds.has("add_brew_ice")) errors.push("Brew ice가 있으면 add_brew_ice step이 필요합니다.");
-    if (servingIce.grams > 0 && !seenStepIds.has("add_serving_ice")) errors.push("Serving ice가 있으면 add_serving_ice step이 필요합니다.");
-    if (plan.steps.some((step) => step.phase === "hold")) errors.push("brew_ready recipe에는 hold step을 둘 수 없습니다.");
-  }
-  return errors;
+function readRuleExtensionRequests(data: Record<string, unknown>): RuleExtensionRequest[] {
+  if (!Array.isArray(data.rule_extension_requests)) return [];
+  return data.rule_extension_requests.map(record).map((item) => ({
+    condition: String(item.condition ?? ""),
+    reason: String(item.reason ?? ""),
+    proposedChanges: Array.isArray(item.proposed_changes) ? item.proposed_changes.map(String) : [],
+  }));
 }
 
 function titleFromMarkdown(content: string, fallback: string): string {
@@ -176,7 +143,24 @@ export function buildCatalog(): Catalog {
     const data = parsed.data as Record<string, unknown>;
     const profile = readProfile(data);
     const preparation = readPreparation(data);
-    const errors = [...validateAidenProfile(profile), ...validatePreparation(data, preparation)];
+    const controlConditions = record(data.control_conditions);
+    const ruleExceptions = readRuleExceptions(data);
+    const ruleExtensionRequests = readRuleExtensionRequests(data);
+    const parsedRulesetVersion = Number(data.ruleset_version);
+    const rulesetVersion = Number.isInteger(parsedRulesetVersion) && parsedRulesetVersion > 0 ? parsedRulesetVersion : null;
+    const ruleEvaluation = evaluateRecipeRules({
+      recipeRulesetVersion: rulesetVersion,
+      serveMode: String(data.serve_mode),
+      brewMethod: String(data.brew_method),
+      brewReady: Boolean(data.brew_ready),
+      coldBrewEnabled: Boolean(data.cold_brew_enabled),
+      preparation,
+      controlConditions,
+      exceptions: ruleExceptions,
+      extensionRequests: ruleExtensionRequests,
+    });
+    const errors = [...validateAidenProfile(profile), ...ruleEvaluation.errors.map((item) => `${item.ruleId}: ${item.message}`)];
+    const warnings = ruleEvaluation.warnings.map((item) => `${item.ruleId}: ${item.message}`);
     const id = path.basename(file, ".md");
     return {
       id,
@@ -204,7 +188,12 @@ export function buildCatalog(): Catalog {
         targetTempC: Number(data.target_temp_c),
       },
       preparation,
-      validation: { valid: errors.length === 0, errors },
+      rulesetVersion,
+      controlConditions,
+      ruleExceptions,
+      ruleExtensionRequests,
+      ruleEvaluation,
+      validation: { valid: errors.length === 0, errors, warnings },
       sourcePath: path.relative(REPO_ROOT, file),
       summary: summaryFromMarkdown(parsed.content),
     };
