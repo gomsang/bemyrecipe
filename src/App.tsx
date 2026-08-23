@@ -30,6 +30,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { AidenProfile } from "../shared/aiden-profile";
 import {
+  evaluateRecipeRules,
   getBrewMethodRule,
   getIceStrategyRule,
   getServeModeRule,
@@ -82,7 +83,7 @@ function App() {
 
   useEffect(() => {
     let active = true;
-    fetch("/catalog.json")
+    fetch("/catalog.json", { cache: "no-store" })
       .then((response) => response.json() as Promise<Catalog>)
       .then((catalog) => {
         if (!active) return;
@@ -93,6 +94,13 @@ function App() {
     loadPublicRecipes()
       .then((liveRecipes) => {
         if (!active || !liveRecipes.length) return;
+        // Markdown is the source of truth. A stale Firestore projection must not
+        // replace the catalog bundled from the current repository ruleset.
+        if (!liveRecipes.every((recipe) => (
+          recipe.rulesetVersion === RECIPE_RULES.version
+          && recipe.ruleEvaluation?.recipeRulesetVersion === RECIPE_RULES.version
+          && Object.keys(recipe.controlConditions ?? {}).length > 0
+        ))) return;
         setRecipes(liveRecipes);
         setSelectedId((current) => current || liveRecipes[0]?.id || "");
       })
@@ -293,7 +301,20 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
   const brewIceRule = RECIPE_RULES.ui.iceRoles.brewIce;
   const servingIceRule = RECIPE_RULES.ui.iceRoles.servingIce;
   const rinseRule = RECIPE_RULES.ui.filterRinse;
-  const ruleStatus = RECIPE_RULES.ui.ruleStatus[recipe.ruleEvaluation.status];
+  // Firestore can briefly contain catalog documents created by an older schema.
+  // Evaluate them in the browser instead of allowing one stale document to break the public catalog.
+  const ruleEvaluation = recipe.ruleEvaluation ?? evaluateRecipeRules({
+    recipeRulesetVersion: recipe.rulesetVersion ?? null,
+    serveMode: recipe.serveMode,
+    brewMethod: recipe.brewMethod,
+    brewReady: recipe.brewReady,
+    coldBrewEnabled: recipe.profile.cold_brew_enabled,
+    preparation: recipe.preparation,
+    controlConditions: recipe.controlConditions ?? {},
+    exceptions: recipe.ruleExceptions ?? [],
+    extensionRequests: recipe.ruleExtensionRequests ?? [],
+  });
+  const ruleStatus = RECIPE_RULES.ui.ruleStatus[ruleEvaluation.status];
   return (
     <aside className="recipe-detail">
       <div className="detail-topline"><span>{serveModeRule?.label ?? recipe.serveMode.toUpperCase()} / {brewMethodRule?.label ?? recipe.brewMethod.toUpperCase()}</span><span>V{recipe.version}.0</span></div>
@@ -360,21 +381,21 @@ function RecipeDetail({ recipe }: { recipe: CatalogRecipe }) {
         <div><span>SERVING ICE</span><strong>{recipe.brew.servingIceG}g</strong></div>
         <div><span>CUP</span><strong>{recipe.brew.cupCapacityMl}ml</strong></div>
       </section>
-      <section className={`rule-program ${recipe.ruleEvaluation.status}`}>
-        <div className="detail-section-title"><span>CONTROL RULES</span><span>RULESET V{recipe.ruleEvaluation.rulesetVersion}</span></div>
+      <section className={`rule-program ${ruleEvaluation.status}`}>
+        <div className="detail-section-title"><span>CONTROL RULES</span><span>RULESET V{ruleEvaluation.rulesetVersion}</span></div>
         <div className="rule-summary">
-          <span>{recipe.ruleEvaluation.status === "pass" ? <CircleCheckBig size={16} /> : <CircleAlert size={16} />}</span>
+          <span>{ruleEvaluation.status === "pass" ? <CircleCheckBig size={16} /> : <CircleAlert size={16} />}</span>
           <div><strong>{ruleStatus.label}</strong><p>{ruleStatus.description}</p></div>
         </div>
         <div className="condition-grid">
-          {Object.entries(recipe.controlConditions).map(([key, value]) => (
+          {Object.entries(recipe.controlConditions ?? {}).map(([key, value]) => (
             <div key={key}><span>{controlConditionLabel(key)}</span><strong>{String(value)}</strong></div>
           ))}
         </div>
-        {recipe.ruleEvaluation.warnings.map((warning) => (
+        {ruleEvaluation.warnings.map((warning) => (
           <div className="rule-message" key={`${warning.ruleId}-${warning.message}`}><CircleAlert size={13} /><span><strong>{warning.ruleId}</strong>{warning.message}</span></div>
         ))}
-        {recipe.ruleEvaluation.proposals.map((proposal) => (
+        {ruleEvaluation.proposals.map((proposal) => (
           <div className="rule-proposal" key={proposal.id}>
             <Waypoints size={15} />
             <div><small>SYSTEM CHANGE PROPOSAL</small><strong>{proposal.title}</strong><p>{proposal.rationale}</p></div>
